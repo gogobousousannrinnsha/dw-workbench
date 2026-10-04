@@ -13,7 +13,6 @@ jobs:
     runs-on: windows-latest
     env:
       PYTHONDONTWRITEBYTECODE: '1'
-      DW_WORKBENCH_TEST_ROOT: ${{ runner.temp }}/dw-workbench-tests
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-python@v7.0.0
@@ -34,6 +33,8 @@ jobs:
       - name: Check installed package metadata
         run: python -c "from importlib.metadata import version, metadata; names=('dw-workbench','docuworks-ctypes','docuworks-integrations'); print({n:version(n) for n in names}); assert all(metadata(n)['License-Expression']=='MIT' for n in names)"
       - name: Run all Workbench synthetic tests, including Tkinter
+        env:
+          DW_WORKBENCH_TEST_ROOT: ${{ runner.temp }}/dw-workbench-tests
         run: python -m pytest -p no:cacheprovider packages/dw-workbench/tests
       - name: Verify the manual publication inputs
         run: python scripts/verify_manual_inputs.py
