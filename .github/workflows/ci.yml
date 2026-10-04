@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install build and test dependencies
-        run: python -m pip install --upgrade pip 'setuptools>=77' wheel pytest openpyxl
+        run: python -m pip install --upgrade pip 'setuptools>=77' wheel pytest openpyxl numpy psutil
       - name: Verify source boundaries and fixed implementation bytes
         run: python scripts/verify_source.py
       - name: Build all fixed companion packages

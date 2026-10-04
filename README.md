@@ -31,7 +31,7 @@ py -3.13 -m venv .venv
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip wheel --no-build-isolation --no-deps --wheel-dir ./dist ./packages/docuworks-ctypes ./packages/docuworks-integrations ./packages/dw-workbench
-.\.venv\Scripts\python.exe -m pip install pytest openpyxl
+.\.venv\Scripts\python.exe -m pip install pytest openpyxl numpy psutil
 .\.venv\Scripts\python.exe scripts/verify_source.py
 .\.venv\Scripts\python.exe -m pytest packages/dw-workbench/tests
 ```
