@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-review-origins"
+    },
+    "schema_version": {
+      "const": "2.0"
+    },
+    "review_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "identity_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "origins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "canonical_manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "region_id": {
+            "type": "string",
+            "pattern": "^p[0-9]{4,}-r[0-9]{6,}$"
+          }
+        },
+        "required": [
+          "run_id",
+          "canonical_manifest_sha256",
+          "region_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "review_id",
+    "identity_sha256",
+    "origins"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "reviewed-origins 2.0"
+}

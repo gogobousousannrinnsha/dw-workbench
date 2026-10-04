@@ -1,0 +1,39 @@
+name: Windows source and package checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workbench:
+    runs-on: windows-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      DW_WORKBENCH_TEST_ROOT: ${{ runner.temp }}/dw-workbench-tests
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.13'
+      - name: Install build and test dependencies
+        run: python -m pip install --upgrade pip 'setuptools>=77' wheel pytest openpyxl
+      - name: Verify source boundaries and fixed implementation bytes
+        run: python scripts/verify_source.py
+      - name: Build all fixed companion packages
+        run: python -m pip wheel --no-build-isolation --no-deps --wheel-dir ./dist ./packages/docuworks-ctypes ./packages/docuworks-integrations ./packages/dw-workbench
+      - name: Install the built wheels and ordinary dependencies
+        shell: pwsh
+        run: |
+          $wheels = @(Get-ChildItem -LiteralPath ./dist -Filter *.whl | ForEach-Object FullName)
+          python -m pip install $wheels
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Check installed package metadata
+        run: python -c "from importlib.metadata import version, metadata; names=('dw-workbench','docuworks-ctypes','docuworks-integrations'); print({n:version(n) for n in names}); assert all(metadata(n)['License-Expression']=='MIT' for n in names)"
+      - name: Run all Workbench synthetic tests, including Tkinter
+        run: python -m pytest -p no:cacheprovider packages/dw-workbench/tests
+      - name: Verify the manual publication inputs
+        run: python scripts/verify_manual_inputs.py

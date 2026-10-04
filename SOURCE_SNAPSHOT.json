@@ -1,0 +1,512 @@
+{
+  "format_version": 1,
+  "description": "Implementation byte hashes for the fixed public source snapshot. Packaging metadata and test output paths were adapted for publication; application implementation is unchanged.",
+  "components": [
+    {
+      "package": "dw-workbench",
+      "module": "dw_workbench",
+      "version": "0.2.0",
+      "path": "packages/dw-workbench"
+    },
+    {
+      "package": "docuworks-ctypes",
+      "module": "docuworks_ctypes",
+      "version": "1.0.1",
+      "path": "packages/docuworks-ctypes"
+    },
+    {
+      "package": "docuworks-integrations",
+      "module": "docuworks_integrations",
+      "version": "0.13.0",
+      "path": "packages/docuworks-integrations"
+    }
+  ],
+  "implementation_files": [
+    {
+      "path": "packages/dw-workbench/dw_workbench/__init__.py",
+      "sha256": "5b7fc4aa428e39495f3da68e96c1a605bdb057ae40731585ee938ce2340ed4f3",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/__main__.py",
+      "sha256": "a60c1ef5226bc303ef1699e9437896d2e583e07a11a4340d7af6e1ddc8eb35d6",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/application.py",
+      "sha256": "5c56e6a70a142a155101562ed6702f31c7110fe77ee8e58f8efc9b0a1c142d26",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/domain.py",
+      "sha256": "34b6651ac27c8a1b4c5eecbfecbe45569f596819160bc3735ff6c133d7567f93",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/exporting.py",
+      "sha256": "e75a884ff756f02a8c3b4196ca7cf86684dde7df9090a1e6d559768ab163860e",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/library.py",
+      "sha256": "bede871538f50874b1bb6585cce77f128c55b931a726c122d97244084c99b975",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/storage.py",
+      "sha256": "945cdb4223ea60dae18f22c761437b9b10d830167b94410f09ebc6d6b2fd57b7",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/ui.py",
+      "sha256": "d76e36c03c80731460c957f330053ac2e3044c2e021783cf289bacf4eaaad2ab",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/workers.py",
+      "sha256": "421d322799d4370784e45bc53ff154efbba5aa3522e4e175b5d05b280c6ad767",
+      "component": "dw-workbench",
+      "version": "0.2.0"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/__init__.py",
+      "sha256": "b638c8b01932c5e47a3e0672be2af6659129d75d91219e114baad3054f84f878",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/_raw/__init__.py",
+      "sha256": "dd444a2783ff8473ab8f8bb772fbdc31f3bae688f9755862a134cd9569cadb81",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/_raw/api.py",
+      "sha256": "6fe11652b87189d4171b0ecb6f8faa2c510b1d6a7bd34dbade76428d55f69ff9",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/_raw/constants.py",
+      "sha256": "c6daf2dc4715e9b752932af1041af312e70fe3f7e3976a71d526d4033ac7cdd5",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/_raw/functions.py",
+      "sha256": "7aa6f7f8fdd107ad9686964624b79b58f2ff433415a569392f03fc8b62eccf69",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/_raw/types.py",
+      "sha256": "e340586ba8c3d93bf4af00387ca8e42c1ec75b5bbc2f31dc345fcb5e440ccb8f",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/api.py",
+      "sha256": "94634287480a9476df18a6c65ac9c50012d0a3a822b596f096b5dfeff34b430b",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/attributes.py",
+      "sha256": "1f66c6f48e522aaf787486a74c5e7537ab85195beaf3c63918efbd91d907d489",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/capabilities.py",
+      "sha256": "42512310e8078d77cd54aac91edcebf8f11e76049984c1f5fddec7df209b3ac1",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/document.py",
+      "sha256": "3c5243b5f53776d2a7168c825ba040c8093d4d1e81a530c6461528703f5598e3",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/encoding.py",
+      "sha256": "896edcbef6deaf390cfd80f839d4809e1585a26b513d43dbfd6cd6c577f12024",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/enums.py",
+      "sha256": "ea10a2919a200974197d708c4e51403073da7d1cd2f99d5f2b690bc03fc173c6",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/errors.py",
+      "sha256": "e8946e406ed37d579e94a725a7380773d92cbc4718e1532819580d77405648fd",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/evidence.py",
+      "sha256": "3a54cf1168bd14f8fa695716aebcaac7819e6906ad0a33d64f8f84166b757912",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/geometry.py",
+      "sha256": "a49eef6d2651ee4ee7463c77e1a51f02c0acb08e14aa10b4853c086bf33a16fe",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/__init__.py",
+      "sha256": "8a58d70ac709cfa34b7c92c10d9ea9355ef5fe579cf440aef827d7c85c6e20e3",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/loader.py",
+      "sha256": "83e2e444cf6886a4d4089a726aee34d779b66b1b09ba911fe4c7fda20b34dc24",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/models.py",
+      "sha256": "96e8c6f84aa6a20eae539849a0990f5c728c8c825f698bea7a2769d5e51be0b1",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/pe.py",
+      "sha256": "8c5293c2576506dbbf4b607c288ff899656521517c2b02069119cff884afa7c7",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/probe_worker.py",
+      "sha256": "f766b1fe160553e909a642fbba3f981d60a2430609bdd9d969c591fa48ec2a4b",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/runtime/resolver.py",
+      "sha256": "2565a9e3ebcedb64e0571affe152bb293555e7dce97807841187c0f3860df0cf",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/simple/__init__.py",
+      "sha256": "a6fe6cd74a76e9f2292858b881dd55225475f73b0c30e5f6856496f5079f107b",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-ctypes/docuworks_ctypes/simple/facade.py",
+      "sha256": "1d474e3717697460beb5b689a13007f03c18851059e214f2b5e2ec35de4c3a6a",
+      "component": "docuworks-ctypes",
+      "version": "1.0.1"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/__init__.py",
+      "sha256": "31e502916d52d8e77cf60370204f1cb8b1e92dfdea5b9ea982f05ec36db927fd",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_authoring_storage.py",
+      "sha256": "e1b6b80631e151ed2cb5430ff4962409691092f8b45f5b75a6f0d4a9192c20bb",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_performance.py",
+      "sha256": "a62a6eaedcd95af41387799ea25ce106d177647abb2f7f25fad0409edae9854f",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_preview.py",
+      "sha256": "61486474cd4d2bde203b109f243643b48f73d063893e86ba6d2937dd083331db",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_rectangle_sdk.py",
+      "sha256": "6550278321ad7a25d2a6a36c91ef8668209c3f20fdeb12d75e48d818465f869f",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_reviewed_sdk.py",
+      "sha256": "017038ba76fa002605d92598bfc686cc390a225d7f2c8c79061d355ce097de9d",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_reviewed_v2.py",
+      "sha256": "db9d4220f30a1abc24146f2e25aebfce764c6d811329d60cf23362552a8ff9ad",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_reviewed_xlsx_cli.py",
+      "sha256": "ef6f54d697dd91d6ee88614fb3cd0543fd311d2383381c785c78c553cbb6298e",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_storage.py",
+      "sha256": "6b173f5cac295513e49cf0e11884c11a48ea13cf75423fb07a942f82e8c6de89",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_structured_csv_cli.py",
+      "sha256": "c778a1c8991e76bfe2675964a37f3a508120a077dfe63ff02070ec869077286d",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_authoring_sdk.py",
+      "sha256": "001f4ca15c1335fc54272ab9a3aa1c36c29d350c9f7a2905cab88383b0d2c3e7",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_cli.py",
+      "sha256": "709a2bbcd72d4a7d74ef5f372e3e718ced2f594bb137a5236c4e04f5300a9b1a",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_editor_worker.py",
+      "sha256": "f585c2c7748fa1244dbd2808fb0632714f0e01798429152ff2ad46f80b9169ad",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_extract.py",
+      "sha256": "d80a6b82043e143a43c3aba0e229421d01cf6a1905a84db9f3c6420c61006c86",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_messages.py",
+      "sha256": "f14b1eb5e6bf35bc24b4377061049e4e1b4e0e7e66ee23a5dc47cb3281639771",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/_template_sdk.py",
+      "sha256": "3443da71ad0a7a1c1099b89c1be9c0ca231b4c55719c8a81a7879928b9e9abcf",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/batch.py",
+      "sha256": "afb90d37b1cdbe369bb3906dc711fb299b5983363872d8702d7a5c02d5e9ac7a",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/cli.py",
+      "sha256": "a890aced0c02f4167827bbb4ecab87268a9b26f7c8e398e99930d778899dba85",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/consumers.py",
+      "sha256": "68695101a7c0eaf4ba9232cfa688b98070fb05dc43530e3095c9820878f35166",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/corrections.py",
+      "sha256": "49399bf5e70a4360156b5f9e4c766c1c040cf42f698d98a80645000c63411438",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/derivatives.py",
+      "sha256": "31c7300d77224b8dc6c504e73eaf37a1334e546e39f8a2cfff8efa412561cc80",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/discovery.py",
+      "sha256": "71153b32572ed03b885fe00a406a95636870fcbd2f2d34ff3566881686ea8ce4",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/executor.py",
+      "sha256": "84c5fc53c558b8f6d5cceee8be50629c6bd355bafa1f299677afc08711b56ee6",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/failures.py",
+      "sha256": "06d04534d0129292253fc44fc4b99011f81a59ae8e982a4aaaab47d6d8e59576",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/jobs.py",
+      "sha256": "3778af2735266f8233e710c81d712aea60f642a76a5682c724cabb890d09adb1",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/legacy_results.py",
+      "sha256": "bb5f3e239a7deb36ec58674d5f148f7b2a9ecfc949f64445ddc44618c3cee7ed",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/model_loading.py",
+      "sha256": "ac0bfc5544da5c813e7f22aaadfe5a3928e6e6009eba4f2c34275e65d02d9742",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/models.py",
+      "sha256": "cd02dfe9bf90ac3e861bdb0979be892e55dd255b17193454addca4ac7b8e48d3",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/ocr.py",
+      "sha256": "934a629655dcaa8e2ce87b139178612722c7084b2b0175ce8b04a9d6c32feca8",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/opencv.py",
+      "sha256": "4a458de02c423183c309f9b9d04bd8cf6777099e6edbbe06831184b79803ec57",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/paddle.py",
+      "sha256": "68f3d7206cc663d53a525e960ec2b42322c39da52a8e579b63109b9e03f38ec4",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/page_selection.py",
+      "sha256": "45dfde8732566176dc0782de0b4ddcd7580d6b802403489c87ddaa3e9b42dd39",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/planning.py",
+      "sha256": "ca38a781cbddfd21ef0619d71c5134231a60cbed58d963e9d7a5a43e50f04c93",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/recognition.py",
+      "sha256": "66bcf46c0ad322d46a683a0bb64caff91f8725f285cf3bcc06ae29de9bb67933",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/rendering.py",
+      "sha256": "f1af3ff53ae04712b8162daa03199b8cee6b9b0ab1aaed92156bb04b26aa4150",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/results.py",
+      "sha256": "a40bbaceef623c83d567e44711ff10d8739a813a592dad9f4405baa34b601740",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/review_xdw.py",
+      "sha256": "44e6d45a8004c47c7076d766e03d094e8e577853b00e70ff3ff468e3cf5965f7",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/reviewed.py",
+      "sha256": "f5f233ef47177827d98f867fcaa13b5d4828acd30c16479025b9fe1ed370ac20",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/reviewed_types.py",
+      "sha256": "c2fb8a19eae458da7226a6ac674c8c96271654f6164cd6550cd20588d0731150",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/reviewed_xlsx.py",
+      "sha256": "e378fb7e47abbc8eaba113d085ff788ce73399b0e21f40c8d098c04589210631",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/settings.py",
+      "sha256": "b3749019463393178fc1859241588f87ced6e9abaca87e79c53aadc48510b281",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/structured.py",
+      "sha256": "7badc36afffa80b6067a3f05949131cac19e0f0280f5476cc103ef8dd823ff09",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/structured_csv.py",
+      "sha256": "4f0d03e3769109e6248d58b77c4464f937a4f11a1aa7e4214974b56bc3e8fa3b",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/template_authoring.py",
+      "sha256": "7d23798712ff2b7540f801160d022719340545016b4f8ca1dc71a262c9fe4acf",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/template_editor.py",
+      "sha256": "b010068f2c94ec7191fc130ef4f2fb81962c6743866b527848b64dfe0dbf7009",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/templates.py",
+      "sha256": "71ce8077c4bf33e2712dfbfb85b19e14d18e62746a7cfa6f8ddec7f9ea6f4a8b",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/transforms.py",
+      "sha256": "50b319fe879ceaf5158e5be678c0f2348677c7c9aee788a697618182c293b6d4",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    },
+    {
+      "path": "packages/docuworks-integrations/docuworks_integrations/workflow.py",
+      "sha256": "cd6233743b75736d69c29f8c7fe561cf4f770c4d75c37a5193f202203dba796c",
+      "component": "docuworks-integrations",
+      "version": "0.13.0"
+    }
+  ]
+}

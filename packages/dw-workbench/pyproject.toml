@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dw-workbench"
+dynamic = ["version"]
+description = "Portable source-grounded field review for DocuWorks"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.13"
+dependencies = ["docuworks-ctypes>=1.0.1,<2", "docuworks-integrations==0.13.0", "Pillow>=11", "XlsxWriter==3.2.9"]
+
+[project.scripts]
+dw-workbench = "dw_workbench.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["dw_workbench*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "dw_workbench.__version__"}

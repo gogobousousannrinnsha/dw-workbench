@@ -1,0 +1,2757 @@
+{
+  "format_version": 1,
+  "application": "DW-Workbench",
+  "application_version": "0.2.0",
+  "generated_at_utc": "2026-10-02T22:40:44.401Z",
+  "source_file": "packages/dw-workbench/dw_workbench/ui.py",
+  "source_sha256": "d76e36c03c80731460c957f330053ac2e3044c2e021783cf289bacf4eaaad2ab",
+  "source_line_count": 1732,
+  "method": "操作カタログ作成工程では、ソースと application.py/domain.py/library.py/storage.py/exporting.py/workers.py の呼出先を静的に確認した。この工程ではアプリ起動・撮影・案件操作を行っていない。画面資料は別工程で合成サンプルを撮影したものを使用。",
+  "scope": "全常設ボタン、5タブ、全主要入力・一覧・選択・状態表示、原本とタブのスクロール、項目編集・適用確認・変更前履歴・出力確認・案件作成・旧案件移行ダイアログ。装飾用Frame・pack/gridは操作カタログから除く。",
+  "label_policy": "label は表示される日本語、隣接ラベル、または一覧の最初の列見出し。文字のない部品は空文字とし annotation_label で注釈名を示す。一覧の全見出しは columns、固定ドロップダウンは options に記載。動的状態は初期文言または代表表示を label とし、変化は result/notes に記載。",
+  "source_line_policy": "source_line は ui.py の1始まり行番号。繰返しで作るボタンは共通の生成行。共通ダイアログ生成は呼出元ごとの操作を個別IDにし、生成行を共用する。タブ全体スクロールは helper 内の生成行、invocation_line は画面への呼出行。",
+  "sections": [
+    {
+      "id": "common",
+      "label": "共通・ツールバー・終了"
+    },
+    {
+      "id": "viewer",
+      "label": "原本表示"
+    },
+    {
+      "id": "worklist",
+      "label": "作業一覧"
+    },
+    {
+      "id": "setup",
+      "label": "テンプレート作成"
+    },
+    {
+      "id": "review",
+      "label": "確認・訂正"
+    },
+    {
+      "id": "history",
+      "label": "出力履歴・出力対象確認"
+    },
+    {
+      "id": "library",
+      "label": "共通テンプレート"
+    }
+  ],
+  "controls": [
+    {
+      "id": "common_01",
+      "section": "common",
+      "label": "DW-Workbench v0.2.0 — ローカル検証候補",
+      "kind": "window_title",
+      "purpose": "起動したアプリの版と位置付けを識別する。",
+      "when": "起動中。",
+      "prerequisites": "なし。",
+      "steps": [
+        "ウィンドウ上部のタイトルを確認する。"
+      ],
+      "result": "アプリの版と「ローカル検証候補」が分かる。",
+      "notes": [
+        "表示はパッケージの __version__ から生成します。"
+      ],
+      "command": "Window.__init__ → root.title",
+      "source_line": 88,
+      "surface": "main"
+    },
+    {
+      "id": "common_02",
+      "section": "common",
+      "label": "案件作成",
+      "kind": "button",
+      "purpose": "Portable内に新しい案件を作り、その案件を開く。",
+      "when": "新しい文書群の作業を始めるとき。",
+      "prerequisites": "実行中のファイル処理が終了し、既存案件の未保存入力・処理結果を保存できること。",
+      "steps": [
+        "「案件作成」を押す。",
+        "「案件名」を入力して確定する。"
+      ],
+      "result": "Portableの projects 内にIDと案件名を含むフォルダーが作られ、現在の案件になる。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "未登録の草案は切替前に案件内へ保存します。",
+        "旧案件形式を開く場合のコピー更新とは別操作です。"
+      ],
+      "command": "Window.safe(Window.new_project) → Window.open_project → Workbench",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_03",
+      "section": "common",
+      "label": "案件を開く",
+      "kind": "button",
+      "purpose": "保存済み案件または完成したバックアップを開く。",
+      "when": "作業を再開するとき。",
+      "prerequisites": "選ぶフォルダーに project.sqlite があること。案件切替前の入力・処理結果を保存でき、ファイル処理が終了していること。",
+      "steps": [
+        "「案件を開く」を押す。",
+        "project.sqlite のある案件フォルダーを選ぶ。",
+        "固定原本の検証完了を待つ。"
+      ],
+      "result": "文書・設定・確認状態・出力履歴を読み込む。保存してあれば未登録草案も復元する。",
+      "notes": [
+        "project.sqlite ファイルそのものではなく、その親フォルダーを選びます。",
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "v0.1.0形式では、同意後にPortableの projects 内へ別コピーを作り更新します。元案件は保持します。",
+        "INCOMPLETE.txt の残る失敗コピー・バックアップは開けません。"
+      ],
+      "command": "Window.safe(Window.choose_project) → Window.open_project → Window.validate_project / migrate_project_copy",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_04",
+      "section": "common",
+      "label": "XDW追加",
+      "kind": "button",
+      "purpose": "選んだXDWを案件内へ固定コピーし、ページ情報を登録する。",
+      "when": "案件へ文書を追加するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。",
+      "steps": [
+        "「XDW追加」を押す。",
+        "登録するXDWを一つまたは複数選ぶ。",
+        "コピーと原本登録が終了するまで待つ。"
+      ],
+      "result": "登録された原本が文書一覧に表示される。新規登録文書はページ単位の作業を始められる。",
+      "notes": [
+        "入力ファイルへの編集は行いません。",
+        "コピー中の入力変更はハッシュで検出し、登録を失敗扱いにします。",
+        "コピー後は原本登録ジョブを再開します。既に案件内にある未完了ジョブも再開対象になり得ます。",
+        "原本登録未完了の行は「未完了ジョブ再開」で再試行できます。"
+      ],
+      "command": "Window.safe(Window.add_sources) → copy_snapshot → Workbench.queue_source → Window.resume_jobs",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_05",
+      "section": "common",
+      "label": "未完了ジョブ再開",
+      "kind": "button",
+      "purpose": "案件内の未完了・失敗した原本登録、描画、OCRジョブを再実行する。",
+      "when": "中断後、起動し直した後、原因を解消した失敗の再試行時。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 未保存ワーカー結果があれば再保存できること。",
+      "steps": [
+        "「未完了ジョブ再開」を押す。",
+        "下部の実行状況を確認する。"
+      ],
+      "result": "登録・描画を先に、OCRを後に処理する。完了済みジョブは再実行しない。",
+      "notes": [
+        "選択ページだけではなく案件内の未完了ジョブ全体が対象です。",
+        "完了したOCRに新しい候補を追加する操作には「範囲OCR」を使います。",
+        "切替前の記録に属する古いOCRは取り消し扱いになり、現在の記録へ流用しません。"
+      ],
+      "command": "Window.safe(Window.resume_jobs) → Workbench.pending_jobs → Window.enqueue",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_06",
+      "section": "common",
+      "label": "中断",
+      "kind": "button",
+      "purpose": "原本登録・描画・OCRのジョブ待ち列とローカルワーカーを止める。",
+      "when": "ジョブを止めて後から再開したいとき。",
+      "prerequisites": "なし。",
+      "steps": [
+        "「中断」を押す。",
+        "下部の中断状態を確認する。"
+      ],
+      "result": "完了済み結果を保持し、実行中ジョブは中断理由付きの失敗状態となる。未完了ジョブ再開で続けられる。",
+      "notes": [
+        "ファイルコピー、原本検証、Excel／CSV生成、バックアップなどの別の非同期処理を取り消すボタンではありません。",
+        "実行中ジョブがなければ、その旨を表示します。"
+      ],
+      "command": "Window.safe(Window.cancel_jobs) → Workbench.finish_job(error=...) → WorkerClient.close",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_07",
+      "section": "common",
+      "label": "案件バックアップ",
+      "kind": "button",
+      "purpose": "DB、固定原本、出力ファイル、保存済み草案をまとめて複製し検証する。",
+      "when": "案件を保全する、別フォルダーへ復元可能なコピーを残すとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 ジョブ・ファイル処理が終了し、未保存分を保存できること。",
+      "steps": [
+        "必要なら「中断」を押し、ファイル処理の終了を待つ。",
+        "「案件バックアップ」を押す。",
+        "バックアップを置く親フォルダーを選ぶ。",
+        "「バックアップ完了」を確認する。"
+      ],
+      "result": "日時付きの新しいバックアップフォルダーと検証用manifestが作られる。",
+      "notes": [
+        "案件フォルダーの内側や既存フォルダーをバックアップ先にはできません。",
+        "DBはSQLite Backup APIで複製します。",
+        "キャッシュ・実行ログ・Portable全体・共通テンプレートのDBはこの案件バックアップに含めません。",
+        "失敗時は INCOMPLETE.txt を残し、完成済みと扱いません。"
+      ],
+      "command": "Window.safe(Window.backup) → Window.retry_saves → Store.begin_backup → complete_backup",
+      "source_line": 103,
+      "surface": "main"
+    },
+    {
+      "id": "common_08",
+      "section": "common",
+      "label": "案件を作成または開いてください",
+      "kind": "status",
+      "purpose": "現在開いている案件を識別する。",
+      "when": "常時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "上部ボタンの右側を確認する。"
+      ],
+      "result": "未選択時は案内、選択後は案件フォルダー名が表示される。",
+      "notes": [
+        "表示名は案件フォルダー名です。"
+      ],
+      "command": "Window.open_project → project_label.configure",
+      "source_line": 104,
+      "surface": "main",
+      "widget_variable": "self.project_label"
+    },
+    {
+      "id": "common_09",
+      "section": "common",
+      "label": "利用可能な機能を確認しています…",
+      "kind": "status",
+      "purpose": "DocuWorks、GPU、Portable内OCRモデルの検出結果を知らせる。",
+      "when": "起動時・機能の利用可否を確認するとき。",
+      "prerequisites": "検出終了を待つこと。",
+      "steps": [
+        "案件名の下の機能表示を確認する。"
+      ],
+      "result": "「DocuWorks: … / GPU: … / ローカルOCRモデル: あり／なし」を表示する。",
+      "notes": [
+        "GPUが利用不可でも手入力・確認・出力は利用できます。",
+        "検出結果は実帳票の認識精度やOCR成功を保証するものではありません。",
+        "DocuWorksが利用不可なら原本登録・描画の処理を利用できません。"
+      ],
+      "command": "Window.async_call(capabilities) → Window.show_capabilities",
+      "source_line": 106,
+      "surface": "main",
+      "widget_variable": "self.cap_label"
+    },
+    {
+      "id": "common_10",
+      "section": "common",
+      "label": "",
+      "kind": "splitter",
+      "purpose": "原本と右側操作画面の幅を調整する。",
+      "when": "片方の表示領域を広くしたいとき。",
+      "prerequisites": "なし。",
+      "steps": [
+        "左右画面の境界をドラッグする。"
+      ],
+      "result": "左右の表示幅が変わる。",
+      "notes": [
+        "表示幅の変更で保存済み根拠のページmm座標は変わりません。"
+      ],
+      "command": "ttk.Panedwindow 標準操作",
+      "source_line": 108,
+      "surface": "main",
+      "annotation_label": "原本と操作画面の境界"
+    },
+    {
+      "id": "common_11",
+      "section": "common",
+      "label": "準備完了",
+      "kind": "status",
+      "purpose": "実行中の工程、残りジョブ、保存・検証・出力の成功や失敗を知らせる。",
+      "when": "常時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "ウィンドウ最下部の表示を確認する。"
+      ],
+      "result": "処理に応じたメッセージを表示する。",
+      "notes": [
+        "実行中表示は原本登録／原本描画／範囲OCR、ページ、待ち列の残り件数です。",
+        "「処理が終了しました」は全ジョブ成功の保証ではありません。失敗した処理は再開操作で再試行します。",
+        "項目の保存状態・確認状態は確認タブの専用表示も確認します。"
+      ],
+      "command": "Window.status.set / Window.next_job / Window.report_export_results",
+      "source_line": 292,
+      "surface": "main",
+      "widget_variable": "self.status"
+    },
+    {
+      "id": "common_12",
+      "section": "common",
+      "label": "",
+      "kind": "window_close",
+      "purpose": "未保存分を保存してワーカー・DBを閉じ、アプリを終了する。",
+      "when": "作業終了時・Portableを移動する前。",
+      "prerequisites": "入力・ワーカー結果・出力履歴・草案を保存できること。",
+      "steps": [
+        "ウィンドウ右上の閉じるボタンを押す。",
+        "処理終了とウィンドウが閉じることを確認する。"
+      ],
+      "result": "ワーカーとDB接続を終了し、アプリが閉じる。",
+      "notes": [
+        "保存に失敗している入力・処理結果・出力履歴・草案があれば終了を止めて保持します。",
+        "実行中のファイル処理があれば終了を待ってから閉じます。",
+        "テンプレート草案の保存失敗は「保存再試行」の対象外です。終了時のエラーはOKで戻り、保存先の原因を解消して右上の×を再度押し、草案保存と終了を再試行します。"
+      ],
+      "command": "WM_DELETE_WINDOW → Window.close",
+      "source_line": 92,
+      "surface": "main",
+      "annotation_label": "アプリを終了（×）"
+    },
+    {
+      "id": "viewer_01",
+      "section": "viewer",
+      "label": "前ページ",
+      "kind": "button",
+      "purpose": "原本の前ページへ移動する。",
+      "when": "複数ページの原本を確認するとき。",
+      "prerequisites": "原本が選ばれていること。",
+      "steps": [
+        "「前ページ」を押す。"
+      ],
+      "result": "前のページを表示する。ページ単位作業ではそのページの記録も選ぶ。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "ページ用テンプレートの作成中は代表ページから移動しません。",
+        "文書全体用テンプレート作成中や過去結果閲覧中は、同じ記録のまま原本ページを移動します。"
+      ],
+      "command": "Window.safe → Window.navigate(-1)",
+      "source_line": 115,
+      "surface": "main"
+    },
+    {
+      "id": "viewer_02",
+      "section": "viewer",
+      "label": "次ページ",
+      "kind": "button",
+      "purpose": "原本の次ページへ移動する。",
+      "when": "複数ページの原本を確認するとき。",
+      "prerequisites": "原本が選ばれていること。",
+      "steps": [
+        "「次ページ」を押す。"
+      ],
+      "result": "次のページを表示する。最終ページを越えて移動しない。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "ページ用テンプレートの作成中は代表ページに固定されます。別ページへの適用は作業一覧で行います。",
+        "ページ単位作業では移動先の記録へ切り替えます。文書全体作業では同じ記録を保ちます。"
+      ],
+      "command": "Window.safe → Window.navigate(1)",
+      "source_line": 116,
+      "surface": "main"
+    },
+    {
+      "id": "viewer_03",
+      "section": "viewer",
+      "label": "原本未選択",
+      "kind": "status",
+      "purpose": "現在表示する原本名とページ位置を知らせる。",
+      "when": "原本閲覧時。",
+      "prerequisites": "原本選択後はページ情報が登録されていること。",
+      "steps": [
+        "原本上部の表示を確認する。"
+      ],
+      "result": "選択後は「p現在ページ/総ページ数 原本名」を表示する。",
+      "notes": [
+        "登録に失敗した文書行を選ぶと「原本登録未完了」と表示します。"
+      ],
+      "command": "Window.load_page / Window.select_source → page_label.configure",
+      "source_line": 117,
+      "surface": "main",
+      "widget_variable": "self.page_label"
+    },
+    {
+      "id": "viewer_04",
+      "section": "viewer",
+      "label": "ページに合わせる",
+      "kind": "dropdown",
+      "purpose": "原本表示の拡大率を選ぶ。",
+      "when": "全体を見たい、文字を大きくしたいとき。",
+      "prerequisites": "原本画像が表示されていること。",
+      "steps": [
+        "倍率のドロップダウンを開く。",
+        "「ページに合わせる」「50%」「100%」「150%」「200%」から選ぶ。"
+      ],
+      "result": "画像表示の大きさとスクロール範囲が変わる。",
+      "notes": [
+        "倍率は画面用画像に対する倍率です。原本のmm座標は変わりません。",
+        "ページに合わせるでは表示領域の大きさに合わせて縮尺を調整します。"
+      ],
+      "command": "<<ComboboxSelected>> → Window.show_image",
+      "source_line": 120,
+      "surface": "main",
+      "widget_variable": "self.zoom",
+      "options": [
+        "ページに合わせる",
+        "50%",
+        "100%",
+        "150%",
+        "200%"
+      ]
+    },
+    {
+      "id": "viewer_05",
+      "section": "viewer",
+      "label": "根拠と周辺",
+      "kind": "button",
+      "purpose": "選択項目の根拠を150%表示で周辺とともに見る。",
+      "when": "値の対応するラベル・行・周辺を照合するとき。",
+      "prerequisites": "現在の項目に根拠が指定されていること。",
+      "steps": [
+        "確認項目を選ぶ。",
+        "「根拠と周辺」を押す。"
+      ],
+      "result": "根拠ページに移動し、根拠の左上から約25mm前の位置を起点にスクロールする。",
+      "notes": [
+        "根拠の範囲そのものは変更しません。",
+        "「ページに合わせる」を選べば全体表示へ戻せます。"
+      ],
+      "command": "Window.focus_anchor",
+      "source_line": 123,
+      "surface": "main"
+    },
+    {
+      "id": "viewer_06",
+      "section": "viewer",
+      "label": "",
+      "kind": "canvas",
+      "purpose": "原本画像と緑色の根拠枠を表示し、項目の範囲を指定する。",
+      "when": "テンプレート作成・確認訂正・過去結果閲覧時。",
+      "prerequisites": "表示には原本登録・描画の成功が必要。範囲指定には検証完了、編集可能状態、作成／確認タブで項目選択が必要。",
+      "steps": [
+        "「テンプレート作成」または「確認・訂正」で項目を選ぶ。",
+        "原本上で値を囲むように押したままドラッグし、離す。"
+      ],
+      "result": "作成タブでは草案の読み取り範囲、確認タブでは選択項目の根拠が更新される。",
+      "notes": [
+        "保存はページの x,y,幅,高さ のmm座標です。",
+        "0.2mm未満の幅または高さの操作は元の範囲に戻します。",
+        "ページ用草案は代表ページ、ページ単位記録の根拠は割当ページで指定します。",
+        "確認タブでの根拠訂正はその記録だけを変更し、テンプレートのOCR範囲を変更しません。",
+        "作業一覧・出力履歴・共通テンプレートのタブ、過去結果、検証中ではドラッグ指定しません。"
+      ],
+      "command": "<ButtonPress-1>/<B1-Motion>/<ButtonRelease-1> → Window.drag_start/drag_move/drag_end",
+      "source_line": 126,
+      "surface": "main",
+      "annotation_label": "原本画像・緑の根拠枠",
+      "widget_variable": "self.canvas"
+    },
+    {
+      "id": "viewer_07",
+      "section": "viewer",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "原本画像を上下へスクロールする。",
+      "when": "拡大してページの一部が見切れるとき。",
+      "prerequisites": "原本画像が表示されていること。",
+      "steps": [
+        "原本右端の縦スクロールバーを動かす。"
+      ],
+      "result": "原本の見える上下位置が変わる。",
+      "notes": [
+        "保存する根拠座標は変わりません。"
+      ],
+      "command": "canvas.yview / canvas.yscrollcommand",
+      "source_line": 127,
+      "surface": "main",
+      "annotation_label": "原本の縦スクロールバー"
+    },
+    {
+      "id": "viewer_08",
+      "section": "viewer",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "原本画像を左右へスクロールする。",
+      "when": "拡大して横方向が見切れるとき。",
+      "prerequisites": "原本画像が表示されていること。",
+      "steps": [
+        "原本下端の横スクロールバーを動かす。"
+      ],
+      "result": "原本の見える左右位置が変わる。",
+      "notes": [
+        "スクロール後のドラッグも原本mm座標に変換します。"
+      ],
+      "command": "canvas.xview / canvas.xscrollcommand",
+      "source_line": 128,
+      "surface": "main",
+      "annotation_label": "原本の横スクロールバー"
+    },
+    {
+      "id": "viewer_09",
+      "section": "viewer",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "マウスホイールで原本を上下へ送る。",
+      "when": "原本画像内で上下に移動するとき。",
+      "prerequisites": "原本画像が表示されていること。",
+      "steps": [
+        "原本画像の上でマウスホイールを回す。"
+      ],
+      "result": "原本の表示位置を上下に送る。",
+      "notes": [
+        "ホイールは拡大率を変える操作ではありません。"
+      ],
+      "command": "<MouseWheel> → canvas.yview_scroll",
+      "source_line": 138,
+      "surface": "main",
+      "annotation_label": "原本上のマウスホイール"
+    },
+    {
+      "id": "viewer_10",
+      "section": "viewer",
+      "label": "原本上をドラッグして範囲を指定します。範囲はページのmm座標で保存します。",
+      "kind": "guidance",
+      "purpose": "範囲指定の操作と保存座標を知らせる。",
+      "when": "原本表示時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "原本下の案内を読む。"
+      ],
+      "result": "範囲指定はドラッグ、保存単位はmmと分かる。",
+      "notes": [
+        "実際に編集できるかはタブ、項目選択、原本検証、過去結果の状態によります。"
+      ],
+      "command": "Window.build → ttk.Label",
+      "source_line": 140,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_01",
+      "section": "worklist",
+      "label": "作業一覧",
+      "kind": "tab",
+      "purpose": "文書・処理単位・対象ページ・テンプレートを選び、案件出力を行う。",
+      "when": "案件の文書を選ぶ、ページ適用・OCR・出力をするとき。",
+      "prerequisites": "なし。",
+      "steps": [
+        "「作業一覧」タブを選ぶ。"
+      ],
+      "result": "文書一覧とページ別の状態、適用操作を表示する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "過去結果表示からこのタブへ戻ると、現在の割当記録へ戻ります。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.safe(Window.tab_changed)",
+      "source_line": 145,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_02",
+      "section": "worklist",
+      "label": "文書",
+      "kind": "list",
+      "purpose": "案件の原本と完了状況、原本登録未完了行を一覧する。",
+      "when": "文書を選ぶとき、案件全体の進み具合を見るとき。",
+      "prerequisites": "案件が開かれていること。",
+      "steps": [
+        "「文書」列で対象の原本をクリックする。"
+      ],
+      "result": "その文書の原本1ページ目・処理単位・ページ一覧を表示する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "列見出しは「文書」「確認状態」です。",
+        "「N/M 記録 完了」には理由付きのページ対象外も完了として含みます。出力する行数とは異なります。",
+        "原本登録未完了の行を選ぶと失敗・未完了の説明を表示します。",
+        "名前は選別・並べ替え操作ではありません。列見出しに並べ替え処理は設定されていません。"
+      ],
+      "command": "<<TreeviewSelect>> → Window.safe(Window.select_source)",
+      "source_line": 147,
+      "surface": "main",
+      "widget_variable": "self.document_list",
+      "annotation_label": "文書／確認状態",
+      "columns": [
+        "文書",
+        "確認状態"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "worklist_03",
+      "section": "worklist",
+      "label": "処理単位",
+      "kind": "dropdown",
+      "purpose": "同じ文書を一ページ一行または一文書一行で扱う方式を選ぶ。",
+      "when": "テンプレートを最初に適用する前。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 この文書でテンプレート適用・対象外指定をまだ行っていないこと。",
+      "steps": [
+        "処理単位から「ページごと（一ページ一行）」または「文書全体（一文書一行）」を選ぶ。"
+      ],
+      "result": "文書の割当単位と、選べるテンプレートの種類が変わる。",
+      "notes": [
+        "新規文書はページごとを初期選択します。",
+        "一度でも適用・対象外指定をすると方式は保持され、この欄は変更できません。",
+        "ページ単位では各ページごとに別の記録、文書全体では一つの記録を持ちます。",
+        "同じ案件内の別文書に別の処理単位を選べます。"
+      ],
+      "command": "<<ComboboxSelected>> → Window.safe(Window.change_mode) → Workbench.set_mode",
+      "source_line": 157,
+      "surface": "main",
+      "widget_variable": "self.mode_choice",
+      "options": [
+        "ページごと（一ページ一行）",
+        "文書全体（一文書一行）"
+      ]
+    },
+    {
+      "id": "worklist_04",
+      "section": "worklist",
+      "label": "文書を選択してください",
+      "kind": "status",
+      "purpose": "処理単位が変更可能か固定済みかを知らせる。",
+      "when": "処理単位選択時。",
+      "prerequisites": "文書を選択すること。",
+      "steps": [
+        "処理単位の下の説明を確認する。"
+      ],
+      "result": "「初期選択はページごと。適用前なら変更できます」または「適用・対象外指定後は処理単位を保持します」と表示する。",
+      "notes": [],
+      "command": "Window.refresh_pages → mode_hint.configure",
+      "source_line": 160,
+      "surface": "main",
+      "widget_variable": "self.mode_hint"
+    },
+    {
+      "id": "worklist_05",
+      "section": "worklist",
+      "label": "ページ",
+      "kind": "list",
+      "purpose": "ページの割当テンプレート、完了項目数、対象外理由を一覧し、適用対象を選ぶ。",
+      "when": "ページ選択・複数ページへの一括操作時。",
+      "prerequisites": "文書を選択していること。",
+      "steps": [
+        "行をクリックして表示対象を選ぶ。",
+        "複数ページはCtrlまたはShiftを使って選ぶ。",
+        "確認画面へ進む場合は行をダブルクリックする。"
+      ],
+      "result": "選んだページの原本と現在の記録を表示する。複数選択は対象指定の「選択ページ」に使う。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "列見出しは「ページ」「テンプレート」「状態」です。",
+        "文書全体方式では「文書全体」の一行となり、個別ページの割当はしません。",
+        "状態は「テンプレート未選択」「対象外: 理由」「N/M 項目 完了」、不一致なら「寸法不一致・手入力」を含みます。",
+        "複数選択時、表示するページはフォーカス行、または最初の選択行です。"
+      ],
+      "command": "<<TreeviewSelect>> → Window.select_page / <Double-1> → tabs.select(review_tab)",
+      "source_line": 162,
+      "surface": "main",
+      "widget_variable": "self.page_list",
+      "annotation_label": "ページ／テンプレート／状態",
+      "columns": [
+        "ページ",
+        "テンプレート",
+        "状態"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "worklist_06",
+      "section": "worklist",
+      "label": "対象",
+      "kind": "dropdown",
+      "purpose": "適用・ページ対象外・選択対象OCR・変更前結果表示に使う対象を指定する。",
+      "when": "複数ページへまとめて操作するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 ページごと方式であること。",
+      "steps": [
+        "「選択ページ」「全ページ」「ページ範囲」「奇数ページ」「偶数ページ」から選ぶ。"
+      ],
+      "result": "次に実行する操作の対象ページが決まる。",
+      "notes": [
+        "選ぶだけではテンプレート適用・OCR・除外を実行しません。",
+        "ページ番号は文書全体の1から始まる実ページ番号です。",
+        "文書全体方式ではこの欄が無効になり、一文書全体が対象です。",
+        "「変更前の結果」は対象が一つでなければ開けません。"
+      ],
+      "command": "Window.chosen_targets → target_pages",
+      "source_line": 172,
+      "surface": "main",
+      "widget_variable": "self.target_choice",
+      "options": [
+        "選択ページ",
+        "全ページ",
+        "ページ範囲",
+        "奇数ページ",
+        "偶数ページ"
+      ]
+    },
+    {
+      "id": "worklist_07",
+      "section": "worklist",
+      "label": "例: 2-10,12",
+      "kind": "entry",
+      "purpose": "「ページ範囲」で対象にするページ番号・範囲を入力する。",
+      "when": "連続・飛び飛びのページを対象にするとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 対象で「ページ範囲」を選んでいること。",
+      "steps": [
+        "対象を「ページ範囲」にする。",
+        "隣の入力欄へ 2-10,12 または 1,3,5-8 のように入力する。"
+      ],
+      "result": "各範囲を合わせ、重複を除いたページ群が次の操作に使われる。",
+      "notes": [
+        "空欄、文書外のページ、逆順、解釈できない表記はエラーにします。",
+        "カンマのほか読点、範囲記号の -・〜・～を受け付けます。",
+        "対象がページ範囲以外なら入力内容は使いません。"
+      ],
+      "command": "Window.chosen_targets → target_pages(expression)",
+      "source_line": 175,
+      "surface": "main",
+      "widget_variable": "self.target_expression"
+    },
+    {
+      "id": "worklist_08",
+      "section": "worklist",
+      "label": "適用するテンプレート版",
+      "kind": "dropdown",
+      "purpose": "適用または改訂元とする案件内テンプレートの版を選ぶ。",
+      "when": "新規適用、版の切替、登録版を改訂するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 対応する単位の登録済みテンプレートが案件内にあること。",
+      "steps": [
+        "名前・版・ページ用／文書用・IDを確認し、使う版を選ぶ。"
+      ],
+      "result": "次の適用・改訂操作で選択版を使う。",
+      "notes": [
+        "選択だけでは現在の記録を変更しません。",
+        "文書の処理単位と同じ種類のみを表示します。",
+        "改訂元はこの欄の選択で決まり、確認画面の表示記録と同一とは限りません。",
+        "共通テンプレートはまず案件に取り込んでからここで選びます。"
+      ],
+      "command": "Window.refresh_lists → profile_choice / Window.apply_profile / Window.revise_profile",
+      "source_line": 179,
+      "surface": "main",
+      "widget_variable": "self.profile_choice"
+    },
+    {
+      "id": "worklist_09",
+      "section": "worklist",
+      "label": "対象を確認して適用",
+      "kind": "button",
+      "purpose": "指定ページまたは文書へ選択したテンプレート版を適用する。",
+      "when": "最初の割当、別テンプレート・別版への切替時。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 対象とテンプレート版を選んでいること。",
+      "steps": [
+        "対象ページとテンプレート版を選ぶ。",
+        "「対象を確認して適用」を押す。",
+        "プレビューで全対象と変更内容を確認して「適用する」を押す。"
+      ],
+      "result": "現在の割当が保存され、確認画面へ進む。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "同じテンプレートID・同じ版の再適用は値・確認状態・記録を変更しません。",
+        "別テンプレート・別版では旧記録を履歴へ保存し、採用値が空の新しい記録を作ります。旧確認状態は引き継ぎません。",
+        "合致した原本ではテンプレート範囲を初期根拠として持ちますが、項目状態は未取得です。",
+        "寸法・向きが不一致でも必要項目を作り、根拠は未指定となります。自動OCRは行えず手入力と範囲指定で進めます。",
+        "適用だけではOCRを開始しません。"
+      ],
+      "command": "Window.safe(Window.apply_profile) → Window.preview_assignment → Workbench.assign_pages",
+      "source_line": 184,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_10",
+      "section": "worklist",
+      "label": "対象外にする",
+      "kind": "button",
+      "purpose": "対象ページまたは文書全体を理由付きで作業対象から除外する。",
+      "when": "表紙・説明ページなどを出力対象にしないとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 除外する対象を選んでいること。",
+      "steps": [
+        "対象を選んで「対象外にする」を押す。",
+        "理由を入力する。",
+        "プレビューを確認して「適用する」を押す。"
+      ],
+      "result": "割当が対象外となり、完了計数に含まれる。現在の記録があれば変更前履歴へ残す。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "確認画面の項目単位「対象外」とは別の操作です。",
+        "復帰するには、その対象へテンプレートを適用します。新しい記録となり旧採用値は引き継ぎません。",
+        "対象外理由は確定結果の除外情報に保存します。"
+      ],
+      "command": "Window.safe(Window.exclude_pages) → Workbench.exclude_pages",
+      "source_line": 184,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_11",
+      "section": "worklist",
+      "label": "変更前の結果",
+      "kind": "button",
+      "purpose": "テンプレート変更・対象外指定で残した記録を閲覧する。",
+      "when": "以前の採用値・確認状態・根拠を見るとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 対象指定が一つで、保存された記録があること。",
+      "steps": [
+        "対象を「選択ページ」などで一つにする。",
+        "「変更前の結果」を押す。",
+        "履歴で記録を選び「選択した記録を編集不可で表示」を押す。"
+      ],
+      "result": "確認画面で保存済みの記録を編集不可で表示する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "履歴には現在の記録も表示します。この経路で開いた記録は現在のものも編集不可として表示します。",
+        "Excel出力前の記録でも閲覧できます。出力履歴とは別です。",
+        "作業一覧へ戻ると現在の割当へ戻ります。"
+      ],
+      "command": "Window.safe(Window.open_assignment_history) → Workbench.history_records",
+      "source_line": 184,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_12",
+      "section": "worklist",
+      "label": "選択対象のOCR",
+      "kind": "button",
+      "purpose": "対象指定に合致する現在の記録に、項目ごとの新しいOCR候補を作る。",
+      "when": "複数ページをまとめて読み取る、対象を再OCRするとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 対象に割当済み・寸法等が一致する記録があり、OCR実行環境を利用できること。",
+      "steps": [
+        "対象を指定する。",
+        "「選択対象のOCR」を押す。",
+        "処理終了後、確認画面で候補を選ぶ。"
+      ],
+      "result": "対象記録のテンプレート全項目について、300dpi画像と範囲OCRジョブを処理し候補を追加する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "未選択・ページ対象外・寸法不一致の対象は読み取りを除外します。全件除外ならエラーです。",
+        "再OCRは既存候補を置き換えず追加します。採用値・根拠・確認状態は変更しません。",
+        "確認画面で訂正した根拠範囲ではなく、割り当てたテンプレートの範囲を読みます。",
+        "GPUなし・OCR失敗・候補ゼロ件でも、必要項目を手入力して完了できます。"
+      ],
+      "command": "Window.safe(Window.run_selected_ocr) → Workbench.ocr_jobs → Window.enqueue_ocr_jobs",
+      "source_line": 188,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_13",
+      "section": "worklist",
+      "label": "選択原本からテンプレート作成",
+      "kind": "button",
+      "purpose": "現在の原本・ページを代表に、新しいテンプレート草案を始める。",
+      "when": "帳票の読み取り範囲と必要項目を初めて登録するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 既存の未登録草案を登録または破棄していること。",
+      "steps": [
+        "代表文書とページを選ぶ。",
+        "「選択原本からテンプレート作成」を押す。"
+      ],
+      "result": "代表原本、初期名、処理単位を設定した空の草案を作り、作成タブへ進む。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "作成時点では登録済みテンプレートになりません。",
+        "ページ方式なら選択ページ、文書方式なら全ページの寸法情報を基準にします。"
+      ],
+      "command": "Window.safe(Window.new_profile)",
+      "source_line": 188,
+      "surface": "main"
+    },
+    {
+      "id": "worklist_14",
+      "section": "worklist",
+      "label": "案件の確認済み結果をExcel／CSVへ出力",
+      "kind": "button",
+      "purpose": "案件全体の完了記録を固定し、新しいExcelとCSVを生成する。",
+      "when": "確認を終えた記録を表として渡すとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 実行中・未保存の処理がなく、入力を保存でき、少なくとも一つ完了記録があること。",
+      "steps": [
+        "案件の確認状態を確認する。",
+        "出力ボタンを押す。",
+        "未完了一覧が出た場合、戻って完了させるか対象を確認して「完了分だけ出力」を押す。",
+        "出力履歴の完了ファイル数を確認する。"
+      ],
+      "result": "原本検証後、確定結果を先に保存し、案件のExcel一ファイルと項目定義ごとのCSVを生成する。",
+      "notes": [
+        "選択文書・選択ページだけではなく案件全体が対象です。",
+        "必須項目は確認済み、任意項目は確認済みまたは理由付き対象外で完了となります。",
+        "同じ項目定義ID・版は同じ結果シート、異なる定義・版は別シート／CSVになります。",
+        "後で訂正しても過去の確定結果は変わりません。",
+        "出力失敗で確認結果は失われません。出力履歴から再出力できます。"
+      ],
+      "command": "Window.safe(Window.finalize) → Workbench.incomplete/finalize → Window.export",
+      "source_line": 189,
+      "surface": "main"
+    },
+    {
+      "id": "setup_01",
+      "section": "setup",
+      "label": "テンプレート作成",
+      "kind": "tab",
+      "purpose": "項目定義と読み取り範囲の草案を作り、案件へ登録する。",
+      "when": "新規作成・改訂・保存した草案の再開時。",
+      "prerequisites": "草案を始めるには代表原本の選択と新規作成／登録版改訂が必要。",
+      "steps": [
+        "「テンプレート作成」タブを選ぶ。"
+      ],
+      "result": "草案があれば、その代表原本・ページを表示し作業を続けられる。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "草案は入力変更から600ms後に案件内 drafts/template.json へ保存します。草案保存と正式登録は別です。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.tab_changed",
+      "source_line": 145,
+      "surface": "main"
+    },
+    {
+      "id": "setup_02",
+      "section": "setup",
+      "label": "テンプレート名",
+      "kind": "entry",
+      "purpose": "登録する読み取り配置に名前を付ける。",
+      "when": "新規草案・改訂草案の編集時。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "テンプレート名を入力する。"
+      ],
+      "result": "草案の名前が更新され、自動保存対象となる。",
+      "notes": [
+        "空白だけの名前では正式登録できません。",
+        "名前を変えても、それだけで項目定義版は変わりません。"
+      ],
+      "command": "setup_name.trace_add → Window.draft_changed",
+      "source_line": 194,
+      "surface": "main",
+      "widget_variable": "self.setup_name"
+    },
+    {
+      "id": "setup_03",
+      "section": "setup",
+      "label": "読み取り単位",
+      "kind": "dropdown",
+      "purpose": "草案を一ページ用または文書全体用にする。",
+      "when": "テンプレートの利用単位を選び直すとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "「ページ用」または「文書全体用」を選ぶ。",
+        "範囲が既にあれば、範囲を指定し直す確認に回答する。"
+      ],
+      "result": "項目は保持し、既存読み取り範囲を消して指定し直せる状態になる。",
+      "notes": [
+        "キャンセルすれば元の単位に戻します。",
+        "ページ用は代表ページの範囲を相対1ページとして登録します。適用先の実ページ番号に対応させます。",
+        "文書全体用は実際のページ番号ごとに範囲を持ちます。"
+      ],
+      "command": "<<ComboboxSelected>> → Window.change_draft_scope",
+      "source_line": 198,
+      "surface": "main",
+      "widget_variable": "self.setup_scope",
+      "options": [
+        "ページ用",
+        "文書全体用"
+      ]
+    },
+    {
+      "id": "setup_04",
+      "section": "setup",
+      "label": "作業一覧で代表文書・ページを選択してください",
+      "kind": "status",
+      "purpose": "草案の代表原本・ページと、次に登録する版を知らせる。",
+      "when": "テンプレート作成時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "読み取り単位の下の表示を確認する。"
+      ],
+      "result": "草案開始後は「草案」または「草案・未登録」、文書名、代表ページ／文書全体、登録予定版を表示する。",
+      "notes": [
+        "「草案・未登録」は正式な案件テンプレートではないことを示します。",
+        "草案の自動保存が済んでも正式登録まで未登録のままです。"
+      ],
+      "command": "Window.update_draft_label",
+      "source_line": 202,
+      "surface": "main",
+      "widget_variable": "self.draft_label"
+    },
+    {
+      "id": "setup_05",
+      "section": "setup",
+      "label": "出力項目の定義（同じ定義・版は同じ結果シート）",
+      "kind": "dropdown",
+      "purpose": "草案で再利用する案件内の項目定義版を選ぶ。",
+      "when": "別配置のテンプレートを同じ結果表へまとめたいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 案件内に登録済み項目定義があること。",
+      "steps": [
+        "定義名・版・IDを確認して選ぶ。",
+        "「選択した項目定義を使用」を押す。"
+      ],
+      "result": "選択後の使用操作で、その定義の項目群を草案へ反映する。",
+      "notes": [
+        "ドロップダウンの選択だけでは定義を切り替えません。",
+        "同じ名前の定義でも、ID・版が違えば別の結果表になります。"
+      ],
+      "command": "Window.refresh_lists → schema_choice / Window.use_schema",
+      "source_line": 205,
+      "surface": "main",
+      "widget_variable": "self.schema_choice"
+    },
+    {
+      "id": "setup_06",
+      "section": "setup",
+      "label": "項目定義の名前",
+      "kind": "entry",
+      "purpose": "結果表の項目群を識別する名前を設定する。",
+      "when": "新しい定義を作る、既存定義を改訂するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "項目定義の名前を入力する。"
+      ],
+      "result": "草案の定義名が更新される。",
+      "notes": [
+        "既存定義の名前を変えて正式登録すると、新しい項目定義版を作ります。",
+        "読み取り範囲だけを変え、名前と項目群を保てば同じ項目定義版を使います。",
+        "空白だけの定義名では登録できません。"
+      ],
+      "command": "schema_name.trace_add → Window.draft_changed / Window.save_profile",
+      "source_line": 210,
+      "surface": "main",
+      "widget_variable": "self.schema_name"
+    },
+    {
+      "id": "setup_07",
+      "section": "setup",
+      "label": "選択した項目定義を使用",
+      "kind": "button",
+      "purpose": "選択した登録定義と同じ項目ID・型・順序で草案を作る。",
+      "when": "配置A/Bを同じ表へ出力したいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 項目定義のドロップダウンで版を選んでいること。",
+      "steps": [
+        "項目定義を選ぶ。",
+        "「選択した項目定義を使用」を押す。",
+        "項目を置き換える確認が出たら内容を確認する。"
+      ],
+      "result": "定義の項目を草案へ読み込む。同じ項目IDの指定済み範囲だけを保持する。",
+      "notes": [
+        "異なる項目名だけをそろえても同一の定義にはなりません。この操作で共通定義を使用します。",
+        "定義の項目が現在の草案と違う場合は置き換え前に確認します。"
+      ],
+      "command": "Window.safe(Window.use_schema)",
+      "source_line": 213,
+      "surface": "main"
+    },
+    {
+      "id": "setup_08",
+      "section": "setup",
+      "label": "新しい項目定義にする",
+      "kind": "button",
+      "purpose": "現在の草案を既存定義と別の定義として登録する準備をする。",
+      "when": "似た項目でも意味が違い、別表として扱いたいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "「新しい項目定義にする」を押す。",
+        "必要に応じて名前・項目を編集し、テンプレートを登録する。"
+      ],
+      "result": "既存定義への関連を外し、登録時に新ID・版1の項目定義を作る。",
+      "notes": [
+        "項目と範囲は保持します。",
+        "同じ名前でも別の結果シートになります。",
+        "押した時点では新しい定義を正式登録しません。"
+      ],
+      "command": "Window.safe(Window.fork_schema)",
+      "source_line": 214,
+      "surface": "main"
+    },
+    {
+      "id": "setup_09",
+      "section": "setup",
+      "label": "項目",
+      "kind": "list",
+      "purpose": "草案の項目、型、必須条件、読み取り範囲、出力順を示す。",
+      "when": "項目の範囲指定・編集・順序変更時。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "編集・範囲指定する項目行を選ぶ。"
+      ],
+      "result": "その項目の根拠枠と範囲ページを原本上で表示する。",
+      "notes": [
+        "上から順に出力します。",
+        "ページ用の範囲は「このページ」、文書全体用では「pページ番号」とmm座標を表示します。",
+        "未指定の項目があれば「未指定」と表示し、そのままでは正式登録できません。"
+      ],
+      "command": "<<TreeviewSelect>> → Window.select_draft_field / Window.refresh_draft",
+      "source_line": 215,
+      "surface": "main",
+      "widget_variable": "self.setup_list",
+      "annotation_label": "項目／型・必須／ページ・範囲",
+      "columns": [
+        "項目",
+        "型・必須",
+        "ページ・範囲"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "setup_10",
+      "section": "setup",
+      "label": "追加",
+      "kind": "button",
+      "purpose": "草案に新しい項目を追加する。",
+      "when": "読み取って出力する項目を増やすとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。",
+      "steps": [
+        "「追加」を押す。",
+        "項目名、文字列／数値、必須条件、標準単位を入力する。",
+        "ダイアログの「保存」を押す。"
+      ],
+      "result": "新しい項目IDを持つ項目が末尾へ追加される。",
+      "notes": [
+        "項目追加後は原本上で読み取り範囲を指定します。",
+        "既存定義を利用中なら、正式登録時に項目定義の新しい版になります。",
+        "ダイアログの保存は草案の更新であり、テンプレートの正式登録ではありません。"
+      ],
+      "command": "Window.safe(Window.add_draft_field) → Window.field_dialog",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_11",
+      "section": "setup",
+      "label": "編集",
+      "kind": "button",
+      "purpose": "選択した草案項目の名前・型・必須条件・標準単位を変更する。",
+      "when": "項目の意味や値の扱いを訂正するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 草案の項目を選択していること。",
+      "steps": [
+        "項目を選んで「編集」を押す。",
+        "内容を変更し、ダイアログの「保存」を押す。"
+      ],
+      "result": "同じ項目IDの定義内容を更新し、指定済み範囲を保持する。",
+      "notes": [
+        "既存定義と内容が変われば、正式登録時に項目定義の新しい版になります。",
+        "既存記録の使用版・採用値は更新しません。"
+      ],
+      "command": "Window.safe(Window.edit_draft_field) → Window.field_dialog",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_12",
+      "section": "setup",
+      "label": "削除",
+      "kind": "button",
+      "purpose": "草案から選択項目とその範囲を取り除く。",
+      "when": "出力項目から外したいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 草案の項目を選択していること。",
+      "steps": [
+        "削除する項目を選ぶ。",
+        "「削除」を押す。"
+      ],
+      "result": "その草案項目と読み取り範囲が消える。",
+      "notes": [
+        "この削除には確認ダイアログを設けていません。",
+        "登録済みの版・既存記録は削除しません。",
+        "既存定義利用中なら、登録時に新しい定義版になります。"
+      ],
+      "command": "Window.safe(Window.delete_draft_field)",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_13",
+      "section": "setup",
+      "label": "↑",
+      "kind": "button",
+      "purpose": "選択項目を出力順で一つ上へ移動する。",
+      "when": "結果表の列順を調整するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 草案の項目を選択していること。",
+      "steps": [
+        "項目を選んで「↑」を押す。"
+      ],
+      "result": "項目の順番が上へ移動し、対応する範囲は保持する。",
+      "notes": [
+        "先頭項目では変更しません。",
+        "順序変更も定義内容の変更として扱います。"
+      ],
+      "command": "Window.safe → Window.move_draft_field(-1)",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_14",
+      "section": "setup",
+      "label": "↓",
+      "kind": "button",
+      "purpose": "選択項目を出力順で一つ下へ移動する。",
+      "when": "結果表の列順を調整するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 草案の項目を選択していること。",
+      "steps": [
+        "項目を選んで「↓」を押す。"
+      ],
+      "result": "項目の順番が下へ移動する。",
+      "notes": [
+        "末尾項目では変更しません。",
+        "既存の記録で使用する版の順序を上書きしません。"
+      ],
+      "command": "Window.safe → Window.move_draft_field(1)",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_15",
+      "section": "setup",
+      "label": "登録版を改訂",
+      "kind": "button",
+      "purpose": "作業一覧で選んだ登録テンプレートの次版の草案を作る。",
+      "when": "範囲や項目を改訂するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 作業一覧で文書を選択していること。 作業一覧で改訂元のテンプレート版を選び、未登録草案を登録または破棄していること。",
+      "steps": [
+        "作業一覧で代表文書と改訂元の版を選ぶ。",
+        "作成タブで「登録版を改訂」を押す。",
+        "草案を編集し、案件へ登録する。"
+      ],
+      "result": "同じテンプレートIDで最新版の次の版を作る準備をし、既存の項目定義を読み込む。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "代表原本と寸法・向きが一致すれば範囲を複製し、不一致なら範囲を空にします。",
+        "登録済み版・既存記録は保持します。",
+        "範囲だけの改訂は同じ項目定義版、項目定義名や項目群の変更は新しい項目定義版になります。"
+      ],
+      "command": "Window.safe(Window.revise_profile)",
+      "source_line": 224,
+      "surface": "main"
+    },
+    {
+      "id": "setup_16",
+      "section": "setup",
+      "label": "項目を選び、原本上で値の範囲をドラッグします。上から順に出力します。\n項目の変更は新しい定義版になります。範囲だけの変更は同じ定義を使います。",
+      "kind": "guidance",
+      "purpose": "範囲指定・出力順・定義改訂の規則を知らせる。",
+      "when": "草案作成時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "項目一覧の下の説明を読む。"
+      ],
+      "result": "配置の改訂と項目定義の改訂の違いが分かる。",
+      "notes": [],
+      "command": "Window.build → ttk.Label",
+      "source_line": 225,
+      "surface": "main"
+    },
+    {
+      "id": "setup_17",
+      "section": "setup",
+      "label": "テンプレートを案件へ登録",
+      "kind": "button",
+      "purpose": "草案を不変の項目定義版・テンプレート版として案件へ登録する。",
+      "when": "全項目と範囲を指定し終えたとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 「選択原本からテンプレート作成」または「登録版を改訂」で草案を開始していること。 名前・項目定義名・一つ以上の項目・全項目の有効な範囲があること。",
+      "steps": [
+        "名前、型、必須条件、単位、順序、全読み取り範囲を確認する。",
+        "「テンプレートを案件へ登録」を押す。"
+      ],
+      "result": "定義とテンプレートを同じ保存単位で登録し、次の登録予定版を表示する。",
+      "notes": [
+        "草案の自動保存とは別の正式登録です。",
+        "登録は文書への適用・OCRを自動実行しません。作業一覧で版を選んで適用します。",
+        "同じ定義内容なら既存の定義版を使い、項目・順序・定義名が変われば新しい定義版を作ります。",
+        "「新しい項目定義にする」を選んだ草案では新ID・版1を作ります。",
+        "共通登録をしない限り、この案件内だけのテンプレートです。"
+      ],
+      "command": "Window.safe(Window.save_profile) → ResultSchema.validate / ExtractionProfile.validate → Workbench.register_template",
+      "source_line": 226,
+      "surface": "main"
+    },
+    {
+      "id": "setup_18",
+      "section": "setup",
+      "label": "この草案を破棄",
+      "kind": "button",
+      "purpose": "未登録の草案と再開用保存ファイルを取り除く。",
+      "when": "作成し直す、別の草案に取り掛かるとき。",
+      "prerequisites": "草案があること。",
+      "steps": [
+        "「この草案を破棄」を押す。",
+        "未登録変更があれば破棄の確認に回答する。"
+      ],
+      "result": "草案の項目・範囲と drafts/template.json が消える。",
+      "notes": [
+        "正式登録済みのテンプレート版は消しません。"
+      ],
+      "command": "Window.safe(Window.discard_draft) → Window.remove_draft_checkpoint",
+      "source_line": 227,
+      "surface": "main"
+    },
+    {
+      "id": "setup_19",
+      "section": "setup",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "テンプレート作成タブ全体を上下へ送る。",
+      "when": "下の登録・破棄ボタンが見切れるとき。",
+      "prerequisites": "作成タブを開いていること。",
+      "steps": [
+        "タブ右端の縦スクロールバーを動かす。",
+        "背景上ではマウスホイールでも上下に送る。"
+      ],
+      "result": "タブ内の見える操作部分が変わる。",
+      "notes": [
+        "ホイール処理は背景・内容領域に設定されています。入力欄や一覧ではスクロールバーを使えます。",
+        "項目一覧内の行送りとは別です。"
+      ],
+      "command": "Window.scrollable_content(setup_tab) → viewport.yview / <MouseWheel>",
+      "source_line": 296,
+      "surface": "main",
+      "annotation_label": "作成タブの縦スクロール",
+      "invocation_line": 190
+    },
+    {
+      "id": "review_01",
+      "section": "review",
+      "label": "確認・訂正",
+      "kind": "tab",
+      "purpose": "項目の採用値・原文・単位・根拠を原本と照合し確認する。",
+      "when": "候補の採用、手入力、訂正、保留・対象外、過去結果の閲覧時。",
+      "prerequisites": "編集には現在のテンプレート割当が必要。",
+      "steps": [
+        "「確認・訂正」タブを選ぶ。",
+        "確認する項目を選ぶ。"
+      ],
+      "result": "現在の記録または表示中の過去結果を項目ごとに表示する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "テンプレート未割当・ページ対象外では入力欄を空にし、編集を無効にします。",
+        "過去結果や原本検証中では編集ボタン・入力欄を無効にします。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.tab_changed / Window.refresh_review",
+      "source_line": 145,
+      "surface": "main"
+    },
+    {
+      "id": "review_02",
+      "section": "review",
+      "label": "項目",
+      "kind": "list",
+      "purpose": "記録の各項目と保存済み採用値・確認状態を一覧する。",
+      "when": "確認する項目を切り替えるとき。",
+      "prerequisites": "表示する記録があること。",
+      "steps": [
+        "確認したい項目行を選ぶ。"
+      ],
+      "result": "その項目の入力値、根拠、候補を表示し、必要なら根拠ページを開く。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "状態は「未取得」「未確認」「確認済み」「保留」「対象外」です。",
+        "表の値は保存済みデータです。入力保存に失敗した場合、入力欄の未保存内容は別に保持します。"
+      ],
+      "command": "<<TreeviewSelect>> → Window.safe(Window.select_field) → Window.load_field",
+      "source_line": 229,
+      "surface": "main",
+      "widget_variable": "self.review_list",
+      "annotation_label": "項目／採用値／状態",
+      "columns": [
+        "項目",
+        "採用値",
+        "状態"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "review_03",
+      "section": "review",
+      "label": "項目を選択してください",
+      "kind": "status",
+      "purpose": "項目名、型、必須条件、確認状態、対象ページと編集可否を示す。",
+      "when": "項目確認時。",
+      "prerequisites": "記録と項目を選択していること。",
+      "steps": [
+        "項目一覧の下の見出しを確認する。"
+      ],
+      "result": "「項目名 / 文字列・数値 / 必須・任意 / 状態 / pページ・文書全体」を表示する。",
+      "notes": [
+        "過去結果では「過去の結果・編集不可」が加わります。",
+        "記録がないときは作業一覧でテンプレートを選ぶ案内を表示します。"
+      ],
+      "command": "Window.load_field / Window.refresh_review → field_label.configure",
+      "source_line": 235,
+      "surface": "main",
+      "widget_variable": "self.field_label"
+    },
+    {
+      "id": "review_04",
+      "section": "review",
+      "label": "採用値",
+      "kind": "entry",
+      "purpose": "表へ出力する値を入力・訂正する。",
+      "when": "手入力またはOCR候補を修正するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。",
+      "steps": [
+        "採用する値を入力する。",
+        "保存表示を確認する。",
+        "原本と照合して「確認済みにする」を押す。"
+      ],
+      "result": "入力変更から350ms後に保存を試み、確認済みとは別に保存状態を示す。",
+      "notes": [
+        "文字列は先頭ゼロ・全角表記を保持します。",
+        "数値は単位を含めず入力します。確認済みにする際に有効な十進表記を検査し、全角等を正規化します。",
+        "値・単位・原文・根拠等の訂正は再確認が必要となります。空値かつ根拠なしなら未取得へ戻ります。",
+        "保存失敗時も入力を保持します。"
+      ],
+      "command": "StringVar.trace_add → Window.changed → Window.autosave → Window.save_field → Workbench.edit",
+      "source_line": 241,
+      "surface": "main",
+      "widget_variable": "self.vars[\"value\"]"
+    },
+    {
+      "id": "review_05",
+      "section": "review",
+      "label": "単位",
+      "kind": "entry",
+      "purpose": "採用値に対応する単位を独立して記録する。",
+      "when": "温度などの単位を確認・訂正するとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。",
+      "steps": [
+        "単位を入力する。",
+        "保存状態を確認し、必要な再確認を行う。"
+      ],
+      "result": "値とは別に単位が保存され、表へ出力される。",
+      "notes": [
+        "テンプレートの標準単位が初期値です。入力欄で変更できます。",
+        "数値の採用値に ℃ 等を含めず、この欄へ分けます。",
+        "単位変更で既存の確認済み状態は維持しません。"
+      ],
+      "command": "StringVar.trace_add → Window.changed → Window.save_field",
+      "source_line": 241,
+      "surface": "main",
+      "widget_variable": "self.vars[\"unit\"]"
+    },
+    {
+      "id": "review_06",
+      "section": "review",
+      "label": "原文表記",
+      "kind": "entry",
+      "purpose": "原本に記載された表記を採用値と別に保存する。",
+      "when": "数値の正規化、全角表記、単位を含む原文を残すとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。",
+      "steps": [
+        "原本どおりの表記を入力する。",
+        "保存状態を確認し、原本照合後に確認する。"
+      ],
+      "result": "原文表記が根拠情報として保存される。",
+      "notes": [
+        "候補取り込みでは候補文字列を採用値と原文の両方へ入れます。",
+        "原文表記の訂正も再確認が必要です。",
+        "採用値を数値として正規化しても原文欄は別に保持します。"
+      ],
+      "command": "StringVar.trace_add → Window.changed → Window.save_field",
+      "source_line": 241,
+      "surface": "main",
+      "widget_variable": "self.vars[\"raw\"]"
+    },
+    {
+      "id": "review_07",
+      "section": "review",
+      "label": "保留・対象外の理由",
+      "kind": "entry",
+      "purpose": "項目を保留または対象外にする理由を入力する。",
+      "when": "判断を後回しにする、任意項目が該当しないとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。",
+      "steps": [
+        "理由を入力する。",
+        "「保留」または「対象外」を押す。"
+      ],
+      "result": "理由と選んだ状態が保存される。",
+      "notes": [
+        "入力だけでは保留・対象外の状態になりません。",
+        "保留・対象外には空でない理由が必要です。",
+        "必須項目は項目単位の対象外にできません。",
+        "既に保留・対象外の項目の理由を空にして保存すると、その状態を解除します。"
+      ],
+      "command": "StringVar.trace_add → Window.changed / Window.mark → Workbench.mark",
+      "source_line": 241,
+      "surface": "main",
+      "widget_variable": "self.vars[\"reason\"]"
+    },
+    {
+      "id": "review_08",
+      "section": "review",
+      "label": "根拠未指定",
+      "kind": "status",
+      "purpose": "項目に結び付いた原本ページとmm範囲を表示する。",
+      "when": "値と原本の対応を確認するとき。",
+      "prerequisites": "項目が選択されていること。",
+      "steps": [
+        "根拠表示と緑の枠を確認する。"
+      ],
+      "result": "指定済みなら「原本 pページ / mm (x,y,幅,高さ)」、なければ根拠未指定を表示する。",
+      "notes": [
+        "確認済みには原本と一致する有効な根拠が必要です。",
+        "根拠の訂正は確認タブで原本上をドラッグします。",
+        "この表示はテンプレートのOCR範囲と常に同じとは限りません。"
+      ],
+      "command": "Window.load_field / Window.drag_end → anchor_label.configure",
+      "source_line": 245,
+      "surface": "main",
+      "widget_variable": "self.anchor_label"
+    },
+    {
+      "id": "review_09",
+      "section": "review",
+      "label": "",
+      "kind": "status",
+      "purpose": "入力が保存できたかを、確認状態から分けて知らせる。",
+      "when": "入力変更・保存・過去結果閲覧時。",
+      "prerequisites": "記録と項目を選択していること。",
+      "steps": [
+        "根拠表示の下の保存表示を確認する。"
+      ],
+      "result": "保存待ち、保存済み、失敗時の入力保持、確定時／変更前の保存済み内容を表示する。",
+      "notes": [
+        "保存済みは確認済みを意味しません。",
+        "「未保存入力 — 保存待ち」から保存結果へ変わることを確認します。",
+        "変更前の履歴は「変更前の保存済み内容（編集不可）」、出力履歴は「確定時の保存済み内容」です。"
+      ],
+      "command": "Window.changed / Window.save_field / Window.load_field → save_label.configure",
+      "source_line": 247,
+      "surface": "main",
+      "annotation_label": "入力の保存状態",
+      "widget_variable": "self.save_label"
+    },
+    {
+      "id": "review_10",
+      "section": "review",
+      "label": "保存再試行",
+      "kind": "button",
+      "purpose": "保持している未保存入力・ワーカー結果・出力履歴を保存し直す。",
+      "when": "保存に失敗した原因を解消した後。",
+      "prerequisites": "案件が開いていること。原本検証中は待つこと。",
+      "steps": [
+        "保存失敗の原因を解消する。",
+        "「保存再試行」を押す。",
+        "保存表示と下部メッセージを確認する。"
+      ],
+      "result": "入力、処理結果、出力履歴の順に再保存を試み、成功した保持分を除去する。",
+      "notes": [
+        "原本検証が失敗した状態では、最初に原本の再検査を開始します。",
+        "生成済み出力の履歴保存再試行はファイルを再生成しません。",
+        "草案の自動保存失敗をこのボタンで保存する処理はありません。草案は変更時・案件切替・終了時・バックアップ時に保存を試みます。"
+      ],
+      "command": "Window.safe(Window.retry_saves)",
+      "source_line": 253,
+      "surface": "main"
+    },
+    {
+      "id": "review_11",
+      "section": "review",
+      "label": "確認済みにする",
+      "kind": "button",
+      "purpose": "採用値と根拠を検証し、選択項目を正式な確認済みにする。",
+      "when": "原本照合を終えたとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。 有効な採用値と有効な原本根拠があること。",
+      "steps": [
+        "原本の値・ラベル・行と採用値・単位・原文・根拠を照合する。",
+        "「確認済みにする」を押す。",
+        "原本検証後の確認状態を確認する。"
+      ],
+      "result": "原本の固定内容と値・根拠が有効なら、確認した版を記録して確認済みにする。",
+      "notes": [
+        "未保存入力を先に保存します。保存失敗時は確認へ進みません。",
+        "数値はこの時点で正確な十進文字列へ正規化します。",
+        "確認後に値・単位・原文・根拠等を変更すると再確認が必要です。",
+        "他の項目を自動で確認済みにしません。"
+      ],
+      "command": "Window.safe(Window.accept) → validate_sources → Workbench.accept → FieldState.accept",
+      "source_line": 253,
+      "surface": "main"
+    },
+    {
+      "id": "review_12",
+      "section": "review",
+      "label": "保留",
+      "kind": "button",
+      "purpose": "選択項目を理由付きの保留にする。",
+      "when": "原本の判断や値の確定を後回しにするとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。 理由が入力されていること。",
+      "steps": [
+        "保留理由を入力する。",
+        "「保留」を押す。"
+      ],
+      "result": "選択項目の状態が保留となり、正式出力では未完了として扱う。",
+      "notes": [
+        "値・原文・根拠は保持します。",
+        "必須・任意の両方で使えます。"
+      ],
+      "command": "Window.safe → Window.mark(Status.DEFERRED) → Workbench.mark",
+      "source_line": 253,
+      "surface": "main"
+    },
+    {
+      "id": "review_13",
+      "section": "review",
+      "label": "対象外",
+      "kind": "button",
+      "purpose": "任意項目を理由付きで対象外にする。",
+      "when": "その項目が当該記録に該当しないとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。 任意項目であり、理由が入力されていること。",
+      "steps": [
+        "対象外理由を入力する。",
+        "「対象外」を押す。"
+      ],
+      "result": "その任意項目は正式出力条件を満たす対象外状態になる。",
+      "notes": [
+        "必須項目には使えません。",
+        "ページ・文書全体を除外する「作業一覧」の対象外操作とは別です。",
+        "値・原文・根拠の保存内容は保持します。"
+      ],
+      "command": "Window.safe → Window.mark(Status.NOT_APPLICABLE) → Workbench.mark",
+      "source_line": 253,
+      "surface": "main"
+    },
+    {
+      "id": "review_14",
+      "section": "review",
+      "label": "候補なし。手入力できます",
+      "kind": "dropdown",
+      "purpose": "選択項目のOCR候補を選ぶ。",
+      "when": "機械の読み取り結果を採用候補として確認するとき。",
+      "prerequisites": "現在の記録と項目が選択されていること。",
+      "steps": [
+        "候補のドロップダウンを開いて文字列を選ぶ。",
+        "必要なら「候補を採用欄へ取り込む」を押す。"
+      ],
+      "result": "候補を選択する。選択だけでは採用値・根拠を変更しない。",
+      "notes": [
+        "再OCR分を含む候補を新しい順に表示します。",
+        "候補ゼロ件でも採用欄で手入力できます。",
+        "過去結果表示では候補の選択肢を出しません。"
+      ],
+      "command": "Window.refresh_candidate_choices / Window.adopt",
+      "source_line": 256,
+      "surface": "main",
+      "widget_variable": "self.candidate_list"
+    },
+    {
+      "id": "review_15",
+      "section": "review",
+      "label": "候補0件",
+      "kind": "status",
+      "purpose": "選択項目で利用できる候補数を知らせる。",
+      "when": "OCR後・候補確認時。",
+      "prerequisites": "現在の記録と項目が選択されていること。",
+      "steps": [
+        "候補ドロップダウンの下を確認する。"
+      ],
+      "result": "「候補N件（取り込み後に原本と照合して確認）」を表示する。",
+      "notes": [
+        "記録全体の候補数ではなく、選択中の一項目の候補数です。",
+        "候補が増えても記録の確認済み項目数は増えません。"
+      ],
+      "command": "Window.refresh_candidate_choices → candidate_count_label.configure",
+      "source_line": 258,
+      "surface": "main",
+      "widget_variable": "self.candidate_count_label"
+    },
+    {
+      "id": "review_16",
+      "section": "review",
+      "label": "候補を採用欄へ取り込む（確認は別操作）",
+      "kind": "button",
+      "purpose": "選択候補の文字列と根拠を選択項目の採用内容へ入れる。",
+      "when": "OCR候補を使って確認作業を始めるとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。 OCR候補を選んでいること。",
+      "steps": [
+        "候補を選ぶ。",
+        "取り込みボタンを押す。",
+        "採用値・原文・根拠を原本と照合し、必要なら訂正する。",
+        "「確認済みにする」を押す。"
+      ],
+      "result": "候補文字列を採用値・原文へ、候補根拠を項目根拠へ保存する。",
+      "notes": [
+        "単位は現在の入力／保存内容を保ちます。",
+        "取り込みは確認済みへの操作ではありません。",
+        "数値候補に単位が混じっていれば、採用値を訂正して単位を別欄へ分けます。",
+        "候補そのものは変更・削除しません。"
+      ],
+      "command": "Window.safe(Window.adopt) → Workbench.adopt → Workbench.edit",
+      "source_line": 260,
+      "surface": "main"
+    },
+    {
+      "id": "review_17",
+      "section": "review",
+      "label": "この記録の範囲OCR（再実行は候補を追加）",
+      "kind": "button",
+      "purpose": "表示中の現在の記録に対して、テンプレート全項目の範囲OCRを実行する。",
+      "when": "この一記録だけを読み直したいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 現在の記録と項目が選択され、過去結果の閲覧中ではないこと。 原本とテンプレートのページ数・寸法・向きが一致し、OCR環境を利用できること。",
+      "steps": [
+        "現在の記録を確認する。",
+        "範囲OCRボタンを押す。",
+        "処理後、各項目の候補を確認する。"
+      ],
+      "result": "その記録の全項目について新しいOCR候補を追加する。",
+      "notes": [
+        "選択中の一項目だけのOCRではありません。",
+        "別記録の未完了OCRを一緒に再開する操作ではありません。",
+        "採用値・原文・根拠・確認状態は変更しません。",
+        "OCRには登録テンプレートの範囲を使い、手で訂正した記録の根拠範囲を使うものではありません。",
+        "GPUなしでも手入力で作業を続けられます。"
+      ],
+      "command": "Window.safe(Window.run_ocr) → Workbench.ocr_jobs → Window.enqueue_ocr_jobs",
+      "source_line": 263,
+      "surface": "main"
+    },
+    {
+      "id": "review_18",
+      "section": "review",
+      "label": "確認済み結果を確定してExcel／CSV出力",
+      "kind": "button",
+      "purpose": "案件の完了記録を固定して新しいExcel／CSVを生成する。",
+      "when": "確認画面から出力に進むとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 実行中・未保存の処理がなく、少なくとも一つ完了記録があること。",
+      "steps": [
+        "出力ボタンを押す。",
+        "未完了一覧が出た場合は対象を確認して戻るか、完了分だけ出力する。",
+        "出力履歴を確認する。"
+      ],
+      "result": "作業一覧の出力ボタンと同じ案件全体の確定・出力を実行する。",
+      "notes": [
+        "この画面の一項目・一記録だけを出力するボタンではありません。",
+        "Excelの同一定義・版は同じ結果シートになります。",
+        "過去の確定結果は上書きせず、新しい確定結果を作ります。"
+      ],
+      "command": "Window.safe(Window.finalize)",
+      "source_line": 266,
+      "surface": "main"
+    },
+    {
+      "id": "review_19",
+      "section": "review",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "確認・訂正タブ全体を上下へ送る。",
+      "when": "候補・OCR・出力ボタンが見切れるとき。",
+      "prerequisites": "確認タブを開いていること。",
+      "steps": [
+        "タブ右端の縦スクロールバーを動かす。",
+        "背景上ではホイールで上下に送る。"
+      ],
+      "result": "下部の候補、OCR、出力操作を表示できる。",
+      "notes": [
+        "項目一覧内の行送りとは別の操作です。",
+        "入力欄上で見切れた操作を探す場合は縦バーを使います。"
+      ],
+      "command": "Window.scrollable_content(review_tab) → viewport.yview / <MouseWheel>",
+      "source_line": 296,
+      "surface": "main",
+      "annotation_label": "確認タブの縦スクロール",
+      "invocation_line": 228
+    },
+    {
+      "id": "history_01",
+      "section": "history",
+      "label": "出力履歴",
+      "kind": "tab",
+      "purpose": "案件で固定した確定結果と出力ファイル状況を参照する。",
+      "when": "過去の表・根拠を見る、出力を再試行するとき。",
+      "prerequisites": "案件が開かれていること。",
+      "steps": [
+        "「出力履歴」タブを選ぶ。"
+      ],
+      "result": "確定日時・対象件数・出力状況の一覧を表示する。",
+      "notes": [
+        "未保存入力があれば保存を試みます。失敗した入力は画面内に保持します。",
+        "現在編集中の値と、確定時の値を区別します。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.tab_changed",
+      "source_line": 145,
+      "surface": "main"
+    },
+    {
+      "id": "history_02",
+      "section": "history",
+      "label": "確定日時 UTC",
+      "kind": "list",
+      "purpose": "確定結果の日時・対象レコード数・完成ファイル数を一覧する。",
+      "when": "再表示・再出力する確定結果を選ぶとき。",
+      "prerequisites": "確定結果を作成していること。",
+      "steps": [
+        "対象の確定結果行をクリックする。"
+      ],
+      "result": "その確定結果を表示・再出力操作の対象として選択する。",
+      "notes": [
+        "日時表示はUTCです。",
+        "件数は出力対象となった記録の行数です。理由付きのページ対象外は件数に含めません。",
+        "新形式はExcel一ファイルと定義ごとのCSV数を合計した「完成数/予定数 ファイル完了」を示します。",
+        "行選択だけでは原本・根拠を表示しません。"
+      ],
+      "command": "Window.refresh_lists → history_list / Window.open_history / Window.retry_export",
+      "source_line": 267,
+      "surface": "main",
+      "widget_variable": "self.history_list",
+      "annotation_label": "確定日時 UTC／対象件数／出力状況",
+      "columns": [
+        "確定日時 UTC",
+        "対象件数",
+        "出力状況"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "history_03",
+      "section": "history",
+      "label": "選択結果の原本・根拠を表示",
+      "kind": "button",
+      "purpose": "選択した確定結果の保存内容を編集不可で開く。",
+      "when": "出力した値の根拠を後から確認するとき。",
+      "prerequisites": "履歴で確定結果を選択し、未保存入力を保存できること。",
+      "steps": [
+        "確定結果行を選ぶ。",
+        "表示ボタンを押す。",
+        "確認画面で項目を選び、原本と根拠を確認する。"
+      ],
+      "result": "確定時の採用値・原文・状態・根拠を確認画面へ表示する。",
+      "notes": [
+        "出力後の訂正内容ではなく、確定時の内容を表示します。",
+        "現在のテンプレート版ではなく、確定時に使用したテンプレート版を用います。",
+        "保存済み原本画像がなければ原本描画を実行します。"
+      ],
+      "command": "Window.safe(Window.open_history) → Window.select_history_record",
+      "source_line": 272,
+      "surface": "main"
+    },
+    {
+      "id": "history_04",
+      "section": "history",
+      "label": "",
+      "kind": "dropdown",
+      "purpose": "開いた確定結果に含まれる記録を選ぶ。",
+      "when": "案件出力の別文書・別ページの根拠を見るとき。",
+      "prerequisites": "先に「選択結果の原本・根拠を表示」を実行していること。",
+      "steps": [
+        "出力履歴の記録ドロップダウンを開く。",
+        "原本名、実ページ／文書全体、テンプレート名・版、記録IDで選ぶ。"
+      ],
+      "result": "選んだ確定記録を確認タブで編集不可として表示する。",
+      "notes": [
+        "履歴一覧で別の確定結果を選択しただけでは、この欄の内容は更新しません。表示ボタンで読み込み直します。"
+      ],
+      "command": "<<ComboboxSelected>> → Window.safe(Window.select_history_record)",
+      "source_line": 273,
+      "surface": "main",
+      "annotation_label": "確定結果内の記録選択",
+      "widget_variable": "self.history_record"
+    },
+    {
+      "id": "history_05",
+      "section": "history",
+      "label": "未生成・失敗した形式を再出力",
+      "kind": "button",
+      "purpose": "選択した確定結果から未完成の出力ファイルを作り直す。",
+      "when": "表生成の失敗、削除・変更された出力ファイルの復旧時。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 履歴で確定結果を選び、未保存履歴などを保存できること。",
+      "steps": [
+        "確定結果行を選ぶ。",
+        "再出力ボタンを押す。",
+        "出力状況と下部メッセージを確認する。"
+      ],
+      "result": "同じ確定結果を使って必要なExcel／CSVを再生成し、出力履歴を更新する。",
+      "notes": [
+        "現在の編集値で新たな確定結果を作る操作ではありません。",
+        "完成済みかつ内容ハッシュが一致するファイルは再生成しません。",
+        "同じ確定結果を出力中なら二重実行を拒否します。",
+        "旧v0.1.0の確定結果は旧出力形式のまま再生成します。"
+      ],
+      "command": "Window.safe(Window.retry_export) → Window.retry_saves → Window.export → generate_artifacts",
+      "source_line": 276,
+      "surface": "main"
+    },
+    {
+      "id": "history_06",
+      "section": "history",
+      "label": "出力履歴の保存を再試行",
+      "kind": "button",
+      "purpose": "生成済みファイルの成否・パス・ハッシュをDBへ保存し直す。",
+      "when": "生成は済んだが出力履歴の保存に失敗したとき。",
+      "prerequisites": "案件が開かれ、保持している未保存履歴を再保存できること。",
+      "steps": [
+        "保存失敗の原因を解消する。",
+        "「出力履歴の保存を再試行」を押す。",
+        "保存結果と出力状況を確認する。"
+      ],
+      "result": "保持していた結果をDBへ保存し、成功後に保持分を除去する。",
+      "notes": [
+        "生成済みファイルを再生成する操作ではありません。",
+        "確認タブの「保存再試行」と同じ処理で、未保存入力・ワーカー結果も先に再保存します。",
+        "公開したファイルの読取不能やハッシュ不一致は、そのファイルの失敗として履歴へ保存します。"
+      ],
+      "command": "Window.safe(Window.retry_saves) → record_artifacts",
+      "source_line": 277,
+      "surface": "main"
+    },
+    {
+      "id": "history_07",
+      "section": "history",
+      "label": "出力フォルダーを開く",
+      "kind": "button",
+      "purpose": "現在の案件の exports フォルダーをエクスプローラーで開く。",
+      "when": "生成されたExcel／CSVを取り出すとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。",
+      "steps": [
+        "「出力フォルダーを開く」を押す。"
+      ],
+      "result": "現在の案件の全出力フォルダーが開く。",
+      "notes": [
+        "履歴で選んだ一つの確定結果フォルダーを直接開く操作ではありません。",
+        "新形式は exports/確定結果ID/案件結果.xlsx と 結果NN.csv に保存します。"
+      ],
+      "command": "Window.safe(Window.open_exports) → os.startfile",
+      "source_line": 278,
+      "surface": "main"
+    },
+    {
+      "id": "library_01",
+      "section": "library",
+      "label": "共通テンプレート",
+      "kind": "tab",
+      "purpose": "Portable内の共有テンプレートを別案件へ再利用する。",
+      "when": "共通版を取り込む、案件内で作った版を共通登録するとき。",
+      "prerequisites": "表示にはなし。取り込み・共通登録には案件を開き原本検証が完了していること。",
+      "steps": [
+        "「共通テンプレート」タブを選ぶ。"
+      ],
+      "result": "共通一覧と、案件から共通へ登録する操作を表示する。",
+      "notes": [
+        "共通登録はこのPortable内の settings/templates.sqlite です。クラウド公開操作ではありません。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.tab_changed",
+      "source_line": 145,
+      "surface": "main"
+    },
+    {
+      "id": "library_02",
+      "section": "library",
+      "label": "Portable内の共通登録から、別案件へ同じテンプレートを取り込めます。\n取り込んだ版は案件内に保存され、共通登録の改訂では変わりません。",
+      "kind": "guidance",
+      "purpose": "共有テンプレートの取り込みと版固定の規則を説明する。",
+      "when": "共通テンプレート利用時。",
+      "prerequisites": "なし。",
+      "steps": [
+        "タブ上部の説明を読む。"
+      ],
+      "result": "共通版の改訂が、既に取り込んだ案件へ自動反映されないと分かる。",
+      "notes": [],
+      "command": "Window.build → ttk.Label",
+      "source_line": 279,
+      "surface": "main"
+    },
+    {
+      "id": "library_03",
+      "section": "library",
+      "label": "テンプレート・版",
+      "kind": "list",
+      "purpose": "Portable内の共通テンプレート版を一覧する。",
+      "when": "取り込む版を選ぶとき。",
+      "prerequisites": "共通登録したテンプレートがあること。",
+      "steps": [
+        "名前・版、ページ用／文書用、項目定義・版を確認する。",
+        "取り込む行を選ぶ。"
+      ],
+      "result": "取り込み操作の対象となる版を選択する。",
+      "notes": [
+        "一覧の選択だけでは案件へ取り込みません。",
+        "登録版は不変で、共通版の編集・削除ボタンはありません。"
+      ],
+      "command": "Window.refresh_library → TemplateLibrary.list_profiles/get_schema",
+      "source_line": 280,
+      "surface": "main",
+      "widget_variable": "self.library_list",
+      "annotation_label": "テンプレート・版／単位／項目定義・版",
+      "columns": [
+        "テンプレート・版",
+        "単位",
+        "項目定義・版"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "library_04",
+      "section": "library",
+      "label": "選択版を現在の案件へ取り込む",
+      "kind": "button",
+      "purpose": "共通テンプレートと使用項目定義の完全な版を案件内へコピーする。",
+      "when": "別案件で同じテンプレートを使うとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 共通一覧で版を選んでいること。",
+      "steps": [
+        "共通一覧の版を選ぶ。",
+        "取り込みボタンを押す。",
+        "作業一覧で対象文書・ページと取り込んだ版を選び、適用する。"
+      ],
+      "result": "その版が案件のテンプレート選択欄へ追加され、作業一覧へ移動する。",
+      "notes": [
+        "取り込みはページへの適用・OCRを実行しません。",
+        "同じID・版・内容の再取り込みは重複版を作りません。",
+        "同じID・版で内容が違う場合は取り込みを拒否します。",
+        "取り込み後の案件は共通DBがなくても使用版を保持します。"
+      ],
+      "command": "Window.safe(Window.import_library) → Workbench.import_template",
+      "source_line": 285,
+      "surface": "main"
+    },
+    {
+      "id": "library_05",
+      "section": "library",
+      "label": "共通へ登録する案件内テンプレート",
+      "kind": "dropdown",
+      "purpose": "共通登録する案件内テンプレートの版を選ぶ。",
+      "when": "自作テンプレートを別案件で使えるようにするとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 案件内に正式登録済みのテンプレートがあること。",
+      "steps": [
+        "テンプレート名・版・読み取り単位・IDを確認して選ぶ。"
+      ],
+      "result": "次の共通登録操作で使う版を選択する。",
+      "notes": [
+        "未登録の草案はこの選択欄に表示しません。",
+        "選択だけでは共通登録しません。"
+      ],
+      "command": "Window.refresh_lists → publish_choice / Window.publish_library",
+      "source_line": 287,
+      "surface": "main",
+      "widget_variable": "self.publish_choice"
+    },
+    {
+      "id": "library_06",
+      "section": "library",
+      "label": "選択版を共通へ登録",
+      "kind": "button",
+      "purpose": "選択した案件内テンプレート版と項目定義版をPortable内へ共通登録する。",
+      "when": "別案件へ同じ設定を再利用したいとき。",
+      "prerequisites": "案件を開き、固定原本の検証が完了していること。 共通登録する案件内版を選んでいること。",
+      "steps": [
+        "共通へ登録する案件内テンプレート版を選ぶ。",
+        "共通登録ボタンを押す。"
+      ],
+      "result": "共通一覧に登録版が表示される。",
+      "notes": [
+        "新しい版を追加し、登録済み共通版を上書きしません。",
+        "同じID・版・内容の再登録は追加しません。内容が違えば拒否します。",
+        "文書の採用値・原本・確認結果を共有する操作ではありません。"
+      ],
+      "command": "Window.safe(Window.publish_library) → Workbench.publish_template → TemplateLibrary.publish",
+      "source_line": 289,
+      "surface": "main"
+    },
+    {
+      "id": "setup_20",
+      "section": "setup",
+      "label": "項目名",
+      "kind": "entry",
+      "purpose": "追加・編集する項目の名称を入力する。",
+      "when": "「追加」または「編集」のダイアログを開いたとき。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "原本で判断できる項目名を入力する。",
+        "ダイアログの「保存」を押す。"
+      ],
+      "result": "項目名を草案へ保存する。",
+      "notes": [
+        "空白だけの名前はエラーになり、ダイアログを閉じません。",
+        "編集では同じ項目IDを保持します。"
+      ],
+      "command": "Window.field_dialog → name StringVar → save → FieldSchema",
+      "source_line": 905,
+      "surface": "dialog"
+    },
+    {
+      "id": "setup_21",
+      "section": "setup",
+      "label": "値の種類",
+      "kind": "dropdown",
+      "purpose": "項目を文字列または数値として定義する。",
+      "when": "項目追加・編集時。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "「文字列」または「数値」を選ぶ。",
+        "ダイアログの「保存」を押す。"
+      ],
+      "result": "項目の保存・確認・表出力で使う型を設定する。",
+      "notes": [
+        "部品番号・先頭ゼロは文字列、温度などは数値を使います。",
+        "数値は確認時に十進文字列へ正規化します。",
+        "Excelで精度を保てない数値は文字列へ切り替え、根拠情報に理由を残す出力処理があります。"
+      ],
+      "command": "Window.field_dialog → kind StringVar → FieldSchema(kind)",
+      "source_line": 908,
+      "surface": "dialog",
+      "options": [
+        "文字列",
+        "数値"
+      ]
+    },
+    {
+      "id": "setup_22",
+      "section": "setup",
+      "label": "部品番号・先頭ゼロは文字列、温度などは数値を選びます。",
+      "kind": "guidance",
+      "purpose": "型を誤って選び、部品番号の先頭ゼロを失うことを避ける。",
+      "when": "項目追加・編集時。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "値の種類の下の説明を読む。"
+      ],
+      "result": "文字列と数値の使い分けが分かる。",
+      "notes": [],
+      "command": "Window.field_dialog → ttk.Label",
+      "source_line": 909,
+      "surface": "dialog"
+    },
+    {
+      "id": "setup_23",
+      "section": "setup",
+      "label": "必須項目にする",
+      "kind": "checkbox",
+      "purpose": "正式出力に必ず確認済みが必要な項目かを選ぶ。",
+      "when": "項目追加・編集時。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "必須ならチェックを入れ、任意なら外す。",
+        "ダイアログの「保存」を押す。"
+      ],
+      "result": "項目の出力可能条件を定義する。",
+      "notes": [
+        "新規項目は必須が初期値です。",
+        "必須項目は確認画面で対象外にできません。",
+        "任意項目も未確認のままでは完了せず、確認済みまたは理由付き対象外が必要です。"
+      ],
+      "command": "Window.field_dialog → required BooleanVar → FieldSchema(required)",
+      "source_line": 910,
+      "surface": "dialog"
+    },
+    {
+      "id": "setup_24",
+      "section": "setup",
+      "label": "標準単位（不要なら空欄）",
+      "kind": "entry",
+      "purpose": "項目の採用値に対応する初期単位を設定する。",
+      "when": "項目追加・編集時。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "℃などの標準単位を入力し、不要なら空欄にする。",
+        "ダイアログの「保存」を押す。"
+      ],
+      "result": "テンプレート適用時、項目の単位欄の初期値になる。",
+      "notes": [
+        "標準単位は固定された入力制約ではありません。確認画面で変更できます。"
+      ],
+      "command": "Window.field_dialog → unit StringVar → FieldSchema(unit)",
+      "source_line": 912,
+      "surface": "dialog"
+    },
+    {
+      "id": "setup_25",
+      "section": "setup",
+      "label": "保存",
+      "kind": "button",
+      "purpose": "項目ダイアログの内容を草案へ反映する。",
+      "when": "項目入力を終えたとき。",
+      "prerequisites": "空白でない項目名と、文字列／数値の選択があること。",
+      "steps": [
+        "入力内容を確認して「保存」を押す。"
+      ],
+      "result": "項目を追加または更新し、草案変更として自動保存対象にする。",
+      "notes": [
+        "テンプレートを正式登録するボタンではありません。",
+        "入力エラーならダイアログ内にエラーを表示し、入力を保持します。"
+      ],
+      "command": "Window.field_dialog.save → FieldSchema → Window.draft_changed/refresh_draft",
+      "source_line": 929,
+      "surface": "dialog"
+    },
+    {
+      "id": "setup_26",
+      "section": "setup",
+      "label": "戻る",
+      "kind": "button",
+      "purpose": "項目ダイアログ内の未反映入力を取り消す。",
+      "when": "追加・編集をやめたいとき。",
+      "prerequisites": "項目ダイアログを開いていること。",
+      "steps": [
+        "「戻る」を押す。"
+      ],
+      "result": "ダイアログを閉じ、項目の追加・更新を反映しない。",
+      "notes": [
+        "既存の草案・登録版は保持します。"
+      ],
+      "command": "Window.field_dialog → dialog.destroy",
+      "source_line": 930,
+      "surface": "dialog"
+    },
+    {
+      "id": "worklist_15",
+      "section": "worklist",
+      "label": "",
+      "kind": "text",
+      "purpose": "適用・ページ対象外の変更対象を一覧して確認する。",
+      "when": "「対象を確認して適用」または「対象外にする」のプレビュー時。",
+      "prerequisites": "対象・テンプレート版、または対象外理由を指定していること。",
+      "steps": [
+        "「適用内容を確認」の各行を読む。",
+        "同じ版・変更なし、寸法不一致・自動OCRなし、切替前後の版を確認する。"
+      ],
+      "result": "実行前に対象ページと旧／新設定の対応を確認できる。",
+      "notes": [
+        "内容は編集不可です。",
+        "別版切替時は旧結果を保持する一方、新記録に値・確認状態を引き継がない説明を表示します。",
+        "ここで「戻る」を押した段階では割当を変更しません。"
+      ],
+      "command": "Window.preview_assignment → Window.confirm_list → tk.Text",
+      "source_line": 707,
+      "surface": "dialog",
+      "annotation_label": "適用内容を確認：対象一覧"
+    },
+    {
+      "id": "worklist_16",
+      "section": "worklist",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "大量の適用対象をプレビューで最後まで確認する。",
+      "when": "適用プレビューで一覧が見切れるとき。",
+      "prerequisites": "「適用内容を確認」を開いていること。",
+      "steps": [
+        "一覧右端の縦スクロールバーで最後まで確認する。"
+      ],
+      "result": "全対象の変更内容を読める。",
+      "notes": [
+        "対象一覧を途中で切り捨てず表示します。"
+      ],
+      "command": "Window.confirm_list → text.yview",
+      "source_line": 708,
+      "surface": "dialog",
+      "annotation_label": "適用プレビューの縦スクロール"
+    },
+    {
+      "id": "worklist_17",
+      "section": "worklist",
+      "label": "適用する",
+      "kind": "button",
+      "purpose": "プレビューで確認した割当・対象外指定を実行する。",
+      "when": "適用内容を確認した後。",
+      "prerequisites": "適用確認ダイアログを開いていること。",
+      "steps": [
+        "対象、旧／新設定、警告を確認する。",
+        "「適用する」を押す。"
+      ],
+      "result": "プレビューを閉じて、呼び出し元のテンプレート適用または対象外指定を実行する。",
+      "notes": [
+        "対象外にする操作でも、この確認ダイアログの実行ボタンは「適用する」です。"
+      ],
+      "command": "Window.confirm_list.finish(True) → Window.apply_profile / Window.exclude_pages",
+      "source_line": 722,
+      "surface": "dialog",
+      "dynamic_label_expression": "action"
+    },
+    {
+      "id": "worklist_18",
+      "section": "worklist",
+      "label": "戻る",
+      "kind": "button",
+      "purpose": "適用・対象外指定を実行せずにプレビューを閉じる。",
+      "when": "対象や版を選び直したいとき。",
+      "prerequisites": "適用確認ダイアログを開いていること。",
+      "steps": [
+        "「戻る」を押す。"
+      ],
+      "result": "今回の割当変更を行わず作業画面へ戻る。",
+      "notes": [
+        "プレビューを開く前に行った既存入力の保存まで取り消す操作ではありません。"
+      ],
+      "command": "Window.confirm_list.finish(False)",
+      "source_line": 723,
+      "surface": "dialog"
+    },
+    {
+      "id": "worklist_19",
+      "section": "worklist",
+      "label": "対象外の理由",
+      "kind": "entry",
+      "purpose": "ページまたは文書全体を対象外にする理由を入力する。",
+      "when": "「対象外にする」を押した後。",
+      "prerequisites": "対象外にするページ／文書全体を選んでいること。",
+      "steps": [
+        "「例：表紙、説明ページ、今回の対象外」の案内に従って理由を入力する。",
+        "確定してプレビューへ進む。"
+      ],
+      "result": "入力した理由を対象外割当へ保存する準備ができる。",
+      "notes": [
+        "空白だけの理由では対象外にできません。",
+        "キャンセルすれば除外を実行しません。"
+      ],
+      "command": "Window.exclude_pages → simpledialog.askstring",
+      "source_line": 733,
+      "surface": "dialog",
+      "annotation_label": "対象外の理由入力",
+      "display_text_origin": "dialog_title"
+    },
+    {
+      "id": "worklist_20",
+      "section": "worklist",
+      "label": "テンプレート・版",
+      "kind": "list",
+      "purpose": "対象一つに保存された現在・変更前の記録を一覧する。",
+      "when": "「変更前の結果」を開いたとき。",
+      "prerequisites": "対象一つに保存された記録があること。",
+      "steps": [
+        "テンプレート版と「現在」または「変更前・編集不可」を確認する。",
+        "閲覧する記録を選ぶ。"
+      ],
+      "result": "表示ボタンの対象となる記録を選択する。",
+      "notes": [
+        "新しい保存記録から順に表示します。",
+        "現在の記録もこの一覧に含まれます。",
+        "列見出しは「テンプレート・版」「記録」「記録ID」です。"
+      ],
+      "command": "Window.open_assignment_history → listing / Workbench.history_records",
+      "source_line": 787,
+      "surface": "dialog",
+      "annotation_label": "テンプレート・版／記録／記録ID",
+      "columns": [
+        "テンプレート・版",
+        "記録",
+        "記録ID"
+      ],
+      "display_text_origin": "column_header"
+    },
+    {
+      "id": "worklist_21",
+      "section": "worklist",
+      "label": "選択した記録を編集不可で表示",
+      "kind": "button",
+      "purpose": "変更履歴で選んだ保存記録を確認画面へ表示する。",
+      "when": "切替前の値や根拠を見るとき。",
+      "prerequisites": "テンプレート変更の履歴で記録を選んでいること。",
+      "steps": [
+        "記録行を選ぶ。",
+        "編集不可表示ボタンを押す。"
+      ],
+      "result": "保存済み記録の項目・根拠を表示し、編集を無効にする。",
+      "notes": [
+        "現在行を選んだ場合も、この表示経路では編集不可にします。",
+        "作業一覧へ戻れば現在の割当記録の作業へ戻れます。"
+      ],
+      "command": "Window.open_assignment_history.show",
+      "source_line": 807,
+      "surface": "dialog"
+    },
+    {
+      "id": "history_08",
+      "section": "history",
+      "label": "",
+      "kind": "text",
+      "purpose": "案件出力から除外する未完了記録を確認する。",
+      "when": "出力ボタンを押し、未完了記録があるとき。",
+      "prerequisites": "出力対象確認ダイアログを開いていること。",
+      "steps": [
+        "文書名・ページと未完了項目を一覧で確認する。",
+        "全件出したい場合は「戻る」、表示された未完了分を除外する場合は「完了分だけ出力」を選ぶ。"
+      ],
+      "result": "出力に含めない対象を明示して判断できる。",
+      "notes": [
+        "理由付きページ対象外とは別に、未完了分を今回の出力から除外する確認です。",
+        "未登録の原本ジョブも除外対象一覧に表示します。",
+        "除外した未完了分は確定結果・Excelの出力情報へ記録します。"
+      ],
+      "command": "Window.finalize → Window.confirm_list → tk.Text",
+      "source_line": 707,
+      "surface": "dialog",
+      "annotation_label": "出力対象の確認：未完了一覧"
+    },
+    {
+      "id": "history_09",
+      "section": "history",
+      "label": "",
+      "kind": "scrollbar",
+      "purpose": "大量の未完了・除外対象を最後まで確認する。",
+      "when": "出力確認一覧が見切れるとき。",
+      "prerequisites": "出力対象確認ダイアログを開いていること。",
+      "steps": [
+        "一覧右端の縦スクロールバーで最後まで確認する。"
+      ],
+      "result": "全除外対象の文書・ページ・未完了項目を読める。",
+      "notes": [
+        "内容は編集不可です。"
+      ],
+      "command": "Window.confirm_list → text.yview",
+      "source_line": 708,
+      "surface": "dialog",
+      "annotation_label": "出力確認の縦スクロール"
+    },
+    {
+      "id": "history_10",
+      "section": "history",
+      "label": "完了分だけ出力",
+      "kind": "button",
+      "purpose": "一覧にある未完了分を除外して、案件の完了記録だけを確定・出力する。",
+      "when": "全件の確認を待たず、対象を明示して出力したいとき。",
+      "prerequisites": "出力確認ダイアログを開き、少なくとも一つ完了記録があること。",
+      "steps": [
+        "除外する全記録を確認する。",
+        "「完了分だけ出力」を押す。"
+      ],
+      "result": "原本検証後に完了分を確定し、Excel／CSVを生成する。",
+      "notes": [
+        "表示された未完了記録を削除・恒久的な対象外にする操作ではありません。",
+        "後から確認を完了させ、別の新しい確定結果へ含められます。"
+      ],
+      "command": "Window.confirm_list.finish(True) → Workbench.finalize(completed_only=True)",
+      "source_line": 722,
+      "surface": "dialog",
+      "dynamic_label_expression": "action"
+    },
+    {
+      "id": "history_11",
+      "section": "history",
+      "label": "戻る",
+      "kind": "button",
+      "purpose": "今回の結果確定・表生成を実行しない。",
+      "when": "除外せず全件確認してから出力したいとき。",
+      "prerequisites": "出力確認ダイアログを開いていること。",
+      "steps": [
+        "「戻る」を押す。",
+        "未完了記録を確認・訂正する。"
+      ],
+      "result": "今回の確定結果・出力ファイルを作らず作業へ戻る。",
+      "notes": [
+        "出力ボタンを押す前の作業保存を取り消す操作ではありません。"
+      ],
+      "command": "Window.confirm_list.finish(False) → Window.finalize return",
+      "source_line": 723,
+      "surface": "dialog"
+    },
+    {
+      "id": "common_13",
+      "section": "common",
+      "label": "案件名",
+      "kind": "entry",
+      "purpose": "新規案件フォルダーの表示名を入力する。",
+      "when": "「案件作成」を押したとき。",
+      "prerequisites": "案件作成ダイアログを開いていること。",
+      "steps": [
+        "案件名を入力して確定する。"
+      ],
+      "result": "Portable内にIDと名前を含む案件フォルダーを作る。",
+      "notes": [
+        "ファイル名に使えない文字は _ に変換し、名前部分を60文字までにします。",
+        "空入力・キャンセルなら作成しません。"
+      ],
+      "command": "Window.new_project → simpledialog.askstring → Window.safe_name",
+      "source_line": 354,
+      "surface": "dialog"
+    },
+    {
+      "id": "common_14",
+      "section": "common",
+      "label": "旧案件をコピーして更新",
+      "kind": "confirmation",
+      "purpose": "v0.1.0案件を残してv0.2.0用の別コピーを作るか判断する。",
+      "when": "旧形式の案件を開いたとき。",
+      "prerequisites": "旧形式案件を選んでいること。",
+      "steps": [
+        "元案件を保持する説明を確認する。",
+        "コピー作成に同意するか、キャンセルする。",
+        "同意した場合は更新・原本検証の完了を待つ。"
+      ],
+      "result": "同意後はPortableの projects 内に別コピーを作り、成功時にそのコピーを開く。",
+      "notes": [
+        "元案件は更新せず、v0.1.0から引き続き開けます。",
+        "未保存入力・草案は切替前に保存を試みます。",
+        "失敗時は元案件を保持し、失敗コピーは完成済み案件として扱いません。"
+      ],
+      "command": "Window.open_project → messagebox.askyesno → migrate_project_copy",
+      "source_line": 384,
+      "surface": "dialog"
+    },
+    {
+      "id": "worklist_22",
+      "section": "worklist",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 147,
+      "surface": "main",
+      "annotation_label": "文書一覧の行送り",
+      "widget_variable": "self.document_list"
+    },
+    {
+      "id": "worklist_23",
+      "section": "worklist",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 162,
+      "surface": "main",
+      "annotation_label": "ページ一覧の行送り",
+      "widget_variable": "self.page_list"
+    },
+    {
+      "id": "setup_27",
+      "section": "setup",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 215,
+      "surface": "main",
+      "annotation_label": "草案項目一覧の行送り",
+      "widget_variable": "self.setup_list"
+    },
+    {
+      "id": "review_20",
+      "section": "review",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 229,
+      "surface": "main",
+      "annotation_label": "確認項目一覧の行送り",
+      "widget_variable": "self.review_list"
+    },
+    {
+      "id": "history_12",
+      "section": "history",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 267,
+      "surface": "main",
+      "annotation_label": "出力履歴一覧の行送り",
+      "widget_variable": "self.history_list"
+    },
+    {
+      "id": "library_07",
+      "section": "library",
+      "label": "",
+      "kind": "scroll",
+      "purpose": "一覧内の見切れた行へ移動する。",
+      "when": "一覧の表示行数より項目が多いとき。",
+      "prerequisites": "対象の一覧が表示されていること。",
+      "steps": [
+        "一覧をクリックしてから上下キーで行を移動する。",
+        "一覧の上でマウスホイール、またはPageUp／PageDownで表示行を送る。",
+        "必要ならShift＋マウスホイールで横方向へ送る。"
+      ],
+      "result": "一覧内で別の行を表示・選択できる。",
+      "notes": [
+        "この一覧には専用スクロールバーを作っていません。",
+        "作成・確認タブ全体の縦スクロールとは別です。",
+        "標準のキー・ホイール動作はPortableに含まれるTkの treeview.tcl／utils.tcl で確認しました。"
+      ],
+      "command": "ttk::treeview::Keynav / Treeview <Prior>/<Next> / TtkScrollable <MouseWheel>/<Shift-MouseWheel>",
+      "source_line": 280,
+      "surface": "main",
+      "annotation_label": "共通テンプレート一覧の行送り",
+      "widget_variable": "self.library_list"
+    },
+    {
+      "id": "common_15",
+      "section": "common",
+      "label": "",
+      "kind": "tab_container",
+      "purpose": "右側の五つの操作画面を切り替える。",
+      "when": "操作する画面を変えるとき。",
+      "prerequisites": "なし。",
+      "steps": [
+        "作業一覧、テンプレート作成、確認・訂正、出力履歴、共通テンプレートから目的のタブをクリックする。"
+      ],
+      "result": "選択タブの内容が表示される。",
+      "notes": [
+        "切替前の未保存入力を保存し、保存失敗時は確認タブへ戻して入力を保持します。"
+      ],
+      "command": "<<NotebookTabChanged>> → Window.safe(Window.tab_changed)",
+      "source_line": 141,
+      "surface": "main",
+      "annotation_label": "右側のタブ切替",
+      "widget_variable": "self.tabs",
+      "related_ids": [
+        "worklist_01",
+        "setup_01",
+        "review_01",
+        "history_01",
+        "library_01"
+      ]
+    },
+    {
+      "id": "setup_28",
+      "section": "setup",
+      "label": "",
+      "kind": "canvas",
+      "purpose": "タブの操作内容を収め、背景上のホイールで上下に送る。",
+      "when": "タブの下部が見切れるとき。",
+      "prerequisites": "対象のタブを開いていること。",
+      "steps": [
+        "タブ内の背景でホイールを回す。",
+        "操作欄の上で送れない場合はタブ右端の縦スクロールバーを使う。"
+      ],
+      "result": "タブの下部・上部の操作部分を表示できる。",
+      "notes": [
+        "原本画像へ範囲を指定するキャンバスとは別です。",
+        "入力欄や一覧の上へのホイール操作はこの背景バインドと同一とは限りません。"
+      ],
+      "command": "Window.scrollable_content → viewport/content <MouseWheel> → viewport.yview_scroll",
+      "source_line": 295,
+      "invocation_line": 190,
+      "surface": "main",
+      "annotation_label": "作成タブのスクロール背景",
+      "related_ids": [
+        "setup_19"
+      ]
+    },
+    {
+      "id": "review_21",
+      "section": "review",
+      "label": "",
+      "kind": "canvas",
+      "purpose": "タブの操作内容を収め、背景上のホイールで上下に送る。",
+      "when": "タブの下部が見切れるとき。",
+      "prerequisites": "対象のタブを開いていること。",
+      "steps": [
+        "タブ内の背景でホイールを回す。",
+        "操作欄の上で送れない場合はタブ右端の縦スクロールバーを使う。"
+      ],
+      "result": "タブの下部・上部の操作部分を表示できる。",
+      "notes": [
+        "原本画像へ範囲を指定するキャンバスとは別です。",
+        "入力欄や一覧の上へのホイール操作はこの背景バインドと同一とは限りません。"
+      ],
+      "command": "Window.scrollable_content → viewport/content <MouseWheel> → viewport.yview_scroll",
+      "source_line": 295,
+      "invocation_line": 228,
+      "surface": "main",
+      "annotation_label": "確認タブのスクロール背景",
+      "related_ids": [
+        "review_19"
+      ]
+    }
+  ],
+  "counts": {
+    "total": 116,
+    "main": 96,
+    "dialog": 20,
+    "main_buttons": 38,
+    "sections": {
+      "common": 15,
+      "viewer": 10,
+      "worklist": 23,
+      "setup": 28,
+      "review": 21,
+      "history": 12,
+      "library": 7
+    }
+  },
+  "additional_source_files": [
+    {
+      "path": "packages/dw-workbench/dw_workbench/application.py",
+      "purpose": "版管理、対象割当、候補採用、OCRジョブ、確定条件の確認"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/domain.py",
+      "purpose": "型、根拠、保存後の状態、確認・保留・対象外の規則"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/library.py",
+      "purpose": "共通登録の不変版と同一ID・版の取り込み規則"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/storage.py",
+      "purpose": "コピー移行、原本検証、バックアップ内容"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/exporting.py",
+      "purpose": "新旧出力形式、完了ファイル再利用、履歴保存失敗"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/workers.py",
+      "purpose": "DocuWorks・GPU・ローカルモデルの検出"
+    },
+    {
+      "path": "runtime/tcl/tk8.6/ttk/treeview.tcl",
+      "lines": [
+        28,
+        50
+      ],
+      "purpose": "一覧の標準キー・複数選択・スクロール操作"
+    },
+    {
+      "path": "runtime/tcl/tk8.6/ttk/utils.tcl",
+      "lines": [
+        312,
+        335
+      ],
+      "purpose": "Windowsの一覧ホイール・Shiftホイール操作"
+    },
+    {
+      "path": "runtime/tcl/tk8.6/tk.tcl",
+      "lines": [
+        403,
+        403
+      ],
+      "purpose": "WindowsのCtrlクリック複数選択イベント"
+    }
+  ]
+}

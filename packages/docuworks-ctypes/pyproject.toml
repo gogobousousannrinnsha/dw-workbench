@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docuworks-ctypes"
+version = "1.0.1"
+description = "Verified ctypes, Core, and Simple APIs for the DocuWorks XDWAPI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "docuworks-ctypes contributors"}]
+
+[tool.setuptools.packages.find]
+include = ["docuworks_ctypes*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+junit_family = "legacy"
+markers = [
+    "integration: requires DocuWorks and a disposable XDW fixture",
+]

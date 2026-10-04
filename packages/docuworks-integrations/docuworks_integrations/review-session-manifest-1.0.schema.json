@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "review-session-manifest 1.0",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-review-session"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "status": {
+      "const": "COMPLETE"
+    },
+    "files": {
+      "type": "object",
+      "properties": {
+        "identity.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "session.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "initial.xdw": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "identity.json",
+        "session.json",
+        "initial.xdw"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "status",
+    "files"
+  ],
+  "additionalProperties": false
+}

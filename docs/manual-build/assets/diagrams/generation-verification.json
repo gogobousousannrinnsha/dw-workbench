@@ -1,0 +1,62 @@
+{
+  "generator": "make_diagrams.py",
+  "font": "検証環境内の参照",
+  "controls_sha256": "f7723f1de744442dbd4aa3808a3f662f33df0e440bb1989ee94984676917381a",
+  "dialogs_sha256": "647b67930f55e896dd3418df5a8c6c39ef5981da7cc40ea69056eae48b1642da",
+  "source_file": "packages/dw-workbench/dw_workbench/ui.py",
+  "source_sha256": "d76e36c03c80731460c957f330053ac2e3044c2e021783cf289bacf4eaaad2ab",
+  "diagram_count": 7,
+  "bounds_validation": "passed",
+  "scope": "Source-derived diagrams only; no app launch, UI operation, or screenshot capture.",
+  "images": [
+    {
+      "file": "assets/diagrams/10-setup-upper.png",
+      "sha256": "6a520018954ed7fbcfc3df5f97e4e12df8b04a2465f827096ad12cc0b8e61238",
+      "width": 900,
+      "height": 1190,
+      "mark_count": 8
+    },
+    {
+      "file": "assets/diagrams/11-setup-lower.png",
+      "sha256": "7aacfff38690b055450a1a59c7ba53efc0f37fe212e41a50811ae9ba4fe5c691",
+      "width": 900,
+      "height": 980,
+      "mark_count": 10
+    },
+    {
+      "file": "assets/diagrams/12-field-dialog.png",
+      "sha256": "834351b3058a107486873bc9377146f6463cebd5dea779c271619dd80449ad54",
+      "width": 900,
+      "height": 959,
+      "mark_count": 7
+    },
+    {
+      "file": "assets/diagrams/13-assignment-confirm.png",
+      "sha256": "8fd9d1eac5b098df5c980976d6ce973158fb0922f693fec537fc60a8cb2f8e20",
+      "width": 900,
+      "height": 882,
+      "mark_count": 4
+    },
+    {
+      "file": "assets/diagrams/14-incomplete-export.png",
+      "sha256": "8d539c479651acb7541137a855d5dd41185fc7d2e99c764ec40430adf2c06566",
+      "width": 900,
+      "height": 846,
+      "mark_count": 4
+    },
+    {
+      "file": "assets/diagrams/15-assignment-history.png",
+      "sha256": "ecd5b82c3987d811ad897ccd441a5450994c5e08ab6debcaba23a0afbdb79fa3",
+      "width": 900,
+      "height": 864,
+      "mark_count": 3
+    },
+    {
+      "file": "assets/diagrams/16-standard-inputs.png",
+      "sha256": "9a52b4a9ca54f53072dbdff6afd5b26082704dc23fc50c749911e6003b475524",
+      "width": 900,
+      "height": 1441,
+      "mark_count": 4
+    }
+  ]
+}

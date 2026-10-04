@@ -1,0 +1,37 @@
+{
+  "beginner-beginner_11": [
+    {
+      "shot": "beginner-export-1",
+      "title": "結果01の完成見本（実列の位置を記載）",
+      "crop": [
+        0,
+        0,
+        1162,
+        450
+      ],
+      "max_width_mm": 174
+    },
+    {
+      "shot": "beginner-export-2",
+      "title": "根拠の完成見本（実列の位置を記載）",
+      "crop": [
+        0,
+        0,
+        1477,
+        580
+      ],
+      "max_width_mm": 174
+    },
+    {
+      "shot": "beginner-export-3",
+      "title": "出力情報の完成見本（実列の位置を記載）",
+      "crop": [
+        0,
+        0,
+        1537,
+        950
+      ],
+      "max_width_mm": 174
+    }
+  ]
+}

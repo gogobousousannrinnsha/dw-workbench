@@ -1,0 +1,28 @@
+{
+  "controls": 116,
+  "dialogs": 25,
+  "workflows": 7,
+  "glossary": 29,
+  "figures": 37,
+  "actual_screenshots": 9,
+  "source_diagrams": 13,
+  "workbook_views": 3,
+  "source_document_views": 0,
+  "actual_screenshot_figures": 17,
+  "source_diagram_figures": 17,
+  "image_count_meaning": "actual_screenshots/source_diagrams はmanifestの元画像枚数、*_figures は掲載する切り出し図の件数。",
+  "warnings": [],
+  "japanese_font": "meiryo.ttc",
+  "outputs": [
+    {
+      "path": "index.html",
+      "sha256": "aeb2a4f92e7cdec18954a3875508c0d825b8db4b0a1d301a8e3aaf6242d65a6c"
+    },
+    {
+      "path": "DW-Workbench_v0.2.0_図解操作マニュアル.pdf",
+      "sha256": "57d594255f04f7a09102e3a73cf982fb79434b7077ba6de32098ef224ffb7a89"
+    }
+  ],
+  "images_modified": false,
+  "visual_qa": "生成担当が全ページを描画して最終確認する必要があります。"
+}

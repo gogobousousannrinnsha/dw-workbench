@@ -1,0 +1,313 @@
+[
+  {
+    "name": "b01-record-unit",
+    "label": "一行を何の結果にするか、適用前に選ぶ",
+    "file": "assets/beginner-diagrams/b01-record-unit.png",
+    "width": 900,
+    "height": 884,
+    "kind": "source-diagram",
+    "section": "beginner-decisions",
+    "marks": [
+      {
+        "control_id": "worklist_03",
+        "display_id": "一覧03",
+        "label": "処理単位",
+        "source_line": 157,
+        "x": 32,
+        "y": 176,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 176
+      }
+    ],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  },
+  {
+    "name": "b02-schema-layout",
+    "label": "項目定義を共通にして、範囲だけ配置A/Bで変える",
+    "file": "assets/beginner-diagrams/b02-schema-layout.png",
+    "width": 900,
+    "height": 1076,
+    "kind": "source-diagram",
+    "section": "beginner-decisions",
+    "marks": [
+      {
+        "control_id": "setup_07",
+        "display_id": "設定07",
+        "label": "選択した項目定義を使用",
+        "source_line": 213,
+        "x": 32,
+        "y": 572,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 572
+      }
+    ],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  },
+  {
+    "name": "b03-drag-evidence",
+    "label": "項目を選ぶ → 原本の値をドラッグで囲む",
+    "file": "assets/beginner-diagrams/b03-drag-evidence.png",
+    "width": 900,
+    "height": 880,
+    "kind": "source-diagram",
+    "section": "beginner-beginner_06",
+    "marks": [
+      {
+        "control_id": "setup_09",
+        "display_id": "設定09",
+        "label": "項目",
+        "source_line": 215,
+        "x": 32,
+        "y": 176,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 176
+      },
+      {
+        "control_id": "viewer_06",
+        "display_id": "原本06",
+        "label": "",
+        "source_line": 126,
+        "x": 32,
+        "y": 265,
+        "width": 836,
+        "height": 310,
+        "badge_x": 48,
+        "badge_y": 278
+      },
+      {
+        "control_id": "setup_17",
+        "display_id": "設定17",
+        "label": "テンプレートを案件へ登録",
+        "source_line": 226,
+        "x": 32,
+        "y": 694,
+        "width": 836,
+        "height": 56,
+        "badge_x": 42,
+        "badge_y": 706
+      }
+    ],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  },
+  {
+    "name": "b04-apply-empty",
+    "label": "テンプレートを適用しても、OCRは始まらない",
+    "file": "assets/beginner-diagrams/b04-apply-empty.png",
+    "width": 900,
+    "height": 1059,
+    "kind": "source-diagram",
+    "section": "beginner-beginner_07",
+    "marks": [
+      {
+        "control_id": "worklist_06",
+        "display_id": "一覧06",
+        "label": "対象",
+        "source_line": 172,
+        "x": 32,
+        "y": 217,
+        "width": 836,
+        "height": 52,
+        "badge_x": 32,
+        "badge_y": 176
+      },
+      {
+        "control_id": "worklist_08",
+        "display_id": "一覧08",
+        "label": "適用するテンプレート版",
+        "source_line": 179,
+        "x": 32,
+        "y": 325,
+        "width": 836,
+        "height": 52,
+        "badge_x": 32,
+        "badge_y": 284
+      },
+      {
+        "control_id": "worklist_09",
+        "display_id": "一覧09",
+        "label": "対象を確認して適用",
+        "source_line": 184,
+        "x": 32,
+        "y": 392,
+        "width": 836,
+        "height": 56,
+        "badge_x": 42,
+        "badge_y": 404
+      },
+      {
+        "control_id": "worklist_17",
+        "display_id": "一覧17",
+        "label": "適用する",
+        "source_line": 722,
+        "x": 32,
+        "y": 513,
+        "width": 836,
+        "height": 56,
+        "badge_x": 42,
+        "badge_y": 525
+      },
+      {
+        "control_id": "review_02",
+        "display_id": "確認02",
+        "label": "項目",
+        "source_line": 229,
+        "x": 32,
+        "y": 627,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 627
+      }
+    ],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  },
+  {
+    "name": "b05-manual-accept",
+    "label": "手入力の保存と、原本確認は別の操作",
+    "file": "assets/beginner-diagrams/b05-manual-accept.png",
+    "width": 900,
+    "height": 1351,
+    "kind": "source-diagram",
+    "section": "beginner-beginner_09",
+    "marks": [
+      {
+        "control_id": "review_02",
+        "display_id": "確認02",
+        "label": "項目",
+        "source_line": 229,
+        "x": 32,
+        "y": 527,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 527
+      },
+      {
+        "control_id": "review_04",
+        "display_id": "確認04",
+        "label": "採用値",
+        "source_line": 241,
+        "x": 48,
+        "y": 667,
+        "width": 376,
+        "height": 52,
+        "badge_x": 48,
+        "badge_y": 626
+      },
+      {
+        "control_id": "review_05",
+        "display_id": "確認05",
+        "label": "単位",
+        "source_line": 241,
+        "x": 48,
+        "y": 775,
+        "width": 376,
+        "height": 52,
+        "badge_x": 48,
+        "badge_y": 734
+      },
+      {
+        "control_id": "review_06",
+        "display_id": "確認06",
+        "label": "原文表記",
+        "source_line": 241,
+        "x": 48,
+        "y": 883,
+        "width": 376,
+        "height": 52,
+        "badge_x": 48,
+        "badge_y": 842
+      },
+      {
+        "control_id": "review_04",
+        "display_id": "確認04",
+        "label": "採用値",
+        "source_line": 241,
+        "x": 476,
+        "y": 667,
+        "width": 376,
+        "height": 52,
+        "badge_x": 476,
+        "badge_y": 626
+      },
+      {
+        "control_id": "review_05",
+        "display_id": "確認05",
+        "label": "単位",
+        "source_line": 241,
+        "x": 476,
+        "y": 775,
+        "width": 376,
+        "height": 52,
+        "badge_x": 476,
+        "badge_y": 734
+      },
+      {
+        "control_id": "review_06",
+        "display_id": "確認06",
+        "label": "原文表記",
+        "source_line": 241,
+        "x": 476,
+        "y": 883,
+        "width": 376,
+        "height": 52,
+        "badge_x": 476,
+        "badge_y": 842
+      },
+      {
+        "control_id": "review_09",
+        "display_id": "確認09",
+        "label": "",
+        "source_line": 247,
+        "x": 32,
+        "y": 990,
+        "width": 74,
+        "height": 32,
+        "badge_x": 32,
+        "badge_y": 990
+      },
+      {
+        "control_id": "review_11",
+        "display_id": "確認11",
+        "label": "確認済みにする",
+        "source_line": 253,
+        "x": 32,
+        "y": 1065,
+        "width": 836,
+        "height": 56,
+        "badge_x": 42,
+        "badge_y": 1077
+      }
+    ],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  },
+  {
+    "name": "b06-save-accept-freeze",
+    "label": "候補・採用・保存・確認・確定・生成を分ける",
+    "file": "assets/beginner-diagrams/b06-save-accept-freeze.png",
+    "width": 900,
+    "height": 1238,
+    "kind": "source-diagram",
+    "section": "beginner-beginner_10",
+    "marks": [],
+    "caption": "UI構成図（ソースから作成・配置の目安）",
+    "synthetic": true,
+    "actual_application_screenshot": false
+  }
+]

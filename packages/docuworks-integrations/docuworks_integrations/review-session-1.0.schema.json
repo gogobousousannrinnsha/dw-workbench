@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "review-session 1.0",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-review-session"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "review_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "identity_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generator": {
+      "type": "object"
+    },
+    "initial_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "page_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "width_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "height_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "rotation": {
+            "const": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "annotation_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                },
+                "region_id": {
+                  "type": "string",
+                  "pattern": "^p[0-9]{4,}-r[0-9]{6,}$"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "rotation": {
+                  "const": 0
+                },
+                "direction": {
+                  "const": 0
+                },
+                "font_name": {
+                  "type": "string"
+                },
+                "font_size": {
+                  "const": 12
+                }
+              },
+              "required": [
+                "annotation_id",
+                "region_id",
+                "text",
+                "x",
+                "y",
+                "width",
+                "height",
+                "rotation",
+                "direction",
+                "font_name",
+                "font_size"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "page",
+          "page_id",
+          "width_mm",
+          "height_mm",
+          "rotation",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "review_id",
+    "identity_sha256",
+    "created_at",
+    "generator",
+    "initial_sha256",
+    "pages"
+  ],
+  "additionalProperties": false
+}

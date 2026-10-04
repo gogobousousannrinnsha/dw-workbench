@@ -1,0 +1,60 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-ocr-corrections"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "correction_set_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "edits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "region_id": {
+            "type": "string",
+            "pattern": "^p[0-9]{4,}-r[0-9]{6,}$"
+          },
+          "before_text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "after_text": {
+            "type": "string",
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "region_id",
+          "before_text",
+          "after_text"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "correction_set_id",
+    "run_id",
+    "manifest_sha256",
+    "edits"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "One explicit text-only correction set. Runtime also validates unique IDs, changed text, source identity and exact before_text."
+}

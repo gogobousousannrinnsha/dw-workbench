@@ -1,0 +1,39 @@
+[
+  {
+    "name": "beginner-export-1",
+    "file": "assets/export-verified/result-values.png",
+    "width": 1162,
+    "height": 450,
+    "kind": "data-derived-workbook-view",
+    "label": "結果01の完成見本",
+    "source_cells": [
+      "A1:A2",
+      "D1:D2",
+      "I1:I2",
+      "K1:L2"
+    ]
+  },
+  {
+    "name": "beginner-export-2",
+    "file": "assets/export-verified/evidence-values.png",
+    "width": 1477,
+    "height": 580,
+    "kind": "data-derived-workbook-view",
+    "label": "根拠の完成見本",
+    "source_cells": [
+      "M1:Q3",
+      "U1:Z3"
+    ]
+  },
+  {
+    "name": "beginner-export-3",
+    "file": "assets/export-verified/export-info.png",
+    "width": 1537,
+    "height": 950,
+    "kind": "data-derived-workbook-view",
+    "label": "出力情報の完成見本",
+    "source_cells": [
+      "A1:D10"
+    ]
+  }
+]

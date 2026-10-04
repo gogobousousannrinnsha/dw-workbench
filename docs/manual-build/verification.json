@@ -1,0 +1,1664 @@
+{
+  "synthetic": true,
+  "real_business_document": false,
+  "reader": {
+    "library": "openpyxl",
+    "version": "3.1.5"
+  },
+  "checked_at_utc": "2026-10-03T10:38:15.237822+00:00",
+  "checks": [
+    {
+      "name": "sheet order",
+      "passed": true,
+      "actual": [
+        "結果01",
+        "根拠",
+        "出力情報"
+      ],
+      "expected": [
+        "結果01",
+        "根拠",
+        "出力情報"
+      ]
+    },
+    {
+      "name": "result headers",
+      "passed": true,
+      "actual": [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ],
+      "expected": [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ]
+    },
+    {
+      "name": "result dimensions",
+      "passed": true,
+      "actual": [
+        2,
+        12
+      ],
+      "expected": [
+        2,
+        12
+      ]
+    },
+    {
+      "name": "text identifier",
+      "passed": true,
+      "actual": "000125",
+      "expected": "000125"
+    },
+    {
+      "name": "text identifier cell type",
+      "passed": true,
+      "actual": "s",
+      "expected": "s"
+    },
+    {
+      "name": "temperature",
+      "passed": true,
+      "actual": "179.8",
+      "expected": "179.8"
+    },
+    {
+      "name": "temperature cell type",
+      "passed": true,
+      "actual": "n",
+      "expected": "n"
+    },
+    {
+      "name": "temperature unit",
+      "passed": true,
+      "actual": "℃",
+      "expected": "℃"
+    },
+    {
+      "name": "source name",
+      "passed": true,
+      "actual": "入門サンプル.xdw",
+      "expected": "入門サンプル.xdw"
+    },
+    {
+      "name": "source id",
+      "passed": true,
+      "actual": "e56ba1628ec94ef5ab659a0dc275b064",
+      "expected": "e56ba1628ec94ef5ab659a0dc275b064"
+    },
+    {
+      "name": "record unit",
+      "passed": true,
+      "actual": "ページ",
+      "expected": "ページ"
+    },
+    {
+      "name": "source page",
+      "passed": true,
+      "actual": 1,
+      "expected": 1
+    },
+    {
+      "name": "record id",
+      "passed": true,
+      "actual": "1015637bd2ab4045ab0fd9dc22be02b2",
+      "expected": "1015637bd2ab4045ab0fd9dc22be02b2"
+    },
+    {
+      "name": "template name",
+      "passed": true,
+      "actual": "入門ページ",
+      "expected": "入門ページ"
+    },
+    {
+      "name": "template id",
+      "passed": true,
+      "actual": "1403551b713740fcafa4dcbee8ffc04e",
+      "expected": "1403551b713740fcafa4dcbee8ffc04e"
+    },
+    {
+      "name": "template version",
+      "passed": true,
+      "actual": "1",
+      "expected": "1"
+    },
+    {
+      "name": "identifier unit blank",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "name": "evidence dimensions",
+      "passed": true,
+      "actual": [
+        3,
+        28
+      ],
+      "expected": [
+        3,
+        28
+      ]
+    },
+    {
+      "name": "evidence part",
+      "passed": true,
+      "actual": {
+        "結果シート": "結果01",
+        "項目定義ID": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "項目定義版": "1",
+        "原本ID": "e56ba1628ec94ef5ab659a0dc275b064",
+        "元ページ番号": "1",
+        "記録ID": "1015637bd2ab4045ab0fd9dc22be02b2",
+        "テンプレート名": "入門ページ",
+        "テンプレートID": "1403551b713740fcafa4dcbee8ffc04e",
+        "項目ID": "part",
+        "原文": "000125",
+        "採用値": "000125",
+        "確認状態": "確認済み",
+        "原本ハッシュ": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "原本相対パス": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+        "根拠ページ": "1",
+        "X mm": "90",
+        "Y mm": "75",
+        "幅 mm": "70",
+        "高さ mm": "16",
+        "確認した版": "2",
+        "確定した版": "4",
+        "ページ割当版": "1"
+      },
+      "expected": {
+        "結果シート": "結果01",
+        "項目定義ID": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "項目定義版": "1",
+        "原本ID": "e56ba1628ec94ef5ab659a0dc275b064",
+        "元ページ番号": "1",
+        "記録ID": "1015637bd2ab4045ab0fd9dc22be02b2",
+        "テンプレート名": "入門ページ",
+        "テンプレートID": "1403551b713740fcafa4dcbee8ffc04e",
+        "項目ID": "part",
+        "原文": "000125",
+        "採用値": "000125",
+        "確認状態": "確認済み",
+        "原本ハッシュ": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "原本相対パス": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+        "根拠ページ": "1",
+        "X mm": "90",
+        "Y mm": "75",
+        "幅 mm": "70",
+        "高さ mm": "16",
+        "確認した版": "2",
+        "確定した版": "4",
+        "ページ割当版": "1"
+      }
+    },
+    {
+      "name": "evidence part unit",
+      "passed": true,
+      "actual": "",
+      "expected": ""
+    },
+    {
+      "name": "evidence measured",
+      "passed": true,
+      "actual": {
+        "結果シート": "結果01",
+        "項目定義ID": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "項目定義版": "1",
+        "原本ID": "e56ba1628ec94ef5ab659a0dc275b064",
+        "元ページ番号": "1",
+        "記録ID": "1015637bd2ab4045ab0fd9dc22be02b2",
+        "テンプレート名": "入門ページ",
+        "テンプレートID": "1403551b713740fcafa4dcbee8ffc04e",
+        "項目ID": "measured",
+        "原文": "179.8℃",
+        "採用値": "179.8",
+        "確認状態": "確認済み",
+        "原本ハッシュ": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "原本相対パス": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+        "根拠ページ": "1",
+        "X mm": "90",
+        "Y mm": "120",
+        "幅 mm": "70",
+        "高さ mm": "16",
+        "確認した版": "4",
+        "確定した版": "4",
+        "ページ割当版": "1"
+      },
+      "expected": {
+        "結果シート": "結果01",
+        "項目定義ID": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "項目定義版": "1",
+        "原本ID": "e56ba1628ec94ef5ab659a0dc275b064",
+        "元ページ番号": "1",
+        "記録ID": "1015637bd2ab4045ab0fd9dc22be02b2",
+        "テンプレート名": "入門ページ",
+        "テンプレートID": "1403551b713740fcafa4dcbee8ffc04e",
+        "項目ID": "measured",
+        "原文": "179.8℃",
+        "採用値": "179.8",
+        "確認状態": "確認済み",
+        "原本ハッシュ": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "原本相対パス": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+        "根拠ページ": "1",
+        "X mm": "90",
+        "Y mm": "120",
+        "幅 mm": "70",
+        "高さ mm": "16",
+        "確認した版": "4",
+        "確定した版": "4",
+        "ページ割当版": "1"
+      }
+    },
+    {
+      "name": "evidence measured unit",
+      "passed": true,
+      "actual": "℃",
+      "expected": "℃"
+    },
+    {
+      "name": "dataset id",
+      "passed": true,
+      "actual": "6850cbad18c64f2a9d62bddd61883888",
+      "expected": "6850cbad18c64f2a9d62bddd61883888"
+    },
+    {
+      "name": "frozen timestamp",
+      "passed": true,
+      "actual": "2026-10-03T10:37:37.004981+00:00",
+      "expected": "2026-10-03T10:37:37.004981+00:00"
+    },
+    {
+      "name": "included records",
+      "passed": true,
+      "actual": "1",
+      "expected": "1"
+    },
+    {
+      "name": "excluded records",
+      "passed": true,
+      "actual": "0",
+      "expected": "0"
+    },
+    {
+      "name": "result-schema mapping",
+      "passed": true,
+      "actual": [
+        "結果表",
+        "結果01",
+        "測定記録（入門用）",
+        "1件"
+      ],
+      "expected": [
+        "結果表",
+        "結果01",
+        "測定記録（入門用）",
+        "1件"
+      ]
+    },
+    {
+      "name": "schema identity",
+      "passed": true,
+      "actual": [
+        "項目定義",
+        "結果01",
+        "b83125fdf6cb48ef972a35dd6f8db02d",
+        "1"
+      ],
+      "expected": [
+        "項目定義",
+        "結果01",
+        "b83125fdf6cb48ef972a35dd6f8db02d",
+        "1"
+      ]
+    },
+    {
+      "name": "template identity",
+      "passed": true,
+      "actual": [
+        "テンプレート",
+        "入門ページ",
+        "1403551b713740fcafa4dcbee8ffc04e",
+        "版 1 / 結果01"
+      ],
+      "expected": [
+        "テンプレート",
+        "入門ページ",
+        "1403551b713740fcafa4dcbee8ffc04e",
+        "版 1 / 結果01"
+      ]
+    },
+    {
+      "name": "no precision warnings",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "no formulas",
+      "passed": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "name": "CSV BOM",
+      "passed": true,
+      "actual": "efbbbf",
+      "expected": "efbbbf"
+    },
+    {
+      "name": "CSV headers",
+      "passed": true,
+      "actual": [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ],
+      "expected": [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ]
+    },
+    {
+      "name": "CSV dimensions",
+      "passed": true,
+      "actual": [
+        2,
+        12
+      ],
+      "expected": [
+        2,
+        12
+      ]
+    },
+    {
+      "name": "CSV exact row",
+      "passed": true,
+      "actual": [
+        "入門サンプル.xdw",
+        "e56ba1628ec94ef5ab659a0dc275b064",
+        "ページ",
+        "1",
+        "1015637bd2ab4045ab0fd9dc22be02b2",
+        "入門ページ",
+        "1403551b713740fcafa4dcbee8ffc04e",
+        "1",
+        "000125",
+        "",
+        "179.8",
+        "℃"
+      ],
+      "expected": [
+        "入門サンプル.xdw",
+        "e56ba1628ec94ef5ab659a0dc275b064",
+        "ページ",
+        "1",
+        "1015637bd2ab4045ab0fd9dc22be02b2",
+        "入門ページ",
+        "1403551b713740fcafa4dcbee8ffc04e",
+        "1",
+        "000125",
+        "",
+        "179.8",
+        "℃"
+      ]
+    }
+  ],
+  "manual_visual_confirmation": false,
+  "sheets": [
+    {
+      "name": "結果01",
+      "rows": 2,
+      "columns": 12,
+      "headers": [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ],
+      "cells": [
+        {
+          "cell": "A1",
+          "value": "文書名",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B1",
+          "value": "原本ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C1",
+          "value": "記録単位",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D1",
+          "value": "元ページ番号",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "E1",
+          "value": "記録ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "F1",
+          "value": "テンプレート名",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "G1",
+          "value": "テンプレートID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "H1",
+          "value": "テンプレート版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "I1",
+          "value": "部品番号",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "J1",
+          "value": "部品番号 単位",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "K1",
+          "value": "測定温度",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "L1",
+          "value": "測定温度 単位",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A2",
+          "value": "入門サンプル.xdw",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B2",
+          "value": "e56ba1628ec94ef5ab659a0dc275b064",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C2",
+          "value": "ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D2",
+          "value": 1,
+          "data_type": "n",
+          "number_format": "0.##############################"
+        },
+        {
+          "cell": "E2",
+          "value": "1015637bd2ab4045ab0fd9dc22be02b2",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "F2",
+          "value": "入門ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "G2",
+          "value": "1403551b713740fcafa4dcbee8ffc04e",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "H2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "I2",
+          "value": "000125",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "J2",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "K2",
+          "value": 179.8,
+          "data_type": "n",
+          "number_format": "0.##############################"
+        },
+        {
+          "cell": "L2",
+          "value": "℃",
+          "data_type": "s",
+          "number_format": "General"
+        }
+      ],
+      "values": [
+        [
+          "文書名",
+          "原本ID",
+          "記録単位",
+          "元ページ番号",
+          "記録ID",
+          "テンプレート名",
+          "テンプレートID",
+          "テンプレート版",
+          "部品番号",
+          "部品番号 単位",
+          "測定温度",
+          "測定温度 単位"
+        ],
+        [
+          "入門サンプル.xdw",
+          "e56ba1628ec94ef5ab659a0dc275b064",
+          "ページ",
+          1,
+          "1015637bd2ab4045ab0fd9dc22be02b2",
+          "入門ページ",
+          "1403551b713740fcafa4dcbee8ffc04e",
+          "1",
+          "000125",
+          "",
+          179.8,
+          "℃"
+        ]
+      ]
+    },
+    {
+      "name": "根拠",
+      "rows": 3,
+      "columns": 28,
+      "headers": [
+        "結果シート",
+        "項目定義ID",
+        "項目定義版",
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "項目ID",
+        "項目名",
+        "原文",
+        "採用値",
+        "単位",
+        "確認状態",
+        "理由・診断",
+        "原本ハッシュ",
+        "原本相対パス",
+        "根拠ページ",
+        "X mm",
+        "Y mm",
+        "幅 mm",
+        "高さ mm",
+        "確認した版",
+        "確定した版",
+        "ページ割当版"
+      ],
+      "cells": [
+        {
+          "cell": "A1",
+          "value": "結果シート",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B1",
+          "value": "項目定義ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C1",
+          "value": "項目定義版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D1",
+          "value": "文書名",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "E1",
+          "value": "原本ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "F1",
+          "value": "記録単位",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "G1",
+          "value": "元ページ番号",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "H1",
+          "value": "記録ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "I1",
+          "value": "テンプレート名",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "J1",
+          "value": "テンプレートID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "K1",
+          "value": "テンプレート版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "L1",
+          "value": "項目ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "M1",
+          "value": "項目名",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "N1",
+          "value": "原文",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "O1",
+          "value": "採用値",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "P1",
+          "value": "単位",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Q1",
+          "value": "確認状態",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "R1",
+          "value": "理由・診断",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "S1",
+          "value": "原本ハッシュ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "T1",
+          "value": "原本相対パス",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "U1",
+          "value": "根拠ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "V1",
+          "value": "X mm",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "W1",
+          "value": "Y mm",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "X1",
+          "value": "幅 mm",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Y1",
+          "value": "高さ mm",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Z1",
+          "value": "確認した版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AA1",
+          "value": "確定した版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AB1",
+          "value": "ページ割当版",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A2",
+          "value": "結果01",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B2",
+          "value": "b83125fdf6cb48ef972a35dd6f8db02d",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D2",
+          "value": "入門サンプル.xdw",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "E2",
+          "value": "e56ba1628ec94ef5ab659a0dc275b064",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "F2",
+          "value": "ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "G2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "H2",
+          "value": "1015637bd2ab4045ab0fd9dc22be02b2",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "I2",
+          "value": "入門ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "J2",
+          "value": "1403551b713740fcafa4dcbee8ffc04e",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "K2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "L2",
+          "value": "part",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "M2",
+          "value": "部品番号",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "N2",
+          "value": "000125",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "O2",
+          "value": "000125",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "P2",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Q2",
+          "value": "確認済み",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "R2",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "S2",
+          "value": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "T2",
+          "value": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "U2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "V2",
+          "value": "90",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "W2",
+          "value": "75",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "X2",
+          "value": "70",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Y2",
+          "value": "16",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Z2",
+          "value": "2",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AA2",
+          "value": "4",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AB2",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A3",
+          "value": "結果01",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B3",
+          "value": "b83125fdf6cb48ef972a35dd6f8db02d",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C3",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D3",
+          "value": "入門サンプル.xdw",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "E3",
+          "value": "e56ba1628ec94ef5ab659a0dc275b064",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "F3",
+          "value": "ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "G3",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "H3",
+          "value": "1015637bd2ab4045ab0fd9dc22be02b2",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "I3",
+          "value": "入門ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "J3",
+          "value": "1403551b713740fcafa4dcbee8ffc04e",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "K3",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "L3",
+          "value": "measured",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "M3",
+          "value": "測定温度",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "N3",
+          "value": "179.8℃",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "O3",
+          "value": "179.8",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "P3",
+          "value": "℃",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Q3",
+          "value": "確認済み",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "R3",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "S3",
+          "value": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "T3",
+          "value": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "U3",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "V3",
+          "value": "90",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "W3",
+          "value": "120",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "X3",
+          "value": "70",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Y3",
+          "value": "16",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "Z3",
+          "value": "4",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AA3",
+          "value": "4",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "AB3",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        }
+      ],
+      "values": [
+        [
+          "結果シート",
+          "項目定義ID",
+          "項目定義版",
+          "文書名",
+          "原本ID",
+          "記録単位",
+          "元ページ番号",
+          "記録ID",
+          "テンプレート名",
+          "テンプレートID",
+          "テンプレート版",
+          "項目ID",
+          "項目名",
+          "原文",
+          "採用値",
+          "単位",
+          "確認状態",
+          "理由・診断",
+          "原本ハッシュ",
+          "原本相対パス",
+          "根拠ページ",
+          "X mm",
+          "Y mm",
+          "幅 mm",
+          "高さ mm",
+          "確認した版",
+          "確定した版",
+          "ページ割当版"
+        ],
+        [
+          "結果01",
+          "b83125fdf6cb48ef972a35dd6f8db02d",
+          "1",
+          "入門サンプル.xdw",
+          "e56ba1628ec94ef5ab659a0dc275b064",
+          "ページ",
+          "1",
+          "1015637bd2ab4045ab0fd9dc22be02b2",
+          "入門ページ",
+          "1403551b713740fcafa4dcbee8ffc04e",
+          "1",
+          "part",
+          "部品番号",
+          "000125",
+          "000125",
+          "",
+          "確認済み",
+          "",
+          "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+          "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+          "1",
+          "90",
+          "75",
+          "70",
+          "16",
+          "2",
+          "4",
+          "1"
+        ],
+        [
+          "結果01",
+          "b83125fdf6cb48ef972a35dd6f8db02d",
+          "1",
+          "入門サンプル.xdw",
+          "e56ba1628ec94ef5ab659a0dc275b064",
+          "ページ",
+          "1",
+          "1015637bd2ab4045ab0fd9dc22be02b2",
+          "入門ページ",
+          "1403551b713740fcafa4dcbee8ffc04e",
+          "1",
+          "measured",
+          "測定温度",
+          "179.8℃",
+          "179.8",
+          "℃",
+          "確認済み",
+          "",
+          "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+          "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+          "1",
+          "90",
+          "120",
+          "70",
+          "16",
+          "4",
+          "4",
+          "1"
+        ]
+      ]
+    },
+    {
+      "name": "出力情報",
+      "rows": 10,
+      "columns": 4,
+      "headers": [
+        "区分",
+        "項目・対象",
+        "値・内容",
+        "補足"
+      ],
+      "cells": [
+        {
+          "cell": "A1",
+          "value": "区分",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B1",
+          "value": "項目・対象",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C1",
+          "value": "値・内容",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D1",
+          "value": "補足",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A2",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B2",
+          "value": "確定結果ID",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C2",
+          "value": "6850cbad18c64f2a9d62bddd61883888",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D2",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A3",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B3",
+          "value": "確定日時 UTC",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C3",
+          "value": "2026-10-03T10:37:37.004981+00:00",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D3",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A4",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B4",
+          "value": "出力日時 UTC",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C4",
+          "value": "2026-10-03T10:37:37.273973+00:00",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D4",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A5",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B5",
+          "value": "対象件数",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C5",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D5",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A6",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B6",
+          "value": "除外件数",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C6",
+          "value": "0",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D6",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A7",
+          "value": "出力",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B7",
+          "value": "根拠の参照",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C7",
+          "value": "DW-Workbenchで同じ案件の出力履歴を開いてください",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D7",
+          "value": "",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A8",
+          "value": "結果表",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B8",
+          "value": "結果01",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C8",
+          "value": "測定記録（入門用）",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D8",
+          "value": "1件",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A9",
+          "value": "項目定義",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B9",
+          "value": "結果01",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C9",
+          "value": "b83125fdf6cb48ef972a35dd6f8db02d",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D9",
+          "value": "1",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "A10",
+          "value": "テンプレート",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "B10",
+          "value": "入門ページ",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "C10",
+          "value": "1403551b713740fcafa4dcbee8ffc04e",
+          "data_type": "s",
+          "number_format": "General"
+        },
+        {
+          "cell": "D10",
+          "value": "版 1 / 結果01",
+          "data_type": "s",
+          "number_format": "General"
+        }
+      ],
+      "values": [
+        [
+          "区分",
+          "項目・対象",
+          "値・内容",
+          "補足"
+        ],
+        [
+          "出力",
+          "確定結果ID",
+          "6850cbad18c64f2a9d62bddd61883888",
+          ""
+        ],
+        [
+          "出力",
+          "確定日時 UTC",
+          "2026-10-03T10:37:37.004981+00:00",
+          ""
+        ],
+        [
+          "出力",
+          "出力日時 UTC",
+          "2026-10-03T10:37:37.273973+00:00",
+          ""
+        ],
+        [
+          "出力",
+          "対象件数",
+          "1",
+          ""
+        ],
+        [
+          "出力",
+          "除外件数",
+          "0",
+          ""
+        ],
+        [
+          "出力",
+          "根拠の参照",
+          "DW-Workbenchで同じ案件の出力履歴を開いてください",
+          ""
+        ],
+        [
+          "結果表",
+          "結果01",
+          "測定記録（入門用）",
+          "1件"
+        ],
+        [
+          "項目定義",
+          "結果01",
+          "b83125fdf6cb48ef972a35dd6f8db02d",
+          "1"
+        ],
+        [
+          "テンプレート",
+          "入門ページ",
+          "1403551b713740fcafa4dcbee8ffc04e",
+          "版 1 / 結果01"
+        ]
+      ]
+    }
+  ],
+  "column_map": {
+    "A": "文書名",
+    "B": "原本ID",
+    "C": "記録単位",
+    "D": "元ページ番号",
+    "E": "記録ID",
+    "F": "テンプレート名",
+    "G": "テンプレートID",
+    "H": "テンプレート版",
+    "I": "部品番号",
+    "J": "部品番号 単位",
+    "K": "測定温度",
+    "L": "測定温度 単位"
+  },
+  "csv": {
+    "path": "sample-output/20261003-193736-63fa4380/結果01.csv",
+    "sha256": "d7fd514da1f9993b36eb69d1e5af73298f98e7085ddbd574256250469f661be6",
+    "rows": [
+      [
+        "文書名",
+        "原本ID",
+        "記録単位",
+        "元ページ番号",
+        "記録ID",
+        "テンプレート名",
+        "テンプレートID",
+        "テンプレート版",
+        "部品番号",
+        "部品番号 単位",
+        "測定温度",
+        "測定温度 単位"
+      ],
+      [
+        "入門サンプル.xdw",
+        "e56ba1628ec94ef5ab659a0dc275b064",
+        "ページ",
+        "1",
+        "1015637bd2ab4045ab0fd9dc22be02b2",
+        "入門ページ",
+        "1403551b713740fcafa4dcbee8ffc04e",
+        "1",
+        "000125",
+        "",
+        "179.8",
+        "℃"
+      ]
+    ]
+  },
+  "xlsx": {
+    "path": "sample-output/20261003-193736-63fa4380/案件結果.xlsx",
+    "sha256": "02c42fc82b3e5a976b6d15357f9e473d0ca8fa58419b10d7268178778b8a6db3"
+  },
+  "status": "passed",
+  "all_checks_passed": true,
+  "artifact_tool_preview": {
+    "status": "rejected",
+    "manifest": "assets/export-render/render-manifest.json",
+    "original_xlsx_modified": false,
+    "imported_identifier": "000125",
+    "imported_identifier_type": "string",
+    "observed_rendered_identifier": "125",
+    "diagnosis_boundary": "getterと画像の不一致を観測した。artifact-tool内部の原因は調査していない。",
+    "adopted_for_manual": false
+  },
+  "derived_figures": {
+    "status": "passed",
+    "manifest": "assets/export-verified/figure-manifest.json",
+    "excel_screenshot": false,
+    "all_three_visually_reviewed": true
+  },
+  "app_export_copy_hashes_match": true
+}

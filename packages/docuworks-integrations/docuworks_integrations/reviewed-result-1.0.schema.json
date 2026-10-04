@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "reviewed-result 1.0",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-reviewed-result"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "result_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "review_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_xdw_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "session_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "coordinate_system": {
+      "const": "top-left-x-right-y-down"
+    },
+    "unit": {
+      "const": "mm"
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "page_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "width_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "height_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "rotation": {
+            "const": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_id": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                },
+                "order": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "text": {
+                  "type": "string"
+                },
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "rotation": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 359
+                },
+                "direction": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "origin": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "matched",
+                        "missing",
+                        "duplicate",
+                        "invalid",
+                        "foreign"
+                      ]
+                    },
+                    "annotation_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "region_id": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^p[0-9]{4,}-r[0-9]{6,}$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "raw_base64": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "contentEncoding": "base64"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "annotation_id",
+                    "region_id",
+                    "raw_base64"
+                  ],
+                  "additionalProperties": false
+                },
+                "diagnostics": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "EMPTY_TEXT",
+                      "ORIGIN_MISSING",
+                      "ORIGIN_DUPLICATE",
+                      "ORIGIN_INVALID",
+                      "ORIGIN_FOREIGN"
+                    ]
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "item_id",
+                "order",
+                "text",
+                "x",
+                "y",
+                "width",
+                "height",
+                "rotation",
+                "direction",
+                "origin",
+                "diagnostics"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "page",
+          "page_id",
+          "width_mm",
+          "height_mm",
+          "rotation",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "result_id",
+    "review_id",
+    "created_at",
+    "source_xdw_sha256",
+    "session_sha256",
+    "coordinate_system",
+    "unit",
+    "pages"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "rectangle-template-manifest-1.0",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-rectangle-template"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "status": {
+      "const": "COMPLETE"
+    },
+    "files": {
+      "type": "object",
+      "properties": {
+        "source-template.xdw": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "template.json": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "source-template.xdw",
+        "template.json"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "status",
+    "files"
+  ],
+  "additionalProperties": false
+}

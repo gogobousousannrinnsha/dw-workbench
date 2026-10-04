@@ -1,0 +1,736 @@
+{
+  "overview": [
+    {
+      "shot": "02-worklist",
+      "title": "実画面：原本とページ別の作業一覧",
+      "crop": [
+        0,
+        0,
+        1382,
+        932
+      ],
+      "marks": []
+    }
+  ],
+  "common": [
+    {
+      "shot": "02-worklist",
+      "title": "案件・処理の共通ボタン",
+      "crop": [
+        0,
+        0,
+        715,
+        93
+      ],
+      "marks": [
+        {
+          "id": "common_02",
+          "x": 44,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_03",
+          "x": 127,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_04",
+          "x": 211,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_05",
+          "x": 303,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_06",
+          "x": 396,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_07",
+          "x": 484,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_08",
+          "x": 685,
+          "y": 34,
+          "compact": true
+        },
+        {
+          "id": "common_09",
+          "x": 622,
+          "y": 79,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "02-worklist",
+      "title": "五つのタブを切り替える",
+      "crop": [
+        706,
+        86,
+        430,
+        35
+      ],
+      "marks": [
+        {
+          "id": "common_15",
+          "x": 1080,
+          "y": 105,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "02-worklist",
+      "title": "画面下端の操作・保存・ジョブ状態",
+      "crop": [
+        0,
+        894,
+        715,
+        38
+      ],
+      "marks": [
+        {
+          "id": "common_11",
+          "x": 692,
+          "y": 913,
+          "compact": false
+        }
+      ]
+    }
+  ],
+  "viewer": [
+    {
+      "shot": "04-review-number",
+      "title": "ページ移動・倍率・根拠表示",
+      "crop": [
+        0,
+        67,
+        575,
+        56
+      ],
+      "marks": [
+        {
+          "id": "viewer_01",
+          "x": 42,
+          "y": 92,
+          "compact": true
+        },
+        {
+          "id": "viewer_02",
+          "x": 120,
+          "y": 92,
+          "compact": true
+        },
+        {
+          "id": "viewer_03",
+          "x": 252,
+          "y": 92,
+          "compact": true
+        },
+        {
+          "id": "viewer_04",
+          "x": 416,
+          "y": 92,
+          "compact": true
+        },
+        {
+          "id": "viewer_05",
+          "x": 525,
+          "y": 92,
+          "compact": true
+        }
+      ]
+    },
+    {
+      "shot": "04-review-number",
+      "title": "原本のラベル・行・値と根拠の枠",
+      "crop": [
+        22,
+        245,
+        497,
+        295
+      ],
+      "marks": [
+        {
+          "id": "viewer_06",
+          "x": 500,
+          "y": 421,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "06-zoom-menu",
+      "title": "表示倍率の選択肢",
+      "crop": [
+        345,
+        89,
+        140,
+        113
+      ],
+      "marks": [],
+      "max_width_mm": 42
+    },
+    {
+      "shot": "05-evidence-focus",
+      "title": "根拠と周辺を拡大した実画面",
+      "crop": [
+        0,
+        115,
+        703,
+        766
+      ],
+      "marks": [
+        {
+          "id": "viewer_07",
+          "x": 693,
+          "y": 525,
+          "compact": false
+        },
+        {
+          "id": "viewer_08",
+          "x": 400,
+          "y": 864,
+          "compact": false
+        }
+      ]
+    }
+  ],
+  "worklist": [
+    {
+      "shot": "02-worklist",
+      "title": "文書・処理単位・各ページの割り当て",
+      "crop": [
+        688,
+        92,
+        686,
+        435
+      ],
+      "marks": [
+        {
+          "id": "worklist_01",
+          "x": 1280,
+          "y": 104,
+          "compact": false
+        },
+        {
+          "id": "worklist_02",
+          "x": 1330,
+          "y": 160,
+          "compact": false
+        },
+        {
+          "id": "worklist_03",
+          "x": 1296,
+          "y": 385,
+          "compact": false
+        },
+        {
+          "id": "worklist_04",
+          "x": 1296,
+          "y": 410,
+          "compact": false
+        },
+        {
+          "id": "worklist_05",
+          "x": 1330,
+          "y": 438,
+          "compact": false
+        },
+        {
+          "id": "worklist_22",
+          "x": 703,
+          "y": 343,
+          "compact": false
+        },
+        {
+          "id": "worklist_23",
+          "x": 703,
+          "y": 516,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "02-worklist",
+      "title": "対象指定・テンプレート適用・OCR・案件出力",
+      "crop": [
+        688,
+        700,
+        686,
+        194
+      ],
+      "marks": [
+        {
+          "id": "worklist_06",
+          "x": 811,
+          "y": 714,
+          "compact": true
+        },
+        {
+          "id": "worklist_07",
+          "x": 926,
+          "y": 715,
+          "compact": false
+        },
+        {
+          "id": "worklist_08",
+          "x": 1296,
+          "y": 777,
+          "compact": false
+        },
+        {
+          "id": "worklist_09",
+          "x": 772,
+          "y": 792,
+          "compact": true
+        },
+        {
+          "id": "worklist_10",
+          "x": 868,
+          "y": 792,
+          "compact": true
+        },
+        {
+          "id": "worklist_11",
+          "x": 946,
+          "y": 792,
+          "compact": true
+        },
+        {
+          "id": "worklist_12",
+          "x": 762,
+          "y": 825,
+          "compact": true
+        },
+        {
+          "id": "worklist_13",
+          "x": 937,
+          "y": 825,
+          "compact": true
+        },
+        {
+          "id": "worklist_14",
+          "x": 748,
+          "y": 871,
+          "compact": false
+        }
+      ]
+    }
+  ],
+  "setup": [
+    {
+      "shot": "10-setup-upper",
+      "title": "テンプレート作成：上部の入力と項目一覧",
+      "crop": [
+        0,
+        0,
+        900,
+        1190
+      ],
+      "marks": []
+    },
+    {
+      "shot": "11-setup-lower",
+      "title": "テンプレート作成：項目操作と登録",
+      "crop": [
+        0,
+        0,
+        900,
+        980
+      ],
+      "marks": []
+    }
+  ],
+  "review": [
+    {
+      "shot": "04-review-number",
+      "title": "測定温度を選択した項目・採用値・確認状態の一覧",
+      "crop": [
+        688,
+        92,
+        686,
+        269
+      ],
+      "marks": [
+        {
+          "id": "review_01",
+          "x": 1280,
+          "y": 104,
+          "compact": false
+        },
+        {
+          "id": "review_02",
+          "x": 1310,
+          "y": 272,
+          "compact": false
+        },
+        {
+          "id": "review_03",
+          "x": 1310,
+          "y": 343,
+          "compact": false
+        },
+        {
+          "id": "review_20",
+          "x": 703,
+          "y": 318,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "04-review-number",
+      "title": "採用値・単位・原文・理由と根拠",
+      "crop": [
+        688,
+        351,
+        686,
+        220
+      ],
+      "marks": [
+        {
+          "id": "review_04",
+          "x": 1296,
+          "y": 389,
+          "compact": false
+        },
+        {
+          "id": "review_05",
+          "x": 1296,
+          "y": 429,
+          "compact": false
+        },
+        {
+          "id": "review_06",
+          "x": 1296,
+          "y": 469,
+          "compact": false
+        },
+        {
+          "id": "review_07",
+          "x": 1296,
+          "y": 509,
+          "compact": false
+        },
+        {
+          "id": "review_08",
+          "x": 1296,
+          "y": 534,
+          "compact": false
+        },
+        {
+          "id": "review_09",
+          "x": 1296,
+          "y": 556,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "04-review-number",
+      "title": "測定温度の保存・確認・候補取込・再OCR・出力",
+      "crop": [
+        688,
+        564,
+        686,
+        190
+      ],
+      "marks": [
+        {
+          "id": "review_10",
+          "x": 754,
+          "y": 570,
+          "compact": true
+        },
+        {
+          "id": "review_11",
+          "x": 839,
+          "y": 570,
+          "compact": true
+        },
+        {
+          "id": "review_12",
+          "x": 924,
+          "y": 570,
+          "compact": true
+        },
+        {
+          "id": "review_13",
+          "x": 1007,
+          "y": 570,
+          "compact": true
+        },
+        {
+          "id": "review_14",
+          "x": 1296,
+          "y": 617,
+          "compact": false
+        },
+        {
+          "id": "review_15",
+          "x": 1296,
+          "y": 640,
+          "compact": false
+        },
+        {
+          "id": "review_16",
+          "x": 748,
+          "y": 665,
+          "compact": false
+        },
+        {
+          "id": "review_17",
+          "x": 748,
+          "y": 695,
+          "compact": false
+        },
+        {
+          "id": "review_18",
+          "x": 748,
+          "y": 729,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "08-frozen-review",
+      "title": "出力履歴から開いた過去の結果：編集不可",
+      "crop": [
+        711,
+        331,
+        651,
+        414
+      ],
+      "marks": []
+    }
+  ],
+  "history": [
+    {
+      "shot": "07-history",
+      "title": "確定結果の一覧：見出しと保存された行を拡大",
+      "crop": [
+        688,
+        92,
+        686,
+        185
+      ],
+      "marks": [
+        {
+          "id": "history_01",
+          "x": 1280,
+          "y": 105,
+          "compact": false
+        },
+        {
+          "id": "history_02",
+          "x": 1330,
+          "y": 160,
+          "compact": false
+        }
+      ],
+      "max_width_mm": 174
+    },
+    {
+      "shot": "07-history",
+      "title": "根拠表示・再出力・保存再試行・出力フォルダー",
+      "crop": [
+        688,
+        728,
+        686,
+        165
+      ],
+      "marks": [
+        {
+          "id": "history_03",
+          "x": 748,
+          "y": 745,
+          "compact": false
+        },
+        {
+          "id": "history_04",
+          "x": 1296,
+          "y": 776,
+          "compact": false
+        },
+        {
+          "id": "history_05",
+          "x": 748,
+          "y": 807,
+          "compact": false
+        },
+        {
+          "id": "history_06",
+          "x": 748,
+          "y": 839,
+          "compact": false
+        },
+        {
+          "id": "history_07",
+          "x": 748,
+          "y": 872,
+          "compact": false
+        }
+      ]
+    }
+  ],
+  "library": [
+    {
+      "shot": "09-library",
+      "title": "共通登録の説明と登録済みテンプレートの一覧",
+      "crop": [
+        688,
+        92,
+        686,
+        230
+      ],
+      "marks": [
+        {
+          "id": "library_01",
+          "x": 1280,
+          "y": 105,
+          "compact": false
+        },
+        {
+          "id": "library_02",
+          "x": 1296,
+          "y": 140,
+          "compact": false
+        },
+        {
+          "id": "library_03",
+          "x": 1330,
+          "y": 273,
+          "compact": false
+        },
+        {
+          "id": "library_07",
+          "x": 703,
+          "y": 292,
+          "compact": false
+        }
+      ]
+    },
+    {
+      "shot": "09-library",
+      "title": "現在の案件への取り込み・共通への登録",
+      "crop": [
+        688,
+        784,
+        686,
+        112
+      ],
+      "marks": [
+        {
+          "id": "library_04",
+          "x": 748,
+          "y": 797,
+          "compact": false
+        },
+        {
+          "id": "library_05",
+          "x": 1296,
+          "y": 843,
+          "compact": false
+        },
+        {
+          "id": "library_06",
+          "x": 748,
+          "y": 872,
+          "compact": false
+        }
+      ]
+    }
+  ],
+  "dialogs": [
+    {
+      "shot": "12-field-dialog",
+      "title": "項目を追加／項目を編集：入力ダイアログ",
+      "crop": [
+        0,
+        0,
+        900,
+        959
+      ],
+      "marks": []
+    },
+    {
+      "shot": "13-assignment-confirm",
+      "title": "適用前確認：対象と旧版→新版",
+      "crop": [
+        0,
+        0,
+        900,
+        882
+      ],
+      "marks": []
+    },
+    {
+      "shot": "14-incomplete-export",
+      "title": "未完了一覧：完了した記録だけを出力",
+      "crop": [
+        0,
+        0,
+        900,
+        846
+      ],
+      "marks": []
+    },
+    {
+      "shot": "15-assignment-history",
+      "title": "変更前の結果：閲覧する記録を選ぶ",
+      "crop": [
+        0,
+        0,
+        900,
+        864
+      ],
+      "marks": []
+    },
+    {
+      "shot": "16-standard-inputs",
+      "title": "標準入力の構成図：案件作成",
+      "crop": [
+        0,
+        0,
+        900,
+        575
+      ],
+      "marks": []
+    },
+    {
+      "shot": "16-standard-inputs",
+      "title": "標準選択の構成図：案件を開く",
+      "crop": [
+        0,
+        578,
+        900,
+        300
+      ],
+      "marks": []
+    },
+    {
+      "shot": "16-standard-inputs",
+      "title": "標準選択の構成図：案件バックアップ",
+      "crop": [
+        0,
+        880,
+        900,
+        561
+      ],
+      "marks": []
+    }
+  ]
+}

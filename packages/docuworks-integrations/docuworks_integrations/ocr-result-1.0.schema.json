@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DocuWorks OCR Result 1.0",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/manifest"
+    },
+    {
+      "$ref": "#/$defs/page"
+    }
+  ],
+  "$defs": {
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "docuworks-ocr-result"
+        },
+        "schema_version": {
+          "const": "1.0"
+        },
+        "status": {
+          "const": "COMPLETE"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "xdw"
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+            },
+            "original_path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "page_count": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "page_count_provenance": {
+              "enum": [
+                "recorded",
+                "unknown-in-legacy"
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "path",
+            "original_path",
+            "sha256",
+            "page_count"
+          ],
+          "additionalProperties": false
+        },
+        "ocr": {
+          "type": "object"
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "result": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+              }
+            },
+            "required": [
+              "page",
+              "result"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "files": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "required": [
+        "schema",
+        "schema_version",
+        "status",
+        "run_id",
+        "source",
+        "ocr",
+        "pages",
+        "files"
+      ],
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "page_width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "page_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "image_width_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "image_height_px": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "render_dpi": {
+          "enum": [
+            300,
+            600
+          ]
+        },
+        "image": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preview": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+        },
+        "listing": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^:\\\\]+$"
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/region"
+          },
+          "minItems": 1
+        },
+        "coordinate_system": {
+          "const": "top-left-x-right-y-down"
+        },
+        "rotation": {
+          "const": 0
+        }
+      },
+      "required": [
+        "page",
+        "page_width_mm",
+        "page_height_mm",
+        "image_width_px",
+        "image_height_px",
+        "render_dpi",
+        "image",
+        "raw",
+        "preview",
+        "listing",
+        "regions",
+        "coordinate_system",
+        "rotation"
+      ],
+      "additionalProperties": false
+    },
+    "region": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^p[0-9]{4,}-r[0-9]{6,}$"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "polygon_px": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "bbox_px": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0
+            },
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "additionalProperties": false
+        },
+        "polygon_mm": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "bbox_mm": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0
+            },
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "width",
+            "height"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "confidence",
+        "polygon_px",
+        "bbox_px",
+        "polygon_mm",
+        "bbox_mm"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

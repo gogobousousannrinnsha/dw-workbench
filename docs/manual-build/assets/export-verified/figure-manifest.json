@@ -1,0 +1,161 @@
+{
+  "created_at_utc": "2026-10-03T10:45:32.033920+00:00",
+  "source_xlsx": "sample-output/20261003-193736-63fa4380/案件結果.xlsx",
+  "source_sha256": "02c42fc82b3e5a976b6d15357f9e473d0ca8fa58419b10d7268178778b8a6db3",
+  "source_verification": "verification.json",
+  "generated_from_independently_read_cells": true,
+  "excel_screenshot": false,
+  "workbook_modified": false,
+  "figures": [
+    {
+      "file": "assets/export-verified/result-values.png",
+      "sha256": "f559edf600fad2650010807767b3a8a11f858c84d8f75fb8aed16a906cdf73ac",
+      "size_pixels": [
+        1162,
+        450
+      ],
+      "source_sheet": "結果01",
+      "source_cells": [
+        "A1:A2",
+        "D1:D2",
+        "I1:I2",
+        "K1:L2"
+      ],
+      "displayed_rows": [
+        [
+          "入門サンプル.xdw",
+          1,
+          "000125",
+          179.8,
+          "℃"
+        ]
+      ],
+      "label": "実XLSXのセル値から作成した表示図（Excelの撮影画像ではありません）",
+      "excel_screenshot": false,
+      "visual_review": "passed",
+      "visual_reviewed_at_utc": "2026-10-03T10:46:40.969254+00:00",
+      "all_displayed_values_readable": true,
+      "missing_glyphs_seen": false,
+      "table_overflow_seen": false
+    },
+    {
+      "file": "assets/export-verified/evidence-values.png",
+      "sha256": "0f3fe58ae6fb1b2f7bc6a705e1c0b8bf372a20ff2e3c5cf1195c673d65354699",
+      "size_pixels": [
+        1477,
+        580
+      ],
+      "source_sheet": "根拠",
+      "source_cells": [
+        "M1:Q3",
+        "U1:Z3"
+      ],
+      "displayed_rows": [
+        [
+          "部品番号",
+          "000125",
+          "000125",
+          "",
+          "確認済み",
+          "1",
+          "X=90, Y=75\n幅=70, 高さ=16",
+          "2"
+        ],
+        [
+          "測定温度",
+          "179.8℃",
+          "179.8",
+          "℃",
+          "確認済み",
+          "1",
+          "X=90, Y=120\n幅=70, 高さ=16",
+          "4"
+        ]
+      ],
+      "label": "実XLSXのセル値から作成した表示図（Excelの撮影画像ではありません）",
+      "excel_screenshot": false,
+      "visual_review": "passed",
+      "visual_reviewed_at_utc": "2026-10-03T10:46:40.969254+00:00",
+      "all_displayed_values_readable": true,
+      "missing_glyphs_seen": false,
+      "table_overflow_seen": false
+    },
+    {
+      "file": "assets/export-verified/export-info.png",
+      "sha256": "2dd6298776d391b031ebe1bfbbe2adc223ebeb20e7c64fd8905882fcc51e99b2",
+      "size_pixels": [
+        1537,
+        950
+      ],
+      "source_sheet": "出力情報",
+      "source_cells": [
+        "A1:D10"
+      ],
+      "displayed_rows": [
+        [
+          "出力",
+          "確定結果ID",
+          "6850cbad18c64f2a9d62bddd61883888",
+          ""
+        ],
+        [
+          "出力",
+          "確定日時 UTC",
+          "2026-10-03T10:37:37.004981+00:00",
+          ""
+        ],
+        [
+          "出力",
+          "出力日時 UTC",
+          "2026-10-03T10:37:37.273973+00:00",
+          ""
+        ],
+        [
+          "出力",
+          "対象件数",
+          "1",
+          ""
+        ],
+        [
+          "出力",
+          "除外件数",
+          "0",
+          ""
+        ],
+        [
+          "出力",
+          "根拠の参照",
+          "DW-Workbenchで同じ案件の出力履歴を開いてください",
+          ""
+        ],
+        [
+          "結果表",
+          "結果01",
+          "測定記録（入門用）",
+          "1件"
+        ],
+        [
+          "項目定義",
+          "結果01",
+          "b83125fdf6cb48ef972a35dd6f8db02d",
+          "1"
+        ],
+        [
+          "テンプレート",
+          "入門ページ",
+          "1403551b713740fcafa4dcbee8ffc04e",
+          "版 1 / 結果01"
+        ]
+      ],
+      "label": "実XLSXのセル値から作成した表示図（Excelの撮影画像ではありません）",
+      "excel_screenshot": false,
+      "visual_review": "passed",
+      "visual_reviewed_at_utc": "2026-10-03T10:46:40.969254+00:00",
+      "all_displayed_values_readable": true,
+      "missing_glyphs_seen": false,
+      "table_overflow_seen": false
+    }
+  ],
+  "status": "passed",
+  "all_figures_visually_reviewed": true
+}

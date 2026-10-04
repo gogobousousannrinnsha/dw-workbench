@@ -1,0 +1,11 @@
+# Preserve the exact implementation snapshot, including existing line endings.
+*.py -text
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.png -text
+*.jpg -text
+*.pdf -text
+*.xdw -text
+*.xlsx -text

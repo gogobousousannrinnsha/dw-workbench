@@ -1,0 +1,196 @@
+{
+  "id": "6850cbad18c64f2a9d62bddd61883888",
+  "created": "2026-10-03T10:37:37.004981+00:00",
+  "groups": [
+    {
+      "schema": {
+        "id": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "version": 1,
+        "name": "測定記録（入門用）",
+        "fields": [
+          {
+            "id": "part",
+            "name": "部品番号",
+            "kind": "text",
+            "required": true,
+            "unit": ""
+          },
+          {
+            "id": "measured",
+            "name": "測定温度",
+            "kind": "decimal",
+            "required": true,
+            "unit": "℃"
+          }
+        ]
+      },
+      "profile": {
+        "id": "1403551b713740fcafa4dcbee8ffc04e",
+        "version": 1,
+        "name": "入門ページ",
+        "pages": [
+          {
+            "width_mm": 210.0,
+            "height_mm": 297.0,
+            "rotation": 0
+          }
+        ],
+        "fields": [
+          {
+            "id": "part",
+            "name": "部品番号",
+            "kind": "text",
+            "required": true,
+            "unit": ""
+          },
+          {
+            "id": "measured",
+            "name": "測定温度",
+            "kind": "decimal",
+            "required": true,
+            "unit": "℃"
+          }
+        ],
+        "regions": {
+          "part": {
+            "page": 1,
+            "rect": [
+              90,
+              75,
+              70,
+              16
+            ]
+          },
+          "measured": {
+            "page": 1,
+            "rect": [
+              90,
+              120,
+              70,
+              16
+            ]
+          }
+        },
+        "scope": "page",
+        "schema_id": "b83125fdf6cb48ef972a35dd6f8db02d",
+        "schema_version": 1
+      },
+      "records": [
+        {
+          "id": "1015637bd2ab4045ab0fd9dc22be02b2",
+          "revision": 4,
+          "source": {
+            "id": "e56ba1628ec94ef5ab659a0dc275b064",
+            "name": "入門サンプル.xdw",
+            "sha256": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+            "path": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+            "pages": [
+              {
+                "width_mm": 210.0,
+                "height_mm": 297.0,
+                "rotation": 0
+              }
+            ]
+          },
+          "fields": {
+            "part": {
+              "value": "000125",
+              "unit": "",
+              "raw": "000125",
+              "anchor": {
+                "source_id": "e56ba1628ec94ef5ab659a0dc275b064",
+                "source_hash": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+                "page": 1,
+                "rect": [
+                  90,
+                  75,
+                  70,
+                  16
+                ]
+              },
+              "status": "accepted",
+              "reason": "",
+              "accepted_revision": 2,
+              "candidate_id": null
+            },
+            "measured": {
+              "value": "179.8",
+              "unit": "℃",
+              "raw": "179.8℃",
+              "anchor": {
+                "source_id": "e56ba1628ec94ef5ab659a0dc275b064",
+                "source_hash": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+                "page": 1,
+                "rect": [
+                  90,
+                  120,
+                  70,
+                  16
+                ]
+              },
+              "status": "accepted",
+              "reason": "",
+              "accepted_revision": 4,
+              "candidate_id": null
+            }
+          },
+          "page": 1,
+          "profile": {
+            "id": "1403551b713740fcafa4dcbee8ffc04e",
+            "version": 1,
+            "name": "入門ページ",
+            "pages": [
+              {
+                "width_mm": 210.0,
+                "height_mm": 297.0,
+                "rotation": 0
+              }
+            ],
+            "fields": [
+              {
+                "id": "part",
+                "name": "部品番号",
+                "kind": "text",
+                "required": true,
+                "unit": ""
+              },
+              {
+                "id": "measured",
+                "name": "測定温度",
+                "kind": "decimal",
+                "required": true,
+                "unit": "℃"
+              }
+            ],
+            "regions": {
+              "part": {
+                "page": 1,
+                "rect": [
+                  90,
+                  75,
+                  70,
+                  16
+                ]
+              },
+              "measured": {
+                "page": 1,
+                "rect": [
+                  90,
+                  120,
+                  70,
+                  16
+                ]
+              }
+            },
+            "scope": "page",
+            "schema_id": "b83125fdf6cb48ef972a35dd6f8db02d",
+            "schema_version": 1
+          },
+          "assignment_revision": 1
+        }
+      ]
+    }
+  ],
+  "excluded": [],
+  "format_version": 2
+}

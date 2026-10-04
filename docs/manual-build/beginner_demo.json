@@ -1,0 +1,204 @@
+{
+  "synthetic": true,
+  "real_business_data": false,
+  "manual_visual_confirmation": false,
+  "created_at_utc": "2026-10-03T10:37:36.390945+00:00",
+  "run_id": "20261003-193736-63fa4380",
+  "portable": "DW-Workbench-v0.2.0",
+  "project": "projects/入門用 合成サンプル 20261003-193736-63fa4380",
+  "input": "sample-input/20261003-193736-63fa4380/入門サンプル.xdw",
+  "source_png": "sample-input/20261003-193736-63fa4380/入門サンプル.png",
+  "original_sha256": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+  "workflow": "hand entry / evidence / accept / freeze / app export",
+  "ocr_calls": 0,
+  "package": {
+    "version": "0.2.0",
+    "sha256": {
+      "application.py": "5c56e6a70a142a155101562ed6702f31c7110fe77ee8e58f8efc9b0a1c142d26",
+      "domain.py": "34b6651ac27c8a1b4c5eecbfecbe45569f596819160bc3735ff6c133d7567f93",
+      "storage.py": "945cdb4223ea60dae18f22c761437b9b10d830167b94410f09ebc6d6b2fd57b7",
+      "exporting.py": "e75a884ff756f02a8c3b4196ca7cf86684dde7df9090a1e6d559768ab163860e"
+    }
+  },
+  "source_id": "e56ba1628ec94ef5ab659a0dc275b064",
+  "record_id": "1015637bd2ab4045ab0fd9dc22be02b2",
+  "schema": {
+    "id": "b83125fdf6cb48ef972a35dd6f8db02d",
+    "version": 1,
+    "name": "測定記録（入門用）",
+    "fields": [
+      {
+        "id": "part",
+        "name": "部品番号",
+        "kind": "text",
+        "required": true,
+        "unit": ""
+      },
+      {
+        "id": "measured",
+        "name": "測定温度",
+        "kind": "decimal",
+        "required": true,
+        "unit": "℃"
+      }
+    ]
+  },
+  "profile": {
+    "id": "1403551b713740fcafa4dcbee8ffc04e",
+    "version": 1,
+    "name": "入門ページ",
+    "pages": [
+      {
+        "width_mm": 210.0,
+        "height_mm": 297.0,
+        "rotation": 0
+      }
+    ],
+    "fields": [
+      {
+        "id": "part",
+        "name": "部品番号",
+        "kind": "text",
+        "required": true,
+        "unit": ""
+      },
+      {
+        "id": "measured",
+        "name": "測定温度",
+        "kind": "decimal",
+        "required": true,
+        "unit": "℃"
+      }
+    ],
+    "regions": {
+      "part": {
+        "page": 1,
+        "rect": [
+          90,
+          75,
+          70,
+          16
+        ]
+      },
+      "measured": {
+        "page": 1,
+        "rect": [
+          90,
+          120,
+          70,
+          16
+        ]
+      }
+    },
+    "scope": "page",
+    "schema_id": "b83125fdf6cb48ef972a35dd6f8db02d",
+    "schema_version": 1
+  },
+  "source": {
+    "id": "e56ba1628ec94ef5ab659a0dc275b064",
+    "name": "入門サンプル.xdw",
+    "sha256": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+    "path": "sources/e56ba1628ec94ef5ab659a0dc275b064.xdw",
+    "pages": [
+      {
+        "width_mm": 210.0,
+        "height_mm": 297.0,
+        "rotation": 0
+      }
+    ]
+  },
+  "fields": {
+    "part": {
+      "value": "000125",
+      "unit": "",
+      "raw": "000125",
+      "anchor": {
+        "source_id": "e56ba1628ec94ef5ab659a0dc275b064",
+        "source_hash": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "page": 1,
+        "rect": [
+          90,
+          75,
+          70,
+          16
+        ]
+      },
+      "status": "accepted",
+      "reason": "",
+      "accepted_revision": 2,
+      "candidate_id": null
+    },
+    "measured": {
+      "value": "179.8",
+      "unit": "℃",
+      "raw": "179.8℃",
+      "anchor": {
+        "source_id": "e56ba1628ec94ef5ab659a0dc275b064",
+        "source_hash": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185",
+        "page": 1,
+        "rect": [
+          90,
+          120,
+          70,
+          16
+        ]
+      },
+      "status": "accepted",
+      "reason": "",
+      "accepted_revision": 4,
+      "candidate_id": null
+    }
+  },
+  "edit_log": [
+    {
+      "field_id": "part",
+      "edit_revision": 1,
+      "accepted_revision": 2
+    },
+    {
+      "field_id": "measured",
+      "edit_revision": 3,
+      "accepted_revision": 4
+    }
+  ],
+  "dataset_id": "6850cbad18c64f2a9d62bddd61883888",
+  "artifacts": [
+    {
+      "name": "6850cbad18c64f2a9d62bddd61883888/案件結果.xlsx",
+      "status": "complete",
+      "path": "exports/6850cbad18c64f2a9d62bddd61883888/案件結果.xlsx",
+      "sha256": "02c42fc82b3e5a976b6d15357f9e473d0ca8fa58419b10d7268178778b8a6db3"
+    },
+    {
+      "name": "6850cbad18c64f2a9d62bddd61883888/結果01.csv",
+      "status": "complete",
+      "path": "exports/6850cbad18c64f2a9d62bddd61883888/結果01.csv",
+      "sha256": "d7fd514da1f9993b36eb69d1e5af73298f98e7085ddbd574256250469f661be6"
+    }
+  ],
+  "docuworks": "10.1.1",
+  "render": {
+    "width_mm": 210.0,
+    "height_mm": 297.0,
+    "rotation": 0,
+    "pixels": [
+      1241,
+      1754
+    ],
+    "docuworks": "10.1.1",
+    "image_sha256": "313ec2beaa9cdf158bd5f3d7ea1c481f8e24aa6490079337082cc5c595e0b3d5",
+    "source_hash": "620cbe6b4447cb8300c2ce890e1e3db87b192908fb68a6a20d81b3a14657c185"
+  },
+  "xlsx": "sample-output/20261003-193736-63fa4380/案件結果.xlsx",
+  "csv": "sample-output/20261003-193736-63fa4380/結果01.csv",
+  "dataset_path": "sample-output/20261003-193736-63fa4380/frozen_dataset.json",
+  "verification_path": "verification.json",
+  "reopen_verified": true,
+  "original_unchanged": true,
+  "snapshot_unchanged": true,
+  "package_unchanged": true,
+  "independent_reader_checks": 35,
+  "status": "complete",
+  "figures_manifest": "assets/export-verified/figure-manifest.json",
+  "verification_sha256": "09d26af1c87de264b59fca7ee9c49050dcf5beab88294a23834958447db18b45"
+}

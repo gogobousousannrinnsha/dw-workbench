@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "rectangle-template-1.0",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "docuworks-rectangle-template"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "template_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_xdw_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "coordinate_basis": {
+      "const": "reviewed"
+    },
+    "coordinate_system": {
+      "const": "top-left-x-right-y-down"
+    },
+    "unit": {
+      "const": "mm"
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "width_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "height_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "rotation": {
+            "const": 0
+          },
+          "rectangles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "rectangle_id": {
+                  "type": "string",
+                  "pattern": "^p[0-9]{4,}-a[0-9]{6,}$"
+                },
+                "annotation_order": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483647
+                },
+                "x": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "purpose": {
+                  "enum": [
+                    "field",
+                    "condition"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "expected": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "output_order": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 2147483647
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "join": {
+                  "enum": [
+                    "連結",
+                    "空白",
+                    "改行"
+                  ]
+                }
+              },
+              "required": [
+                "rectangle_id",
+                "annotation_order",
+                "x",
+                "y",
+                "width",
+                "height",
+                "purpose",
+                "name",
+                "expected",
+                "required",
+                "output_order",
+                "join"
+              ],
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "purpose": {
+                        "const": "field"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "expected": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "purpose": {
+                        "const": "condition"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "expected": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "\\S"
+                      },
+                      "required": {
+                        "const": true
+                      },
+                      "output_order": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "page",
+          "width_mm",
+          "height_mm",
+          "rotation",
+          "rectangles"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "template_id",
+    "name",
+    "created_at",
+    "source_xdw_sha256",
+    "coordinate_basis",
+    "coordinate_system",
+    "unit",
+    "pages"
+  ],
+  "additionalProperties": false
+}
