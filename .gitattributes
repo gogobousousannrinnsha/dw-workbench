@@ -1,5 +1,7 @@
 # Preserve the exact implementation snapshot, including existing line endings.
 *.py -text
+*.ps1 -text
+*.bat -text
 *.md text eol=lf
 *.json text eol=lf
 *.toml text eol=lf

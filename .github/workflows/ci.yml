@@ -22,6 +22,10 @@ jobs:
         run: python -m pip install --upgrade pip 'setuptools>=77' wheel pytest openpyxl numpy psutil
       - name: Verify source boundaries and fixed implementation bytes
         run: python scripts/verify_source.py
+      - name: Verify Portable restore helper with 17 synthetic cases
+        env:
+          DW_WORKBENCH_RESTORE_TEST_ROOT: ${{ runner.temp }}/dw-restore-helper-tests
+        run: python scripts/test_restore.py
       - name: Build all fixed companion packages
         run: python -m pip wheel --no-build-isolation --no-deps --wheel-dir ./dist ./packages/docuworks-ctypes ./packages/docuworks-integrations ./packages/dw-workbench
       - name: Install the built wheels and ordinary dependencies
