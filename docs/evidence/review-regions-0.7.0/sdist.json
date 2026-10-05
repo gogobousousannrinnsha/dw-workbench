@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "source_unchanged": true,
+  "supplemental_files_added": false,
+  "archive_sha256": "8796b0bdd2009ea0c0e662c81918610116697243e4cdb34d7330b9dcfd489ac4",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "source_files": 63,
+  "generated_cache_files": 5
+}

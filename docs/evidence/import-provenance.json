@@ -1,0 +1,33 @@
+{
+  "inputs": [
+    {
+      "name": "docuworks-integrations-0.3.0-source.zip",
+      "size": 47129,
+      "sha256": "b7204447a872c561f3b4ef36bb43b8b8e55fd94817163080c749abf3d81e5f40"
+    },
+    {
+      "name": "docuworks_integrations-0.3.0-py3-none-any.whl",
+      "size": 28032,
+      "sha256": "2cb1157e1e558523d8e272acbaa0d15efbb74bd32180ebfd89bb98a6ce4cb424"
+    },
+    {
+      "name": "docuworks_ctypes-1.0.0-py3-none-any.whl",
+      "size": 46491,
+      "sha256": "28250286bc42bff5fc37b8f536822c892f1da9bf697a4ecc4da1e94e9b91c91a"
+    }
+  ],
+  "package_comparison": [
+    {
+      "package": "docuworks_ctypes",
+      "matched_files": 23,
+      "content_identical_to_original_wheel": true
+    },
+    {
+      "package": "docuworks_integrations",
+      "matched_files": 16,
+      "content_identical_to_original_wheel": true
+    }
+  ],
+  "repository_target": "REDACTED_PRIVATE_REPOSITORY",
+  "repository_strategy": "new private repository; previous repository unchanged"
+}

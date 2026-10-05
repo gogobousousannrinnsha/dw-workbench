@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-06",
+  "source_tests": [
+    {
+      "package": "core",
+      "tests": 102,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "package": "integration",
+      "tests": 61,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "excluded_tests": {
+    "core": "integration directory and installed-bundle patch-difference test",
+    "integrations": "3 native integration cases"
+  },
+  "source_test_commands": [
+    "python -m pytest tests --ignore=tests/integration -k 'not installed_bundle_allows_companion_patch_difference' -p no:cacheprovider",
+    "python -m pytest tests --ignore=tests/integration -p no:cacheprovider"
+  ],
+  "wheel_build": {
+    "success": true,
+    "command": "python -m pip wheel --no-index --no-deps --no-build-isolation --no-cache-dir --wheel-dir work/wheels ./packages/docuworks-ctypes ./packages/docuworks-integrations"
+  },
+  "isolated_wheel_smoke": {
+    "python": "3.13.15",
+    "packages": {
+      "docuworks-ctypes": "1.0.0",
+      "docuworks-integrations": "0.3.0"
+    },
+    "isolated_wheel_imports": true,
+    "synthetic_bundle_roundtrip": true,
+    "jsonl": true,
+    "marker_dry_run": true,
+    "powershell_export_and_plan": true,
+    "ocr_modules_not_imported": true,
+    "real_document_or_gpu_test": false
+  },
+  "pip_check": "No broken requirements found.",
+  "models": {
+    "existing_local_assets_only": true,
+    "archives": 2,
+    "files": 6,
+    "hashes_match_recorded_baseline": true,
+    "downloaded_this_run": false
+  },
+  "powershell_syntax": {
+    "scripts": 10,
+    "errors": 0
+  },
+  "environment_limitations": [
+    "Initial pip installation blocked by temporary-directory ACL; offline build/install retried outside sandbox.",
+    "PowerShell sample initially blocked by language-mode boundary; successful retry outside sandbox.",
+    "Initial integration temporary-root assignment failed under constrained language mode; corrected assignment and all 61 cases reran successfully."
+  ],
+  "not_retested": [
+    "GPU OCR",
+    "native XDW rendering/save/reopen",
+    "Viewer",
+    "full network dependency/model installation"
+  ],
+  "repository_target": "REDACTED_PRIVATE_REPOSITORY",
+  "repository_strategy": "new private repository; previous repository unchanged"
+}

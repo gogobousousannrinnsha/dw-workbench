@@ -1,0 +1,81 @@
+{
+  "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+  "user_report": "Viewer確認完了問題なし",
+  "separate_save_file_found": true,
+  "save_as_status": "verified saved.xdw files for all six cases",
+  "save_as_user_report": "別名保存  できました",
+  "source_bundle_unchanged_since_preparation": true,
+  "inputs_unchanged_during_verification": true,
+  "cases": [
+    {
+      "case": "01-edit",
+      "sha256": "64ee03cefc218b0a113fd1d1656284e2c7ad22ee3bcf592883b6a0802dc19b66",
+      "differs_from_prepared_input": true,
+      "annotation_count": 1,
+      "result": "passed",
+      "original_metadata_preserved": true,
+      "jsonl_rows": 2,
+      "correction_set_id": "cda73292-1948-4908-b75c-dd47257b7952",
+      "input_filename": "saved.xdw"
+    },
+    {
+      "case": "02-move",
+      "sha256": "82a347b83b722421567f1c7cc3f36eae27d1c9e1e4667298dbb9764feb4c7e8f",
+      "differs_from_prepared_input": true,
+      "annotation_count": 1,
+      "display_position_mm": {
+        "before": [
+          27.85,
+          28.45
+        ],
+        "after": [
+          90.51,
+          54.52
+        ]
+      },
+      "result": "passed",
+      "original_metadata_preserved": true,
+      "jsonl_rows": 2,
+      "correction_set_id": "c8828a2a-4554-4d5f-b208-f9405cd1c912",
+      "input_filename": "saved.xdw"
+    },
+    {
+      "case": "03-unchanged",
+      "sha256": "b12bcdcaf1c17df1f8e5545212985233fb7ef699a502377de1102745861c6431",
+      "differs_from_prepared_input": false,
+      "annotation_count": 1,
+      "result": "passed",
+      "original_metadata_preserved": true,
+      "jsonl_rows": 2,
+      "correction_set_id": "82db340e-d8a1-4b0c-a535-82abffe2192e",
+      "input_filename": "saved.xdw"
+    },
+    {
+      "case": "04-copy",
+      "sha256": "8ff462425377bb93ea7d46b6552cce00d6a4b51aaa12343fb8d8620537a95c4a",
+      "differs_from_prepared_input": true,
+      "annotation_count": 2,
+      "result": "expected_rejection",
+      "error": "review identity missing or duplicated",
+      "input_filename": "saved.xdw"
+    },
+    {
+      "case": "05-delete",
+      "sha256": "9aaa9c48d75e948d7a3ecf10910be83d1b1b1129d84c0dd0ad8303d8eb17d15d",
+      "differs_from_prepared_input": true,
+      "annotation_count": 0,
+      "result": "expected_rejection",
+      "error": "review identity missing or duplicated",
+      "input_filename": "saved.xdw"
+    },
+    {
+      "case": "06-blank",
+      "sha256": "5f0d775695363cfd369a5542b1839b0b3424d1b47a14c531eb4684dea431619d",
+      "differs_from_prepared_input": true,
+      "annotation_count": 1,
+      "result": "expected_rejection",
+      "error": "correction text must be nonblank",
+      "input_filename": "saved.xdw"
+    }
+  ]
+}

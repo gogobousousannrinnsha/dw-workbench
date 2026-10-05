@@ -1,0 +1,16 @@
+{
+  "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+  "api_version": "10.1.1",
+  "dll_file_version": [
+    10,
+    1,
+    0,
+    17
+  ],
+  "dll_sha256": "35A5EACF7C0959DF48E42F6F5B63840F95B06E803375CF70C5C5D262CD1055D3",
+  "sdk": "SDK 9.1.7 / doc/ja/XDWAPI.xdw",
+  "sdk_sha256": "1ae313f7e39d1cecf7172ba5c5790a4c2fc5d8ba4a6684d9f3cb9aaf9253b094",
+  "sdk_pages": 261,
+  "research_commit": "0e93209f99daea0d8497687d728f8629a77f927c",
+  "runtime_scope": "Installed DocuWorks API on one Windows x64 host; not a new DocuWorks 9.1 runtime verification."
+}

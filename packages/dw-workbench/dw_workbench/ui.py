@@ -1,5 +1,6 @@
 """Tk desktop. Source coordinates are independent of canvas zoom and scrolling."""
 from concurrent.futures import ThreadPoolExecutor
+from collections import Counter
 from dataclasses import asdict
 from pathlib import Path
 import copy
@@ -9,10 +10,11 @@ import tkinter as tk
 from tkinter import ttk, filedialog, simpledialog, messagebox
 from .application import Workbench
 from . import __version__
-from .domain import (Anchor, ExtractionProfile, FieldSchema, ResultSchema, RuleError, Status, identifier,
+from .domain import (Anchor, ExtractionProfile, FieldSchema, ResultSchema, RuleError, StaleRevision, Status, identifier,
     profile_from, source_from, state_from, schema_from)
 from .library import TemplateLibrary
 from .workers import WorkerClient, capabilities
+from .ui_guidance import WorkflowUI
 
 LABELS = {Status.MISSING: "未取得", Status.PENDING: "未確認", Status.ACCEPTED: "確認済み", Status.DEFERRED: "保留", Status.NOT_APPLICABLE: "対象外"}
 KINDS = {"text": "文字列", "decimal": "数値"}
@@ -50,7 +52,7 @@ def target_pages(choice, selected, page_count, expression=""):
     return result
 
 
-class Window:
+class Window(WorkflowUI):
     def __init__(self, root, portable, project=None):
         self.root, self.portable = root, Path(portable).resolve()
         self.app = None
@@ -83,6 +85,8 @@ class Window:
         self.pending_results = {}
         self.pending_exports = {}
         self.exporting_ids = set()
+        self.ledger_dialog = None
+        self.batch_dialog = None
         self.project_verified = True
         self.validation_busy = False
         self.root.title(f"DW-Workbench v{__version__} — ローカル検証候補")
@@ -96,15 +100,7 @@ class Window:
             self.open_project(project)
 
     def build(self):
-        bar = ttk.Frame(self.root, padding=5)
-        bar.pack(fill="x")
-        for text, command in (("案件作成", self.new_project), ("案件を開く", self.choose_project), ("XDW追加", self.add_sources),
-            ("未完了ジョブ再開", self.resume_jobs), ("中断", self.cancel_jobs), ("案件バックアップ", self.backup)):
-            ttk.Button(bar, text=text, command=lambda c=command: self.safe(c)).pack(side="left", padx=3)
-        self.project_label = ttk.Label(bar, text="案件を作成または開いてください")
-        self.project_label.pack(side="left", padx=12)
-        self.cap_label = ttk.Label(self.root, text="利用可能な機能を確認しています…", padding=4)
-        self.cap_label.pack(fill="x")
+        self.build_workflow()
         split = ttk.Panedwindow(self.root, orient="horizontal")
         split.pack(fill="both", expand=True, padx=5)
         left, right = ttk.Frame(split), ttk.Frame(split)
@@ -114,13 +110,16 @@ class Window:
         nav.pack(fill="x")
         ttk.Button(nav, text="前ページ", command=lambda: self.safe(lambda: self.navigate(-1))).pack(side="left")
         ttk.Button(nav, text="次ページ", command=lambda: self.safe(lambda: self.navigate(1))).pack(side="left")
-        self.page_label = ttk.Label(nav, text="原本未選択")
-        self.page_label.pack(side="left", padx=5)
         self.zoom = tk.StringVar(value="ページに合わせる")
         combo = ttk.Combobox(nav, textvariable=self.zoom, values=("ページに合わせる", "50%", "100%", "150%", "200%"), state="readonly", width=18)
         combo.pack(side="left", padx=5)
         combo.bind("<<ComboboxSelected>>", lambda e: self.show_image())
-        ttk.Button(nav, text="根拠と周辺", command=self.focus_anchor).pack(side="left")
+        pagebar = ttk.Frame(left)
+        pagebar.pack(fill="x")
+        ttk.Button(pagebar, text="選択範囲を拡大", command=self.focus_anchor).pack(side="right")
+        self.page_label = ttk.Label(pagebar, text="原本未選択", wraplength=400)
+        self.page_label.pack(side="left", padx=5, fill="x", expand=True)
+        pagebar.bind("<Configure>", lambda e: self.page_label.configure(wraplength=max(150,e.width-130)))
         canvas_frame = ttk.Frame(left)
         canvas_frame.pack(fill="both", expand=True)
         self.canvas = tk.Canvas(canvas_frame, bg="#404449", highlightthickness=0)
@@ -137,56 +136,65 @@ class Window:
         self.canvas.bind("<ButtonRelease-1>", self.drag_end)
         self.canvas.bind("<MouseWheel>", lambda e: self.canvas.yview_scroll(-int(e.delta/120), "units"))
         self.canvas.bind("<Configure>", lambda e: self.show_image() if self.image is not None and self.zoom.get() == "ページに合わせる" else None)
-        ttk.Label(left, text="原本上をドラッグして範囲を指定します。範囲はページのmm座標で保存します。", padding=4).pack(fill="x")
+        ttk.Label(left, text="左の原本画像をドラッグして、読み取り範囲を指定します。", padding=4).pack(fill="x")
         self.tabs = ttk.Notebook(right)
         self.tabs.pack(fill="both", expand=True)
-        self.list_tab, self.setup_tab, self.review_tab, self.history_tab, self.library_tab = (ttk.Frame(self.tabs, padding=8) for _ in range(5))
-        for frame, label in ((self.list_tab, "作業一覧"), (self.setup_tab, "テンプレート作成"), (self.review_tab, "確認・訂正"), (self.history_tab, "出力履歴"), (self.library_tab, "共通テンプレート")):
+        self.list_tab, self.setup_tab, self.review_tab, self.output_tab, self.history_tab, self.library_tab = (ttk.Frame(self.tabs, padding=8) for _ in range(6))
+        for frame, label in ((self.list_tab, "文書"), (self.setup_tab, "範囲"), (self.review_tab, "確認"), (self.output_tab, "出力"), (self.history_tab, "履歴"), (self.library_tab, "共通")):
             self.tabs.add(frame, text=label)
         self.tabs.bind("<<NotebookTabChanged>>", lambda e: self.safe(self.tab_changed))
-        self.document_list = ttk.Treeview(self.list_tab, columns=("name", "status"), show="headings", height=5, selectmode="browse")
+        list_content = self.scrollable_content(self.list_tab)
+        ttk.Label(list_content, text="1 文書を登録・選択", font=("Yu Gothic UI", 10, "bold")).pack(anchor="w")
+        self.action_button(list_content, "add", "XDW文書を追加する", self.add_sources).pack(fill="x", pady=4)
+        self.document_list = self.make_table(list_content, columns=("name", "status"), show="headings", height=4, selectmode="browse")
         self.document_list.heading("name", text="文書")
         self.document_list.heading("status", text="確認状態")
-        self.document_list.column("name", width=260)
-        self.document_list.column("status", width=170)
-        self.document_list.pack(fill="both", expand=True)
+        self.document_list.column("name", width=240)
+        self.document_list.column("status", width=145)
         self.document_list.bind("<<TreeviewSelect>>", lambda e: self.safe(self.select_source))
-        modebar = ttk.Frame(self.list_tab)
+        ttk.Label(list_content, text="2 ページと読み取りテンプレートを選ぶ", font=("Yu Gothic UI", 10, "bold")).pack(anchor="w", pady=(8,0))
+        self.action_button(list_content, "bulk", "複数文書へ一括適用", self.open_bulk_templates).pack(fill="x", pady=4)
+        modebar = ttk.Frame(list_content)
         modebar.pack(fill="x", pady=5)
-        ttk.Label(modebar, text="処理単位").pack(side="left")
+        ttk.Label(modebar, text="結果をまとめる単位").pack(side="left")
         self.mode_choice = ttk.Combobox(modebar, values=list(MODES.values()), state="readonly", width=29)
         self.mode_choice.pack(side="left", padx=5)
         self.mode_choice.bind("<<ComboboxSelected>>", lambda e: self.safe(self.change_mode))
-        self.mode_hint = ttk.Label(self.list_tab, text="文書を選択してください")
+        self.mode_hint = ttk.Label(list_content, text="文書を選択してください", wraplength=400)
         self.mode_hint.pack(anchor="w")
-        self.page_list = ttk.Treeview(self.list_tab, columns=("page", "template", "status"), show="headings", height=7, selectmode="extended")
-        for name, title, width in (("page", "ページ", 55), ("template", "テンプレート", 210), ("status", "状態", 170)):
+        self.page_list = self.make_table(list_content, columns=("page", "template", "status"), show="headings", height=5, selectmode="extended")
+        for name, title, width in (("page", "ページ", 55), ("template", "読取設定", 180), ("status", "状態", 145)):
             self.page_list.heading(name, text=title)
             self.page_list.column(name, width=width)
-        self.page_list.pack(fill="both", expand=True, pady=5)
         self.page_list.bind("<<TreeviewSelect>>", lambda e: self.safe(self.select_page))
         self.page_list.bind("<Double-1>", lambda e: self.tabs.select(self.review_tab))
-        targets = ttk.Frame(self.list_tab)
+        targets = ttk.Frame(list_content)
         targets.pack(fill="x", pady=3)
         ttk.Label(targets, text="対象").pack(side="left")
         self.target_choice = ttk.Combobox(targets, values=("選択ページ", "全ページ", "ページ範囲", "奇数ページ", "偶数ページ"), state="readonly", width=15)
         self.target_choice.set("選択ページ")
         self.target_choice.pack(side="left", padx=4)
-        self.target_expression = ttk.Entry(targets, width=20)
+        self.target_expression = ttk.Entry(targets, width=12)
         self.target_expression.pack(side="left")
         ttk.Label(targets, text="例: 2-10,12").pack(side="left", padx=4)
-        ttk.Label(self.list_tab, text="適用するテンプレート版").pack(anchor="w", pady=(5, 0))
-        self.profile_choice = ttk.Combobox(self.list_tab, state="readonly")
+        ttk.Label(list_content, text="使う読み取りテンプレート").pack(anchor="w", pady=(5, 0))
+        self.profile_choice = ttk.Combobox(list_content, state="readonly")
         self.profile_choice.pack(fill="x")
-        actions = ttk.Frame(self.list_tab)
-        actions.pack(fill="x", pady=4)
-        for text, command in (("対象を確認して適用", self.apply_profile), ("対象外にする", self.exclude_pages), ("変更前の結果", self.open_assignment_history)):
-            ttk.Button(actions, text=text, command=lambda c=command: self.safe(c)).pack(side="left", padx=2)
-        actions = ttk.Frame(self.list_tab)
-        actions.pack(fill="x", pady=4)
-        for text, command in (("選択対象のOCR", self.run_selected_ocr), ("選択原本からテンプレート作成", self.new_profile)):
-            ttk.Button(actions, text=text, command=lambda c=command: self.safe(c)).pack(side="left", padx=2)
-        ttk.Button(self.list_tab, text="案件の確認済み結果をExcel／CSVへ出力", command=lambda: self.safe(self.finalize)).pack(fill="x", pady=5)
+        self.profile_choice.bind("<<ComboboxSelected>>", lambda e: self.refresh_workflow())
+        self.target_choice.bind("<<ComboboxSelected>>", lambda e: self.refresh_workflow())
+        self.target_expression.bind("<KeyRelease>", lambda e: self.refresh_workflow())
+        self.action_button(list_content, "apply", "選んだページへ読取設定を適用", self.apply_profile).pack(fill="x", pady=4)
+        self.action_button(list_content, "new_template", "読み取り範囲を新しく作る", self.new_profile).pack(fill="x")
+        ttk.Button(list_content, text="共通テンプレートから取り込む", command=lambda: self.tabs.select(self.library_tab)).pack(fill="x", pady=3)
+        extras = ttk.Frame(list_content)
+        extras.pack(fill="x", pady=4)
+        ttk.Button(extras, text="ページを理由付きで対象外に", command=lambda: self.safe(self.exclude_pages)).pack(side="left", padx=2)
+        ttk.Button(extras, text="設定変更前の結果を見る", command=lambda: self.safe(self.open_assignment_history)).pack(side="left", padx=2)
+        ttk.Label(list_content, text="3 OCRで文字の候補を作る", font=("Yu Gothic UI", 10, "bold")).pack(anchor="w", pady=(8,0))
+        self.selected_ocr_button = self.action_button(list_content, "ocr", "選択したページの文字を読み取る", self.run_selected_ocr)
+        self.selected_ocr_button.pack(fill="x", pady=4)
+        ttk.Label(list_content, text="OCRは候補を追加します。値の採用と確認は別操作です。手入力でも続けられます。", wraplength=400).pack(anchor="w")
+        ttk.Button(list_content, text="4 原文の確認・訂正へ進む", command=lambda: self.safe(lambda: self.select_step(4))).pack(fill="x", pady=5)
         setup_content = self.scrollable_content(self.setup_tab)
         self.setup_name = tk.StringVar()
         self.setup_name.trace_add("write", lambda *a: self.draft_changed())
@@ -199,9 +207,9 @@ class Window:
         self.setup_scope.set("ページ用")
         self.setup_scope.pack(side="left", padx=5)
         self.setup_scope.bind("<<ComboboxSelected>>", lambda e: self.safe(self.change_draft_scope))
-        self.draft_label = ttk.Label(setup_content, text="作業一覧で代表文書・ページを選択してください", wraplength=480)
+        self.draft_label = ttk.Label(setup_content, text="「文書」画面で代表文書・ページを選択してください", wraplength=480)
         self.draft_label.pack(anchor="w")
-        ttk.Label(setup_content, text="出力項目の定義（同じ定義・版は同じ結果シート）").pack(anchor="w", pady=(6, 0))
+        ttk.Label(setup_content, text="出力する項目のまとまり（項目定義）").pack(anchor="w", pady=(6, 0))
         self.schema_choice = ttk.Combobox(setup_content, state="readonly")
         self.schema_choice.pack(fill="x")
         self.schema_name = tk.StringVar()
@@ -212,11 +220,10 @@ class Window:
         schemabar.pack(fill="x", pady=3)
         ttk.Button(schemabar, text="選択した項目定義を使用", command=lambda: self.safe(self.use_schema)).pack(side="left")
         ttk.Button(schemabar, text="新しい項目定義にする", command=lambda: self.safe(self.fork_schema)).pack(side="left", padx=4)
-        self.setup_list = ttk.Treeview(setup_content, columns=("name", "type", "region"), show="headings", height=13)
+        self.setup_list = self.make_table(setup_content, columns=("name", "type", "region"), show="headings", height=9)
         for name, title in (("name", "項目"), ("type", "型・必須"), ("region", "ページ・範囲")):
             self.setup_list.heading(name, text=title)
             self.setup_list.column(name, width=160)
-        self.setup_list.pack(fill="both", expand=True, pady=8)
         self.setup_list.bind("<<TreeviewSelect>>", self.select_draft_field)
         buttons = ttk.Frame(setup_content)
         buttons.pack(fill="x")
@@ -225,18 +232,26 @@ class Window:
         ttk.Label(setup_content, text="項目を選び、原本上で値の範囲をドラッグします。上から順に出力します。\n項目の変更は新しい定義版になります。範囲だけの変更は同じ定義を使います。", wraplength=480).pack(anchor="w", pady=8)
         ttk.Button(setup_content, text="テンプレートを案件へ登録", command=lambda: self.safe(self.save_profile)).pack(fill="x")
         ttk.Button(setup_content, text="この草案を破棄", command=lambda: self.safe(self.discard_draft)).pack(fill="x", pady=4)
+        review_footer = ttk.Frame(self.review_tab)
+        review_footer.pack(side="bottom", fill="x", pady=(5,0))
+        self.edit_buttons = []
+        self.accept_button = self.action_button(review_footer, "accept", "この項目を確認済みにする  Ctrl+Enter", self.accept)
+        self.accept_button.pack(fill="x")
+        self.edit_buttons.append(self.accept_button)
+        self.action_button(review_footer, "next_unfinished", "次の未完了項目へ（案件全体）", self.next_unfinished).pack(fill="x", pady=3)
+        ttk.Button(review_footer, text="出力へ進む（結果の確定は次の画面）", command=lambda: self.safe(lambda: self.select_step(5))).pack(fill="x")
         review_content = self.scrollable_content(self.review_tab)
-        self.review_list = ttk.Treeview(review_content, columns=("name", "value", "status"), show="headings", height=9)
+        ttk.Label(review_content, text="4 原文を見て、値と範囲を確認", font=("Yu Gothic UI",10,"bold")).pack(anchor="w")
+        self.review_list = self.make_table(review_content, columns=("name", "value", "status"), show="headings", height=5)
         for name, title in (("name", "項目"), ("value", "採用値"), ("status", "状態")):
             self.review_list.heading(name, text=title)
-            self.review_list.column(name, width=150)
-        self.review_list.pack(fill="both", expand=True)
+            self.review_list.column(name, width=130)
         self.review_list.bind("<<TreeviewSelect>>", lambda e: self.safe(self.select_field))
-        self.field_label = ttk.Label(review_content, text="項目を選択してください")
+        self.field_label = ttk.Label(review_content, text="項目を選択してください",wraplength=400)
         self.field_label.pack(anchor="w", pady=5)
         self.vars = {k: tk.StringVar() for k in ("value", "unit", "raw", "reason")}
         self.entries = []
-        for key, label in (("value", "採用値"), ("unit", "単位"), ("raw", "原文表記"), ("reason", "保留・対象外の理由")):
+        for key, label in (("value", "出力する値（採用値）"), ("unit", "単位"), ("raw", "原文の文字表記"), ("reason", "保留・対象外にする理由")):
             ttk.Label(review_content, text=label).pack(anchor="w")
             entry = ttk.Entry(review_content, textvariable=self.vars[key])
             entry.pack(fill="x")
@@ -248,8 +263,7 @@ class Window:
         self.save_label.pack(anchor="w")
         review_buttons = ttk.Frame(review_content)
         review_buttons.pack(fill="x", pady=5)
-        self.edit_buttons = []
-        for label, command in (("保存再試行", self.retry_saves), ("確認済みにする", self.accept), ("保留", lambda: self.mark(Status.DEFERRED)), ("対象外", lambda: self.mark(Status.NOT_APPLICABLE))):
+        for label, command in (("入力の保存を再試行", self.retry_saves), ("理由を付けて保留", lambda: self.mark(Status.DEFERRED)), ("この項目を対象外に", lambda: self.mark(Status.NOT_APPLICABLE))):
             b = ttk.Button(review_buttons, text=label, command=lambda c=command: self.safe(c))
             b.pack(side="left", padx=2)
             self.edit_buttons.append(b)
@@ -257,25 +271,44 @@ class Window:
         self.candidate_list.pack(fill="x", pady=4)
         self.candidate_count_label = ttk.Label(review_content, text="候補0件")
         self.candidate_count_label.pack(anchor="w")
-        b = ttk.Button(review_content, text="候補を採用欄へ取り込む（確認は別操作）", command=lambda: self.safe(self.adopt))
+        b = ttk.Button(review_content, text="OCR候補を入力欄に使う（確認はまだ）", command=lambda: self.safe(self.adopt))
         b.pack(fill="x")
         self.edit_buttons.append(b)
-        b = ttk.Button(review_content, text="この記録の範囲OCR（再実行は候補を追加）", command=lambda: self.safe(self.run_ocr))
+        b = self.action_button(review_content, "ocr", "この記録の文字を読み直す（候補を追加）", self.run_ocr)
         b.pack(fill="x", pady=5)
         self.edit_buttons.append(b)
-        ttk.Button(review_content, text="確認済み結果を確定してExcel／CSV出力", command=lambda: self.safe(self.finalize)).pack(fill="x", pady=7)
-        self.history_list = ttk.Treeview(self.history_tab, columns=("date", "count", "status"), show="headings", height=12)
+        ttk.Label(review_content, text="入力は自動保存されます。保存しただけでは確認済みになりません。変更した項目は再確認が必要です。", wraplength=400).pack(anchor="w", pady=6)
+        output_content = self.scrollable_content(self.output_tab)
+        ttk.Label(output_content, text="5 確認済み結果を確定してExcelへ", font=("Yu Gothic UI",10,"bold")).pack(anchor="w",pady=4)
+        ttk.Label(output_content, text="確定すると、その時点の値と原本の範囲を保存します。後で訂正しても過去の確定結果は変わりません。ExcelとCSVを新しいファイルへ出力します。", wraplength=400).pack(fill="x")
+        self.finalize_button = self.action_button(output_content, "finalize", "結果を確定してExcel／CSV出力", self.finalize)
+        self.finalize_button.pack(fill="x", pady=7)
+        self.output_reason = tk.StringVar()
+        ttk.Label(output_content, textvariable=self.output_reason,wraplength=400).pack(fill="x")
+        ttk.Button(output_content, text="未完了を確認して作業へ戻る",command=lambda:self.safe(self.next_unfinished)).pack(fill="x",pady=5)
+        ttk.Separator(output_content).pack(fill="x",pady=12)
+        ttk.Label(output_content,text="6 台帳と照合して原文へ注釈",font=("Yu Gothic UI",10,"bold")).pack(anchor="w")
+        ttk.Label(output_content,text="台帳の条件で対象を選び、原文プレビューを確認します。最後に、原本のコピーへ塗りなしの枠を追加したXDWを出力します。",wraplength=400).pack(fill="x",pady=4)
+        self.ledger_entry_button = self.action_button(output_content,"ledger","台帳を選び、照合プレビューへ進む",self.open_ledger)
+        self.ledger_entry_button.pack(fill="x",pady=7)
+        self.ledger_reason = tk.StringVar()
+        ttk.Label(output_content,textvariable=self.ledger_reason,wraplength=400).pack(fill="x")
+        ttk.Button(output_content,text="確定結果・出力履歴を見る",command=lambda:self.tabs.select(self.history_tab)).pack(fill="x",pady=9)
+        ttk.Button(output_content,text="案件の出力フォルダーを開く",command=lambda:self.safe(self.open_exports)).pack(fill="x")
+        history_content = self.scrollable_content(self.history_tab)
+        self.history_list = self.make_table(history_content, columns=("date", "count", "status"), show="headings", height=8)
         for name, title in (("date", "確定日時 UTC"), ("count", "対象件数"), ("status", "出力状況")):
             self.history_list.heading(name, text=title)
             self.history_list.column(name, width=160)
-        self.history_list.pack(fill="both", expand=True)
-        ttk.Button(self.history_tab, text="選択結果の原本・根拠を表示", command=lambda: self.safe(self.open_history)).pack(fill="x", pady=4)
-        self.history_record = ttk.Combobox(self.history_tab, state="readonly")
+        self.action_button(history_content,"history_view","選んだ確定結果の原文を見る",self.open_history).pack(fill="x", pady=4)
+        self.history_record = ttk.Combobox(history_content, state="readonly")
         self.history_record.pack(fill="x", pady=4)
         self.history_record.bind("<<ComboboxSelected>>", lambda e: self.safe(self.select_history_record))
-        ttk.Button(self.history_tab, text="未生成・失敗した形式を再出力", command=lambda: self.safe(self.retry_export)).pack(fill="x", pady=4)
-        ttk.Button(self.history_tab, text="出力履歴の保存を再試行", command=lambda: self.safe(self.retry_saves)).pack(fill="x", pady=4)
-        ttk.Button(self.history_tab, text="出力フォルダーを開く", command=lambda: self.safe(self.open_exports)).pack(fill="x", pady=4)
+        self.history_list.bind("<<TreeviewSelect>>",lambda e:self.refresh_workflow())
+        self.action_button(history_content,"history_export","失敗・未生成のExcel／CSVを再出力",self.retry_export).pack(fill="x", pady=4)
+        self.action_button(history_content,"ledger","この案件の確定結果を台帳と照合",self.open_ledger).pack(fill="x", pady=4)
+        ttk.Button(history_content, text="出力履歴の保存を再試行", command=lambda: self.safe(self.retry_saves)).pack(fill="x", pady=4)
+        ttk.Button(history_content, text="出力フォルダーを開く", command=lambda: self.safe(self.open_exports)).pack(fill="x", pady=4)
         ttk.Label(self.library_tab, text="Portable内の共通登録から、別案件へ同じテンプレートを取り込めます。\n取り込んだ版は案件内に保存され、共通登録の改訂では変わりません。", wraplength=480).pack(anchor="w", pady=5)
         self.library_list = ttk.Treeview(self.library_tab, columns=("name", "scope", "schema"), show="headings", height=15, selectmode="browse")
         for key, title in (("name", "テンプレート・版"), ("scope", "単位"), ("schema", "項目定義・版")):
@@ -289,21 +322,13 @@ class Window:
         ttk.Button(self.library_tab, text="選択版を共通へ登録", command=lambda: self.safe(self.publish_library)).pack(fill="x", pady=5)
         self.refresh_library()
         self.status = tk.StringVar(value="準備完了")
-        ttk.Label(self.root, textvariable=self.status, padding=6).pack(fill="x")
+        status_label = ttk.Label(self.root, textvariable=self.status, padding=6,wraplength=1250)
+        status_label.pack(fill="x")
+        self.root.bind("<Configure>",lambda e:status_label.configure(wraplength=max(400,e.width-30)) if e.widget==self.root else None,add=True)
+        self.refresh_workflow()
 
     def scrollable_content(self, frame):
-        viewport = tk.Canvas(frame, highlightthickness=0)
-        scroll = ttk.Scrollbar(frame, orient="vertical", command=viewport.yview)
-        viewport.configure(yscrollcommand=scroll.set)
-        scroll.pack(side="right", fill="y")
-        viewport.pack(side="left", fill="both", expand=True)
-        content = ttk.Frame(viewport)
-        item = viewport.create_window(0, 0, window=content, anchor="nw")
-        content.bind("<Configure>", lambda e: viewport.configure(scrollregion=viewport.bbox("all")))
-        viewport.bind("<Configure>", lambda e: viewport.itemconfigure(item, width=e.width))
-        viewport.bind("<MouseWheel>", lambda e: viewport.yview_scroll(-int(e.delta/120), "units"))
-        content.bind("<MouseWheel>", lambda e: viewport.yview_scroll(-int(e.delta/120), "units"))
-        return content
+        return self.make_scroll_panel(frame)
 
     def safe(self, operation):
         try:
@@ -312,9 +337,12 @@ class Window:
             self.status.set("処理失敗: "+str(exc))
             messagebox.showerror("DW-Workbench", str(exc), parent=self.root)
             return False
+        finally:
+            self.refresh_workflow()
 
     def async_call(self, operation, callback, error=None):
         self.background += 1
+        self.refresh_workflow()
         future = self.pool.submit(operation)
         def done(f):
             try:
@@ -337,12 +365,15 @@ class Window:
             elif error:
                 self.background -= 1
                 self.status.set("処理失敗: "+str(error))
+                self.refresh_workflow()
             else:
                 self.background -= 1
+                self.refresh_workflow()
         self.root.after(75, self.poll)
 
     def show_capabilities(self, caps):
-        self.cap_label.configure(text=f"DocuWorks: {caps['docuworks']}  /  GPU: {caps['gpu']}  /  ローカルOCRモデル: {'あり' if caps['models'] else 'なし'}")
+        self.caps = caps
+        self.cap_label.configure(text=f"原本表示: DocuWorks {caps['docuworks']}  /  文字読取: {'利用可能' if caps['models'] else 'モデルなし・手入力で確認可'}")
 
     def require_project(self):
         if not self.app:
@@ -368,10 +399,13 @@ class Window:
             self.open_project(folder)
 
     def open_project(self, folder):
+        if self.ledger_dialog and not self.ledger_dialog.closed:
+            if not self.ledger_dialog.close():
+                raise RuleError("台帳照合の処理を終了してから案件を切り替えてください")
         if self.app and self.background:
             raise RuleError("処理が終了してから案件を切り替えてください")
         if (self.pending_results or self.pending_exports) and not self.retry_saves():
-            raise RuleError("処理結果・出力履歴の未保存分を保持しています。保存再試行を行ってください")
+            raise RuleError("処理結果・出力履歴の未保存分を保持しています。管理・復旧から保存を再試行してください")
         if self.dirty and not self.save_field():
             return
         if self.draft_dirty:
@@ -413,11 +447,14 @@ class Window:
         self.draft_fields, self.draft_regions = [], {}
         self.draft_dirty = False
         self.refresh_draft()
-        self.project_label.configure(text=Path(folder).name)
+        folder_name=Path(folder).name
+        first,space,rest=folder_name.partition(" ")
+        visible_name=rest if space and len(first)==32 and all(c in "0123456789abcdef" for c in first) else folder_name
+        self.project_label.configure(text=visible_name)
         self.refresh_lists()
         self.canvas.delete("all")
         self.image = None
-        self.status.set("案件を開きました。未完了の処理は「未完了ジョブ再開」で再開できます")
+        self.status.set("案件を開きました。未完了の処理は管理・復旧の再開操作で再開できます")
         self.project_verified = False
         self.validate_project()
         self.restore_draft()
@@ -451,7 +488,7 @@ class Window:
             self.validation_busy = False
             self.project_verified = False
             self.refresh_review()
-            self.status.set("原本検証に失敗しました。復旧後に保存再試行で再検査できます: "+str(exc))
+            self.status.set("原本検証に失敗しました。復旧後に管理・復旧の再保存から再検査できます: "+str(exc))
         self.async_call(lambda: validate_sources(project.store.root, snapshots), finish, failure)
 
     def add_sources(self):
@@ -471,6 +508,7 @@ class Window:
     def refresh_lists(self):
         if not self.app:
             return
+        self.flow_cache = None
         self.refreshing = True
         selection = self.document_list.selection()
         self.document_list.delete(*self.document_list.get_children())
@@ -517,6 +555,7 @@ class Window:
             self.history_list.insert("", 0, iid=d["id"], values=(d["created"][:19], count, state))
         self.refresh_pages()
         self.refreshing = False
+        self.refresh_workflow()
 
     @staticmethod
     def profile_text(profile):
@@ -610,7 +649,7 @@ class Window:
             self.canvas.delete("all")
             self.page_label.configure(text=job["data"]["name"]+" / 原本登録未完了")
             self.refresh_review()
-            self.status.set("原本登録未完了: "+str(job["error"] or job["status"])+" / 未完了ジョブ再開で再試行できます")
+            self.status.set("原本登録未完了: "+str(job["error"] or job["status"])+" / 管理・復旧の再開操作で再試行できます")
             return
         if self.dirty and not self.save_field():
             if self.source and self.document_list.exists(self.source.id):
@@ -653,6 +692,47 @@ class Window:
             self.status.set("寸法・向きが不一致です。項目は保持しました。手入力と原本上の範囲指定をご利用ください")
         else:
             self.status.set(f"{len(pages)}記録に適用しました。同じ版の再適用では値を変更しません")
+
+    def open_bulk_templates(self):
+        self.require_project()
+        if self.background or self.validation_busy or self.pending_results or self.pending_exports:
+            raise RuleError("実行中・未保存の処理を終了してから一括適用を開いてください")
+        if not self.save_field():
+            return
+        if self.batch_dialog and self.batch_dialog.dialog.winfo_exists():
+            self.batch_dialog.dialog.lift()
+            return self.batch_dialog
+        profiles = self.app.profiles()
+        sources = [self.app.source(row["id"]) for row in self.app.store.rows("sources")]
+        if not profiles:
+            raise RuleError("案件にテンプレートを登録してください。共通テンプレートから取り込むこともできます")
+        if not sources:
+            raise RuleError("登録が完了した文書を追加してください")
+        self.batch_dialog = BulkTemplateDialog(self, profiles, sources)
+        return self.batch_dialog
+
+    def refresh_bulk_application(self, plan):
+        """Refresh affected sources without changing the main document selection or old-result view."""
+        changed = {entry.source_id for entry in plan.entries if entry.action == "apply"}
+        if self.source and any(change.source_id == self.source.id for change in plan.mode_changes):
+            previous = self.profile_choice.get()
+            mode = self.app.mode(self.source.id)["mode"]
+            self.available_profiles = [p for p in self.all_profiles if p.scope == mode]
+            values = [self.profile_text(p) for p in self.available_profiles]
+            self.profile_choice.configure(values=values)
+            self.profile_choice.set(previous if previous in values else values[-1] if values else "")
+        if self.source and self.source.id in changed and not self.frozen:
+            target = 0 if self.app.mode(self.source.id)["mode"] == "document" else self.page
+            assignment = next((a for a in self.app.assignments(self.source.id) if a.page == target), None)
+            current_id = assignment.current_record_id if assignment else None
+            if current_id != (self.record["id"] if self.record else None):
+                self.load_assignment(target)
+                self.select_field()
+                self.load_page()
+        for source_id in changed:
+            self.refresh_source_progress(source_id)
+        self.flow_cache = None
+        self.refresh_workflow()
 
     def change_mode(self):
         self.require_project()
@@ -862,7 +942,7 @@ class Window:
             return
         index = self.profile_choice.current()
         if index < 0:
-            raise RuleError("作業一覧で改訂元の設定を選んでください")
+            raise RuleError("「文書」画面で改訂元の設定を選んでください")
         p = self.available_profiles[index]
         self.draft_id = p.id
         self.draft_version = max(q.version for q in self.all_profiles if q.id == p.id)+1
@@ -891,7 +971,7 @@ class Window:
     def field_dialog(self, field=None):
         self.require_project()
         if not self.draft_source:
-            raise RuleError("作業一覧からテンプレートを新規作成するか、登録版を改訂してください")
+            raise RuleError("「文書」画面からテンプレートを新規作成するか、登録版を改訂してください")
         dialog = tk.Toplevel(self.root)
         dialog.title("項目を編集" if field else "項目を追加")
         dialog.transient(self.root)
@@ -1021,7 +1101,7 @@ class Window:
 
     def update_draft_label(self):
         if not self.draft_source:
-            self.draft_label.configure(text="作業一覧で代表文書・ページを選択してください")
+            self.draft_label.configure(text="「文書」画面で代表文書・ページを選択してください")
             return
         target = f"p{self.draft_page}" if self.setup_scope.get() == "ページ用" else "文書全体"
         state = "草案・未登録" if self.draft_dirty else "草案"
@@ -1161,7 +1241,7 @@ class Window:
             for variable in self.vars.values():
                 variable.set("")
             self.loading = False
-            self.field_label.configure(text="この対象のテンプレートを作業一覧で選択してください")
+            self.field_label.configure(text="この対象のテンプレートを「文書」画面で選択してください")
             self.anchor_label.configure(text="根拠未指定")
             self.save_label.configure(text="")
             self.refresh_candidate_choices()
@@ -1173,6 +1253,7 @@ class Window:
                 self.review_list.selection_set(selected)
             elif self.profile.fields:
                 self.review_list.selection_set(self.profile.fields[0].id)
+        self.refresh_workflow()
 
     def select_field(self):
         selected = self.review_list.selection()
@@ -1227,6 +1308,7 @@ class Window:
         if self.save_timer:
             self.root.after_cancel(self.save_timer)
         self.save_timer = self.root.after(350, self.autosave)
+        self.refresh_workflow()
 
     def autosave(self):
         self.save_timer = None
@@ -1246,21 +1328,25 @@ class Window:
                 value=self.vars["value"].get(), unit=self.vars["unit"].get(), raw=self.vars["raw"].get(), anchor=self.anchor, reason=self.vars["reason"].get())
             self.record, _, self.profile = self.app.context(self.record["id"])
             self.dirty = False
+            self.save_failed = False
             self.save_label.configure(text="保存済み — 変更した項目は再確認が必要です")
             self.refresh_review()
             self.refresh_source_progress(self.record["source_id"])
             return True
         except Exception as exc:
+            self.save_failed = True
             self.save_label.configure(text="保存失敗・未保存入力を保持: "+str(exc))
             self.status.set("保存失敗: "+str(exc))
             return False
+        finally:
+            self.refresh_workflow()
 
     def accept(self):
         self.require_project()
         if self.frozen or not self.field_id:
             return
         if not self.save_field():
-            raise RuleError("未保存入力があります。保存再試行を行ってください")
+            raise RuleError("未保存入力があります。管理・復旧から保存を再試行してください")
         from .storage import validate_sources
         project, record_id, field, revision = self.app, self.record["id"], self.field_id, self.record["revision"]
         source = project.context(record_id)[1]
@@ -1288,7 +1374,7 @@ class Window:
         if self.frozen or not self.field_id:
             return
         if not self.save_field():
-            raise RuleError("保存再試行が必要です")
+            raise RuleError("管理・復旧から再保存してください")
         self.app.mark(self.record["id"], self.field_id, self.record["revision"], status, self.vars["reason"].get())
         self.after_edit()
 
@@ -1315,7 +1401,7 @@ class Window:
             return
         page = max(1, min(len(self.source.pages), self.page+delta))
         if self.tabs.select() == str(self.setup_tab) and self.draft_source and self.setup_scope.get() == "ページ用":
-            self.status.set(f"ページ用テンプレートは代表p{self.draft_page}で範囲を指定します。別ページへ適用する操作は作業一覧で行います")
+            self.status.set(f"ページ用テンプレートは代表p{self.draft_page}で範囲を指定します。別ページへ適用する操作は「文書」画面で行います")
             return
         if not self.frozen and self.tabs.select() != str(self.setup_tab) and self.app.mode(self.source.id)["mode"] == "page":
             self.load_assignment(page)
@@ -1326,6 +1412,67 @@ class Window:
         else:
             self.page = page
         self.load_page()
+
+    def next_unfinished(self):
+        self.require_project()
+        if self.frozen:
+            raise RuleError("過去の結果は閲覧専用です。「文書」画面へ戻ってください")
+        if not self.save_field():
+            return
+        current = (self.source.id, self.record.get('page') or 0, self.field_id) if self.source and self.record else (
+            (self.source.id, self.page if self.app.mode(self.source.id)['mode'] == 'page' else 0, None) if self.source else None)
+        selection = self.document_list.selection()
+        if not self.source and selection and selection[0].startswith('job-'):
+            job = self.app.job(selection[0][4:])
+            current = (job['data']['id'], 0, None)
+        target = self.app.next_unfinished(current)
+        if target is None:
+            self.status.set("案件の全項目が完了しています")
+            return
+        if target.get('job_id'):
+            self.document_list.selection_set('job-'+target['job_id'])
+            self.select_source()
+            self.tabs.select(self.list_tab)
+            self.status.set("原本登録未完了です。管理・復旧の再開操作で続けてください")
+            return
+        self.refreshing = True
+        try:
+            self.source = self.app.source(target['source_id'])
+            if self.app.mode(self.source.id)['mode'] is None:
+                self.app.set_mode(self.source.id, 'page')
+                # A newly inspected source has no assignment yet; start at p1.
+                target = target | {'page': 1}
+            self.document_list.selection_set(self.source.id)
+            self.document_list.see(self.source.id)
+            self.page = target['page'] or 1
+            self.load_assignment(target['page'])
+            self.refresh_lists()
+            if self.page_list.exists(str(target['page'])):
+                self.page_list.selection_set(str(target['page']))
+                self.page_list.focus(str(target['page']))
+                self.page_list.see(str(target['page']))
+            if target['field_id']:
+                self.field_id = target['field_id']
+                self.review_list.selection_set(self.field_id)
+                self.review_list.see(self.field_id)
+                self.tabs.select(self.review_tab)
+            else:
+                self.tabs.select(self.list_tab)
+            self.load_page()
+        finally:
+            self.refreshing = False
+        # Let queued selection/tab events settle before setting the requested field.
+        self.root.after_idle(lambda: self.show_review_target(target))
+
+    def show_review_target(self, target):
+        if target['field_id'] and self.record and self.record['id'] == target['record_id']:
+            self.field_id = target['field_id']
+            self.review_list.selection_set(self.field_id)
+            self.review_list.see(self.field_id)
+            self.load_field()
+            self.status.set("未完了項目を表示しました。原本と照合して確認してください")
+        elif not target['field_id']:
+            self.status.set("テンプレート未選択です。「文書」画面で対象を設定してください")
 
     def tab_changed(self):
         if not self.save_field():
@@ -1492,7 +1639,7 @@ class Window:
                 from .exporting import record_artifacts
                 record_artifacts(self.app.store, dataset, results)
             except Exception as exc:
-                self.status.set("出力履歴の保存失敗・生成結果を保持。保存再試行してください: "+str(exc))
+                self.status.set("出力履歴の保存失敗・生成結果を保持。管理・復旧から保存を再試行してください: "+str(exc))
                 return False
             del self.pending_exports[id]
             self.report_export_results(results)
@@ -1548,7 +1695,7 @@ class Window:
                 self.pending_results[id] = (value, error)
                 self.active_job = None
                 self.tasks.clear()
-                self.status.set("結果保存失敗・結果を保持。保存再試行を行ってください: "+str(exc))
+                self.status.set("結果保存失敗・結果を保持。管理・復旧から保存を再試行してください: "+str(exc))
                 return
             self.active_job = None
             self.refresh_job_view(job)
@@ -1572,7 +1719,7 @@ class Window:
             client.close()
         self.clients.clear()
         if hasattr(self, "status"):
-            self.status.set("処理を中断しました。完了済みの結果は保持しています。未完了ジョブ再開で続けられます" if had_jobs else "実行中のジョブはありません")
+            self.status.set("処理を中断しました。完了済みの結果は保持しています。管理・復旧の再開操作で続けられます" if had_jobs else "実行中の処理はありません")
 
     def finalize(self):
         self.require_project()
@@ -1627,7 +1774,7 @@ class Window:
                 record_artifacts(project.store, dataset, results)
             except Exception as exc:
                 self.pending_exports[id] = (dataset, results)
-                self.status.set("確認結果は保存済み。出力履歴の保存失敗・生成結果を保持。保存再試行してください: "+str(exc))
+                self.status.set("確認結果は保存済み。出力履歴の保存失敗・生成結果を保持。管理・復旧から保存を再試行してください: "+str(exc))
                 self.refresh_lists()
                 self.tabs.select(self.history_tab)
                 self.history_list.selection_set(id)
@@ -1707,6 +1854,8 @@ class Window:
     def close(self):
         if self.closing:
             return
+        if self.ledger_dialog and not self.ledger_dialog.closed and not self.ledger_dialog.close():
+            return
         if (self.pending_results or self.pending_exports) and not self.retry_saves():
             messagebox.showerror("未保存の処理・出力結果", "処理結果・出力履歴を保持しています。保存失敗を解決してから終了してください", parent=self.root)
             return
@@ -1730,3 +1879,290 @@ class Window:
             self.app.close()
         self.library.close()
         self.root.destroy()
+
+    def open_ledger(self):
+        self.require_project()
+        if self.background or self.pending_results or self.pending_exports:
+            raise RuleError("実行中・未保存の処理を終了してから台帳照合を開いてください")
+        if not self.save_field():
+            return
+        if self.ledger_dialog and not self.ledger_dialog.closed:
+            self.ledger_dialog.root.lift()
+            return
+        from .ledger_ui import LedgerDialog
+        self.ledger_dialog = LedgerDialog(self)
+
+
+class BulkTemplateDialog:
+    """A separate modal selection and immutable preview; the main list stays single-select."""
+
+    def __init__(self, window, profiles, sources):
+        self.window, self.app = window, window.app
+        self.profiles = list(profiles)
+        self.sources = {source.id: source for source in sources}
+        name_counts = Counter(source.name for source in sources)
+        self.source_labels = {source.id: source.name + (f" / {source.id[:8]}" if name_counts[source.name] > 1 else "") for source in sources}
+        self.plan = self.preview_signature = self.result = None
+        self.preview_rows = {}
+        self.dialog = tk.Toplevel(window.root)
+        self.dialog.title("複数文書へ一括適用")
+        width = max(960, min(1160, window.root.winfo_screenwidth()-60))
+        height = max(600, min(780, window.root.winfo_screenheight()-90))
+        self.dialog.geometry(f"{width}x{height}")
+        self.dialog.minsize(960, 600)
+        self.dialog.transient(window.root)
+        self.dialog.protocol("WM_DELETE_WINDOW", self.close)
+        content = ttk.Frame(self.dialog, padding=10)
+        content.pack(fill="both", expand=True)
+        content.columnconfigure(0, weight=1)
+        content.rowconfigure(4, weight=1)
+        content.rowconfigure(8, weight=2)
+        wrapped_labels = []
+        intro = ttk.Label(content, text="同じテンプレートを複数の文書へ適用します。プレビューは保存しません。適用してもOCRは始まりません。", wraplength=1100)
+        intro.grid(row=0, column=0, sticky="w", pady=(0, 6))
+        wrapped_labels.append(intro)
+        ttk.Label(content, text="1. 案件に登録済みのテンプレート・版").grid(row=1, column=0, sticky="w")
+        self.profile_variable = tk.StringVar(self.dialog)
+        self.profile_choice = ttk.Combobox(content, textvariable=self.profile_variable, state="readonly",
+            values=[window.profile_text(p) for p in self.profiles])
+        self.profile_choice.grid(row=2, column=0, sticky="ew", pady=(3, 7))
+
+        source_bar = ttk.Frame(content)
+        source_bar.grid(row=3, column=0, sticky="ew")
+        ttk.Label(source_bar, text="2. 登録済みの文書（Ctrl・Shiftで複数選択）").pack(side="left")
+        self.source_count = ttk.Label(source_bar)
+        self.source_count.pack(side="left", padx=10)
+        self.select_all_button = ttk.Button(source_bar, text="全選択", command=lambda: self.select_documents(True))
+        self.select_all_button.pack(side="right")
+        self.clear_button = ttk.Button(source_bar, text="選択解除", command=lambda: self.select_documents(False))
+        self.clear_button.pack(side="right", padx=5)
+        source_body = ttk.Frame(content)
+        source_body.grid(row=4, column=0, sticky="nsew", pady=(3, 7))
+        self.document_list = ttk.Treeview(source_body, columns=("name", "pages", "mode"), show="headings", height=6, selectmode="extended")
+        for key, title, width in (("name", "文書", 520), ("pages", "ページ数", 80), ("mode", "現在の処理単位", 250)):
+            self.document_list.heading(key, text=title)
+            self.document_list.column(key, width=width)
+        source_scroll = ttk.Scrollbar(source_body, orient="vertical", command=self.document_list.yview)
+        self.document_list.configure(yscrollcommand=source_scroll.set)
+        source_scroll.pack(side="right", fill="y")
+        self.document_list.pack(side="left", fill="both", expand=True)
+        for source in sources:
+            mode = self.app.mode(source.id)["mode"]
+            self.document_list.insert("", "end", iid=source.id, values=(self.source_labels[source.id], len(source.pages), MODES.get(mode, "未選択")))
+
+        targets = ttk.Frame(content)
+        targets.grid(row=5, column=0, sticky="ew")
+        ttk.Label(targets, text="3. 対象ページ").pack(side="left")
+        self.target_variable = tk.StringVar(self.dialog, value="全ページ")
+        self.target_choice = ttk.Combobox(targets, textvariable=self.target_variable,
+            values=("全ページ", "ページ範囲", "奇数ページ", "偶数ページ"), state="readonly", width=16)
+        self.target_choice.pack(side="left", padx=5)
+        self.expression_variable = tk.StringVar(self.dialog)
+        self.target_expression = ttk.Entry(targets, textvariable=self.expression_variable, width=22)
+        self.target_expression.pack(side="left")
+        self.page_hint = ttk.Label(targets, text="例: 2-10,12")
+        self.page_hint.pack(side="left", padx=5)
+        self.unassigned_only = tk.BooleanVar(self.dialog, value=True)
+        self.unassigned_check = ttk.Checkbutton(targets, text="未割当だけに適用する", variable=self.unassigned_only)
+        self.unassigned_check.pack(side="right")
+        range_hint = ttk.Label(content, text="範囲は選択文書の最大ページ数まで指定できます。短い文書の存在しないページはスキップします。", wraplength=1100)
+        range_hint.grid(row=6, column=0, sticky="w", pady=(3, 6))
+        wrapped_labels.append(range_hint)
+
+        preview_bar = ttk.Frame(content)
+        preview_bar.grid(row=7, column=0, sticky="ew")
+        self.preview_button = ttk.Button(preview_bar, text="プレビュー", command=self.preview)
+        self.preview_button.pack(side="left")
+        self.summary = tk.StringVar(self.dialog, value="対象を選び、プレビューで変更内容を確認してください")
+        summary_label = ttk.Label(preview_bar, textvariable=self.summary, wraplength=970)
+        summary_label.pack(side="left", padx=10)
+        wrapped_labels.append(summary_label)
+        preview_body = ttk.Frame(content)
+        preview_body.grid(row=8, column=0, sticky="nsew", pady=5)
+        columns = (("document", "文書", 180), ("page", "ページ", 70), ("previous", "現在のテンプレート", 230),
+                   ("action", "変更", 85), ("reason", "理由", 390), ("geometry", "寸法・向き", 130), ("mode", "処理単位の変更", 280))
+        self.preview_list = ttk.Treeview(preview_body, columns=[c[0] for c in columns], show="headings", height=8, selectmode="browse")
+        for key, title, width in columns:
+            self.preview_list.heading(key, text=title)
+            self.preview_list.column(key, width=width, stretch=False)
+        yscroll = ttk.Scrollbar(preview_body, orient="vertical", command=self.preview_list.yview)
+        xscroll = ttk.Scrollbar(preview_body, orient="horizontal", command=self.preview_list.xview)
+        self.preview_list.configure(yscrollcommand=yscroll.set, xscrollcommand=xscroll.set)
+        self.preview_list.grid(row=0, column=0, sticky="nsew")
+        yscroll.grid(row=0, column=1, sticky="ns")
+        xscroll.grid(row=1, column=0, sticky="ew")
+        preview_body.rowconfigure(0, weight=1)
+        preview_body.columnconfigure(0, weight=1)
+        self.details = tk.StringVar(self.dialog, value="一覧の行を選ぶと理由の全文を表示します")
+        detail_body = ttk.Frame(content)
+        detail_body.grid(row=9, column=0, sticky="ew", pady=(0, 5))
+        self.detail_text = tk.Text(detail_body, height=3, wrap="word", font="TkDefaultFont")
+        detail_scroll = ttk.Scrollbar(detail_body, orient="vertical", command=self.detail_text.yview)
+        self.detail_text.configure(yscrollcommand=detail_scroll.set)
+        detail_scroll.pack(side="right", fill="y")
+        self.detail_text.pack(side="left", fill="x", expand=True)
+        self.detail_text.insert("1.0", self.details.get())
+        self.detail_text.configure(state="disabled")
+        self.details.trace_add("write", self.update_details)
+        note = ttk.Label(content, text="「未割当だけ」を外すと、変更前の結果を残して新しい記録を作成します。値・確認状態は引き継ぎません。\n"
+                         "同じ版は変更しません。適用済み・対象外の記録がある文書の処理単位は変更できません。", wraplength=1100)
+        note.grid(row=10, column=0, sticky="ew")
+        wrapped_labels.append(note)
+        bottom = ttk.Frame(content)
+        bottom.grid(row=11, column=0, sticky="ew", pady=(7, 0))
+        ttk.Button(bottom, text="閉じる", command=self.close).pack(side="right")
+        self.apply_button = ttk.Button(bottom, text="この内容を適用", command=self.apply, state="disabled")
+        self.apply_button.pack(side="right", padx=8)
+
+        main_index = window.profile_choice.current()
+        main_profile = window.available_profiles[main_index] if main_index >= 0 else None
+        selected = next((i for i, p in enumerate(self.profiles) if main_profile and
+                         (p.id, p.version) == (main_profile.id, main_profile.version)), len(self.profiles)-1)
+        self.profile_choice.current(selected)
+        if window.source and window.source.id in self.sources:
+            self.document_list.selection_set(window.source.id)
+            self.document_list.see(window.source.id)
+        for variable in (self.profile_variable, self.target_variable, self.expression_variable, self.unassigned_only):
+            variable.trace_add("write", self.inputs_changed)
+        self.document_list.bind("<<TreeviewSelect>>", self.inputs_changed)
+        self.preview_list.bind("<<TreeviewSelect>>", self.show_details)
+        content.bind("<Configure>", lambda event: [label.configure(wraplength=max(450, event.width-120 if label is summary_label else event.width-20)) for label in wrapped_labels])
+        self.inputs_changed()
+        self.dialog.grab_set()
+
+    def selected_profile(self):
+        index = self.profile_choice.current()
+        if index < 0:
+            raise RuleError("一括適用するテンプレートを選択してください")
+        return self.profiles[index]
+
+    def signature(self):
+        return (self.profile_variable.get(), tuple(sorted(self.document_list.selection())), self.target_variable.get(),
+                self.expression_variable.get(), self.unassigned_only.get())
+
+    def inputs_changed(self, *args):
+        self.source_count.configure(text=f"{len(self.document_list.selection())}/{len(self.sources)} 文書 選択")
+        document = self.selected_profile().scope == "document"
+        self.target_choice.configure(state="disabled" if document else "readonly")
+        self.target_expression.configure(state="normal" if not document and self.target_variable.get() == "ページ範囲" else "disabled")
+        self.page_hint.configure(text="文書全体に適用します" if document else "例: 2-10,12")
+        if self.plan is not None and self.signature() != self.preview_signature:
+            self.invalidate("入力を変更しました。プレビューを作り直してください", clear=True)
+        elif self.result is not None:
+            self.result = None
+            self.invalidate("入力を変更しました。プレビューを作り直してください", clear=True)
+
+    def invalidate(self, text, clear=False):
+        self.plan = self.preview_signature = None
+        self.apply_button.configure(state="disabled")
+        self.summary.set(text)
+        if clear:
+            self.preview_list.delete(*self.preview_list.get_children())
+            self.preview_rows.clear()
+            self.details.set("一覧の行を選ぶと理由の全文を表示します")
+
+    def select_documents(self, all_documents):
+        self.document_list.selection_set(tuple(self.sources) if all_documents else ())
+        self.inputs_changed()
+
+    def targets(self, profile):
+        selected = self.document_list.selection()
+        if not selected:
+            raise RuleError("一括適用する文書を選択してください")
+        if profile.scope == "document":
+            return {source_id: [0] for source_id in selected}
+        if self.target_variable.get() == "ページ範囲":
+            pages = target_pages("ページ範囲", (), max(len(self.sources[sid].pages) for sid in selected), self.expression_variable.get())
+            return {sid: pages for sid in selected}
+        # An even-page selector can yield no targets for a one-page document;
+        # the application keeps that document visible as a skip in the preview.
+        result = {}
+        for sid in selected:
+            if self.target_variable.get() == "偶数ページ" and len(self.sources[sid].pages) < 2:
+                result[sid] = []
+            else:
+                result[sid] = target_pages(self.target_variable.get(), (), len(self.sources[sid].pages))
+        return result
+
+    def require_current_project(self):
+        self.window.require_project()
+        if self.window.app is not self.app:
+            raise RuleError("案件が変わりました。この画面を閉じ、現在の案件で開き直してください")
+
+    def preview(self):
+        try:
+            self.require_current_project()
+            profile = self.selected_profile()
+            plan = self.app.plan_template_application(profile.id, profile.version, self.targets(profile), self.unassigned_only.get())
+            self.preview_list.delete(*self.preview_list.get_children())
+            self.preview_rows.clear()
+            modes = {change.source_id: f"{MODES.get(change.old_mode, '未選択')} → {MODES[change.new_mode]}" for change in plan.mode_changes}
+            profiles = {(p.id, p.version): p for p in self.profiles}
+            for index, entry in enumerate(plan.entries):
+                previous = profiles.get((entry.previous_profile_id, entry.previous_profile_version))
+                old = f"{previous.name} / 版{previous.version}" if previous else ("対象外" if entry.current_state == "excluded" else "未割当")
+                page = "文書全体" if entry.page == 0 else "対象なし" if entry.page is None else str(entry.page)
+                geometry = "—" if entry.geometry_matches is None else "一致" if entry.geometry_matches else "不一致・手入力"
+                values = (self.source_labels[entry.source_id], page, old, {"apply": "適用", "same": "変更なし", "skip": "スキップ"}[entry.action],
+                          entry.reason, geometry, modes.get(entry.source_id, "変更なし"))
+                self.preview_list.insert("", "end", iid=str(index), values=values)
+                self.preview_rows[str(index)] = values
+            self.plan, self.preview_signature = plan, self.signature()
+            counts = {action: sum(entry.action == action for entry in plan.entries) for action in ("apply", "same", "skip")}
+            warning = sum(entry.geometry_matches is False for entry in plan.entries)
+            self.summary.set(f"適用 {counts['apply']} / 変更なし {counts['same']} / スキップ {counts['skip']} / 処理単位変更 {len(plan.mode_changes)}文書 / 寸法不一致 {warning}")
+            self.apply_button.configure(state="normal" if counts["apply"] or counts["same"] else "disabled")
+            if self.preview_rows:
+                self.preview_list.selection_set("0")
+                self.show_details()
+            return plan
+        except Exception as exc:
+            self.invalidate("プレビューを作成できませんでした。条件を確認してください", clear=True)
+            messagebox.showerror("一括適用のプレビュー", str(exc), parent=self.dialog)
+            return None
+
+    def show_details(self, event=None):
+        selected = self.preview_list.selection()
+        if selected and selected[0] in self.preview_rows:
+            values = self.preview_rows[selected[0]]
+            self.details.set(f"{values[0]} / {values[1]} / {values[2]} → {values[3]}\n{values[4]} / {values[5]} / 処理単位: {values[6]}")
+
+    def update_details(self, *args):
+        self.detail_text.configure(state="normal")
+        self.detail_text.delete("1.0", "end")
+        self.detail_text.insert("1.0", self.details.get())
+        self.detail_text.configure(state="disabled")
+
+    def apply(self):
+        try:
+            self.require_current_project()
+            if self.plan is None or self.signature() != self.preview_signature:
+                self.invalidate("条件が変わりました。プレビューを作り直してください", clear=True)
+                return False
+            if not self.window.save_field():
+                self.summary.set("未保存入力を保持しています。保存失敗を解決してから、適用を再試行してください")
+                return False
+            plan = self.plan
+            result = self.app.apply_template_plan(plan)
+        except StaleRevision as exc:
+            self.invalidate("保存内容が変わりました。プレビューを作り直して再確認してください")
+            messagebox.showerror("一括適用を再確認してください", str(exc), parent=self.dialog)
+            return False
+        except Exception as exc:
+            self.invalidate("適用できませんでした。原因を解決し、プレビューを作り直してください")
+            messagebox.showerror("一括適用できませんでした", str(exc), parent=self.dialog)
+            return False
+        self.result = result
+        self.invalidate(f"適用完了: 適用 {result.applied} / 変更なし {result.same} / スキップ {result.skipped} / 処理単位変更 {result.mode_changes}文書。OCRは別操作です")
+        self.window.status.set(self.summary.get())
+        self.window.refresh_bulk_application(plan)
+        for source_id in self.sources:
+            mode = self.app.mode(source_id)["mode"]
+            self.document_list.set(source_id, "mode", MODES.get(mode, "未選択"))
+        return True
+
+    def close(self):
+        self.dialog.grab_release()
+        self.dialog.destroy()
+        if self.window.batch_dialog is self:
+            self.window.batch_dialog = None

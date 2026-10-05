@@ -61,6 +61,10 @@ def _parser() -> argparse.ArgumentParser:
     export.add_argument("--run-dir", required=True, type=Path)
     export.add_argument("--format", required=True, choices=("jsonl",))
     export.add_argument("--output", required=True, type=Path)
+    report = subparsers.add_parser('review-report', help='OCRの確認優先一覧（訂正・確認状態は変更しません）')
+    report.add_argument('--run-dir', required=True, type=Path)
+    report.add_argument('--threshold', type=float, default=0.8)
+    report.add_argument('--output', required=True, type=Path)
     rectangles = subparsers.add_parser('annotate-rectangles')
     rectangles.add_argument('--run-dir', required=True, type=Path)
     rectangles.add_argument('--output-xdw', required=True, type=Path)
@@ -110,7 +114,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    if argv and argv[0] in ('template-editor', 'register-template', 'check-template', 'apply-template', 'export-structured-csv', 'export-reviewed-xlsx', '--help', '-h'):
+    if argv and argv[0] in ('template-editor', 'register-template', 'check-template', 'apply-template', 'export-structured-csv', 'export-reviewed-xlsx', 'review-report', '--help', '-h'):
         # Windows CI/redirection may default to cp1252, which cannot print Japanese.
         # Scope this output contract to the new commands and the shared help text.
         for stream in (sys.stdout, sys.stderr):
@@ -118,6 +122,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 stream.reconfigure(encoding='utf-8')
     parser = _parser()
     args = parser.parse_args(argv)
+    if args.command == 'review-report':
+        from .results import load_ocr_result
+        from .review_report import export_review_report
+        try:
+            output = export_review_report(load_ocr_result(args.run_dir), args.output, threshold=args.threshold)
+        except (ValueError, OSError, RuntimeError) as exc:
+            parser.error(str(exc))
+        print(output)
+        return 0
     if args.command == 'export-reviewed-xlsx':
         from ._reviewed_xlsx_cli import run
         return run(args)

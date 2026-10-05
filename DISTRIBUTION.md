@@ -1,3 +1,13 @@
+# Workbench 0.4.0 のダウンロード
+
+[共通Portable v0.8.0](https://github.com/gogobousousannrinnsha/dw-ocr/releases/tag/v0.8.0) をダウンロードし、[READMEの起動手順](README.md#portableをダウンロードして使う)に従ってください。旧版の復元部品と混ぜず、新しいフォルダーへ展開します。
+
+# v0.4.0公開Pre-release
+
+今回の候補はDW-OCR v0.8.0との共通Portableで、`Workbench開始.bat`から起動します。初期のprojects・settingsは空です。全部品と結合ツールを同じ版でそろえ、新しいフォルダーへ展開してください。[別PCの条件と移動方法](docs/user/portable-transfer.md)を参照してください。
+
+以下は既存公開版v0.2.0-restore.1の案内です。旧版の部品・manifestと新しい候補を混用しません。
+
 # 配布物の選び方
 
 [v0.2.0-restore.1の配布ページ](https://github.com/gogobousousannrinnsha/dw-workbench/releases/tag/v0.2.0-restore.1)から取得します。この版は実帳票での受け入れ確認前の検証候補です。復元用ヘルパーの保守版で、アプリはv0.2.0のままです。Portableの4つのZIP部品・説明書・アプリ実装は従来版と同一です。旧v0.2.0のタグと配布物を保持しています。

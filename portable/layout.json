@@ -1,0 +1,43 @@
+{
+  "schema": "dw-ocr-portable-layout",
+  "schema_version": "1.0",
+  "provenance": "Launchers are source-managed here. Reviewed import, template authoring/application and full-text Excel export have dedicated entries; exporters delegate to the public CLI.",
+  "files": [
+    "Workbench開始.bat",
+    "workbench/launch.bat",
+    "OCR確認一覧.bat",
+    "scripts/review_report.py",
+    "全文Excel出力.bat",
+    "scripts/export_reviewed_xlsx.py",
+    "ocr開始（一括）.bat",
+    "ocr開始（分割）.bat",
+    "A_一括作成.bat",
+    "B_ページ別作成と結合.bat",
+    "比較結果作成.bat",
+    "OCR開始.bat",
+    "校正結果取込.bat",
+    "テンプレート作成.bat",
+    "テンプレート適用.bat",
+    "docuworks-integrations.bat",
+    "ocr_rectangles.bat",
+    "ocr_xdw.bat",
+    "python.bat",
+    "repair_project_wheels.bat",
+    "shell.bat",
+    "text_maps.bat",
+    "verify_environment.bat",
+    "verify_environment.py",
+    "settings.ini",
+    "scripts/start_ocr.py",
+    "scripts/start_ab.py",
+    "scripts/compare_ab.py",
+    "scripts/import_reviewed.py",
+    "scripts/apply_template.py",
+    "scripts/ocr_all_regions_to_rectangles.py",
+    "scripts/generate_bundle_text_maps.py"
+  ],
+  "templates": {
+    "public_readme": "templates/public-readme.txt",
+    "portable_readme": "templates/portable-readme.txt"
+  }
+}

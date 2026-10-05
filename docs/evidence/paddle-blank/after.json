@@ -1,0 +1,87 @@
+{
+  "expected": "after",
+  "python": "3.13.15",
+  "input_sha256": "38c3be53bd1d6c724c5a91f08564843880affe2ffac79e1ab901a884ca7496ec",
+  "payload_sha256": "bf83668227f7f33ae356dd8e2b48bde862380beb70e37072253e1fdab36bd0c9",
+  "baseline": "8f8d53765b4ba237268aa942fef32353f90fa7c9",
+  "checkout_commit": "8f8d53765b4ba237268aa942fef32353f90fa7c9",
+  "parser_sha256": "68f3d7206cc663d53a525e960ec2b42322c39da52a8e579b63109b9e03f38ec4",
+  "replay_sha256": "4e6a2f81a6907a697c3c9498e70b8d0b58334d208ee190f314aab5be7a090989",
+  "tracked_changes_present": true,
+  "minimal": [
+    {
+      "text": "",
+      "output": [
+        "ABC",
+        "DEF"
+      ]
+    },
+    {
+      "text": " ",
+      "output": [
+        "ABC",
+        "DEF"
+      ]
+    },
+    {
+      "text": "\t",
+      "output": [
+        "ABC",
+        "DEF"
+      ]
+    },
+    {
+      "text": "\n",
+      "output": [
+        "ABC",
+        "DEF"
+      ]
+    },
+    {
+      "text": "　",
+      "output": [
+        "ABC",
+        "DEF"
+      ]
+    },
+    {
+      "text": null,
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": "CONTROL",
+      "output": [
+        "ABC",
+        "CONTROL",
+        "DEF"
+      ]
+    }
+  ],
+  "actual_user_document_tested": false,
+  "document": {
+    "status": "COMPLETE",
+    "regions": [
+      3,
+      2,
+      3
+    ]
+  },
+  "batch": {
+    "status": "COMPLETE",
+    "exit_code": 0,
+    "ocr": [
+      "SUCCEEDED",
+      "SUCCEEDED"
+    ],
+    "calls": [
+      1,
+      2,
+      3,
+      1,
+      2,
+      3
+    ],
+    "native_rectangles": "dry-run only"
+  },
+  "status": "PASS"
+}

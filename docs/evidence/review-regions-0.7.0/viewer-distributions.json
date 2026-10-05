@@ -1,0 +1,62 @@
+{
+  "date": "2026-09-13",
+  "version": "0.7.0.dev3",
+  "revision": "multiple-regions-viewer-verified",
+  "implementation_commit": "0d26beb95b25c7787afc075fe66172d46550f456",
+  "wheel_built_from_sdist": true,
+  "ordinary_pip_install_into_fresh_venv": true,
+  "pip_check": "PASS",
+  "python": "3.11.9",
+  "wheel_package_files_unchanged_and_match_source": 34,
+  "wheel_description_matches_updated_readme": true,
+  "installed_wheel_tests": 156,
+  "pristine_sdist_tests": 156,
+  "sdist_conditions": {
+    "exit_code": 0,
+    "source_unchanged": true,
+    "supplemental_files_added": false,
+    "archive_sha256": "161c7c632cb2232f45052cbeead71d2f1bea56ffcd21f5bfb97c44ede136ab14",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "source_files": 63,
+    "generated_cache_files": 5
+  },
+  "installed_wheel_viewer_file_roundtrip": {
+    "status": "FILE_ROUNDTRIP_PASS",
+    "input_filename": "saved.xdw",
+    "edited_xdw_sha256": "f1997b6c37d6d6a1a73e27e3e9b6d5e8ca4fc3984d76556f06712ff4807e0aaa",
+    "outputs_sha256": {
+      "corrections.json": "daf9c3cd8ce571188e1ae2f1cb19f1630087f88b24ff522b9e496016df4be404",
+      "effective.jsonl": "c15c36507a9764b544f839f6accedc5a7fd0d0670db5ec05cb9bb210e60f2b75"
+    }
+  },
+  "distribution_content_audit": "PASS",
+  "twine_check_four_archives": "PASS",
+  "core_artifacts_unchanged": true,
+  "historical_tests_not_rerun": {
+    "baseline_installed_wheel": 202,
+    "sdk_multi_region": 15,
+    "regression_python311_312_313_each": 283
+  },
+  "files": [
+    {
+      "file": "docuworks_ctypes-1.0.0-py3-none-any.whl",
+      "bytes": 46587,
+      "sha256": "8d62f219c58d7b92f3179a0a8670718bc2adf0e3b41f20ba4f2b1da1a4d74871"
+    },
+    {
+      "file": "docuworks_ctypes-1.0.0.tar.gz",
+      "bytes": 56475,
+      "sha256": "b0e72baa088efc5a6f31e212df94be6203869405246b16846ee4b25f1cf06d08"
+    },
+    {
+      "file": "docuworks_integrations-0.7.0.dev3-py3-none-any.whl",
+      "bytes": 62115,
+      "sha256": "07c1e16d550a26e041a5580c6da83b1350e7648bd0e6d496ea28346d6f177e29"
+    },
+    {
+      "file": "docuworks_integrations-0.7.0.dev3.tar.gz",
+      "bytes": 76564,
+      "sha256": "161c7c632cb2232f45052cbeead71d2f1bea56ffcd21f5bfb97c44ede136ab14"
+    }
+  ]
+}

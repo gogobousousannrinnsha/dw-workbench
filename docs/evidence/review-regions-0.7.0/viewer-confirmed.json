@@ -1,0 +1,62 @@
+{
+  "date": "2026-09-13",
+  "version": "0.7.0.dev3",
+  "revision": "multiple-regions-viewer-verified",
+  "implementation_commit": "0d26beb95b25c7787afc075fe66172d46550f456",
+  "scope": "one page; two selected equal-text regions; one unselected region; first region edited",
+  "source_is_synthetic": true,
+  "ocr_executed": false,
+  "user_report": {
+    "evidence_type": "user_statement",
+    "statement": "別名保存・再表示とも問題なし",
+    "viewer_edit_save_as_reopen": "confirmed",
+    "independent_gui_observation_by_agent": false
+  },
+  "file_verification": {
+    "status": "PASS",
+    "input_filename": "saved.xdw",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "dll_sha256": "35a5eacf7c0959df48e42f6f5b63840f95b06e803375cf70c5c5d262cd1055d3",
+    "run_id": "1d7fb383-e011-48cb-b5b7-cf5afb8f32a0",
+    "manifest_sha256": "f94e39bea37b5e739b46561a4d7dead9dfe7aab629ccd3a9ef71d75ede995b94",
+    "review_id": "95ce78e3-d548-427f-b4a5-cc2d7e38211b",
+    "review_manifest_sha256": "b0e2702e0707ca2fbff52ff03a4159aef329989dfeccc67fe3ab7a38dab76fdb",
+    "edited_xdw_sha256": "f1997b6c37d6d6a1a73e27e3e9b6d5e8ca4fc3984d76556f06712ff4807e0aaa",
+    "changed_region_ids": [
+      "p0001-r000001"
+    ],
+    "expected_text_matched": true,
+    "unchanged_selected_region_ids": [
+      "p0001-r000002"
+    ],
+    "unselected_region_ids": [
+      "p0001-r000003"
+    ],
+    "all_nontext_region_fields_preserved": true,
+    "all_run_files_unchanged": true,
+    "initial_review_files_unchanged": true,
+    "previous_artifacts_unchanged": true,
+    "input_hashes_checked_before_and_after": true,
+    "page_and_annotation_structure_verified_by_review_api": true,
+    "jsonl_region_count": 3,
+    "correction_provenance_verified": true,
+    "outputs_sha256": {
+      "corrections.json": "391d908d0f8a69b4f5ed34c11aebb0285fc11b4ea7dcd47999e3bd61cd68b439",
+      "effective.jsonl": "914e94dce461f772cd5763452c5d83dd8bb8f1ca29b5f8b7e28ff0e1786fc9d7"
+    }
+  },
+  "protected_file_counts": [
+    7,
+    7,
+    7
+  ],
+  "raw_verification_sha256": "b3b783e9e7a68d6aa525c799a98fdb4966fb25fe4d71e7a9bcd2d9f5364fcbf4",
+  "excluded": [
+    "multi-region Viewer abnormal operations",
+    "blank-background mode"
+  ],
+  "notes": [
+    "Region content and local paths are omitted from this distributable record.",
+    "Single-region Viewer six-case results remain separate historical evidence."
+  ]
+}

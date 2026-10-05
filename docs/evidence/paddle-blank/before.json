@@ -1,0 +1,66 @@
+{
+  "expected": "before",
+  "python": "3.13.15",
+  "input_sha256": "6128ad9018647d21b3da4c84a634acb918365eab4b98137ab6b0b99a8b53f49f",
+  "baseline": "8f8d53765b4ba237268aa942fef32353f90fa7c9",
+  "tested_commit": "8f8d53765b4ba237268aa942fef32353f90fa7c9",
+  "minimal": [
+    {
+      "text": "",
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": " ",
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": "\t",
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": "\n",
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": "　",
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": null,
+      "error": "OCR text must be a non-empty string"
+    },
+    {
+      "text": "CONTROL",
+      "output": [
+        "ABC",
+        "CONTROL",
+        "DEF"
+      ]
+    }
+  ],
+  "actual_user_document_tested": false,
+  "document": {
+    "type": "ValueError",
+    "message": "OCR text must be a non-empty string",
+    "phase": "recognize",
+    "failure_scope": "batch",
+    "failed_page": 2,
+    "completed_pages": [
+      1
+    ]
+  },
+  "batch": {
+    "status": "FAILED",
+    "exit_code": 1,
+    "ocr": [
+      "FAILED",
+      "PENDING"
+    ],
+    "calls": [
+      1,
+      2
+    ],
+    "native_rectangles": "dry-run only"
+  },
+  "status": "PASS"
+}

@@ -1,7 +1,8 @@
 import sys
-import os
 from pathlib import Path
 import uuid
+import os
+import tempfile
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -10,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 @pytest.fixture
 def workdir():
     # Normal mkdir inherits the Windows ACL; do not use Python's 0700 temp helper.
-    root = Path(os.environ.get("DW_WORKBENCH_TEST_ROOT", str(Path.cwd()/".test-work")))/uuid.uuid4().hex
+    root = Path(os.environ.get("DW_WORKBENCH_TEST_TMP", str(Path(tempfile.gettempdir())/"workbench-tests")))/uuid.uuid4().hex
     root.mkdir(parents=True)
     return root
 

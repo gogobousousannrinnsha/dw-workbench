@@ -1,0 +1,84 @@
+{
+  "version": "0.7.0",
+  "feature_baseline": "d31c2cb9866b41ae1d79c2f17d949a5688d6bb10",
+  "suites": {
+    "3.10": {
+      "tests": "156",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "3.11": {
+      "tests": "283",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "3.12": {
+      "tests": "283",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "3.13": {
+      "tests": "283",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "sdk": {
+      "tests": "28",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "core": {
+      "tests": "102",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "guards-final": {
+      "tests": "74",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    },
+    "wheel": {
+      "tests": "283",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0"
+    }
+  },
+  "core_hardware_case_deselected": 1,
+  "python310_scope": "correction and review only",
+  "sdist_dev": {
+    "exit_code": 0,
+    "source_unchanged": true,
+    "supplemental_files_added": false,
+    "archive_sha256": "e2cbfae58789468139b9614e68e4ff33a6fd7d93ddb3612fa5bf625307234970",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "source_files": 63,
+    "generated_cache_files": 5
+  },
+  "sdist_public": {
+    "exit_code": 0,
+    "source_unchanged": true,
+    "supplemental_files_added": false,
+    "archive_sha256": "e66a060f0fe8860a11d1e2fbf4e216c35cd1a9989e78351321d76df099c1d283",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "source_files": 64,
+    "generated_cache_files": 5
+  },
+  "ordinary_pip_install_and_check": true,
+  "saved_viewer_file_reimport": "PASS",
+  "viewer_manual_evidence": "Inherited user confirmation recorded at d31c2cb; not re-requested",
+  "public_wheel_tests_environment": "Python 3.11.9; installed with pip; tested outside source repository",
+  "example_console_encodings": [
+    "utf-8",
+    "cp1252"
+  ],
+  "job_and_derivative_version_matches_runtime": true,
+  "public_wheel_fresh_environment_python": "3.13.15; ordinary pip install and pip check; saved Viewer reimport passed"
+}

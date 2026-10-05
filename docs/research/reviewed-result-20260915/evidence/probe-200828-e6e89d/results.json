@@ -1,0 +1,275 @@
+{
+  "baseline_unchanged": true,
+  "cases": [
+    {
+      "case": "resize_actual_geometry_vs_requested",
+      "passed": true,
+      "detail": {
+        "observations": [
+          {
+            "requested_height_mm": 10,
+            "immediate_raw_rect": [
+              6000,
+              1186
+            ],
+            "auto_resize_height": 0
+          },
+          {
+            "requested_height_mm": 20,
+            "immediate_raw_rect": [
+              6000,
+              2032
+            ],
+            "auto_resize_height": 0
+          },
+          {
+            "requested_height_mm": 30,
+            "immediate_raw_rect": [
+              6000,
+              3301
+            ],
+            "auto_resize_height": 0
+          }
+        ],
+        "saved_actual_rect": [
+          2000,
+          2000,
+          6000,
+          3301
+        ],
+        "conclusion": "Read actual SDK geometry; requested height is not an exact persistence contract."
+      }
+    },
+    {
+      "case": "sticky_child_parent_relative_coordinates",
+      "passed": false,
+      "error": "Traceback (most recent call last):\n  File \"[local-research]\\probe.py\", line 73, in case\n    detail=fn()\n  File \"[local-research]\\followup_probe.py\", line 33, in sticky_fixed_call\n    p,s=variant('sticky-child-followup',edit)\n        ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[local-research]\\probe.py\", line 67, in variant\n    p=OUT/(name+'.xdw');shutil.copyfile(baseline,p)\n                                        ^^^^^^^^\nNameError: name 'baseline' is not defined\n"
+    },
+    {
+      "case": "historical_viewer_saves_identity_and_copy_duplicate",
+      "passed": true,
+      "detail": {
+        "historical_viewer_files": [
+          {
+            "case": "01-edit",
+            "sha256_matches_record": true,
+            "text_count": 1,
+            "region_ids": [
+              "p0003-r000001"
+            ]
+          },
+          {
+            "case": "02-move",
+            "sha256_matches_record": true,
+            "text_count": 1,
+            "region_ids": [
+              "p0003-r000001"
+            ]
+          },
+          {
+            "case": "03-unchanged",
+            "sha256_matches_record": true,
+            "text_count": 1,
+            "region_ids": [
+              "p0003-r000001"
+            ]
+          },
+          {
+            "case": "04-copy",
+            "sha256_matches_record": true,
+            "text_count": 2,
+            "region_ids": [
+              "p0003-r000001",
+              "p0003-r000001"
+            ]
+          },
+          {
+            "case": "05-delete",
+            "sha256_matches_record": true,
+            "text_count": 0,
+            "region_ids": []
+          },
+          {
+            "case": "06-blank",
+            "sha256_matches_record": true,
+            "text_count": 1,
+            "region_ids": [
+              "p0003-r000001"
+            ]
+          }
+        ],
+        "copy_result": "Historical Viewer copy preserved the same origin ID on both annotations. Current-session Viewer operation not performed."
+      }
+    },
+    {
+      "case": "duplicate_page_identity_detection",
+      "passed": false,
+      "error": "Traceback (most recent call last):\n  File \"[local-research]\\probe.py\", line 73, in case\n    detail=fn()\n  File \"[local-research]\\followup_probe.py\", line 70, in page_copy_identity\n    p,s=variant('duplicate-page',edit)\n        ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[local-research]\\probe.py\", line 67, in variant\n    p=OUT/(name+'.xdw');shutil.copyfile(baseline,p)\n                                        ^^^^^^^^\nNameError: name 'baseline' is not defined\n"
+    },
+    {
+      "case": "vertical_text_metadata",
+      "passed": false,
+      "error": "Traceback (most recent call last):\n  File \"[local-research]\\probe.py\", line 73, in case\n    detail=fn()\n  File \"[local-research]\\followup_probe.py\", line 77, in vertical\n    p,s=variant('vertical',edit)\n        ~~~~~~~^^^^^^^^^^^^^^^^^\n  File \"[local-research]\\probe.py\", line 67, in variant\n    p=OUT/(name+'.xdw');shutil.copyfile(baseline,p)\n                                        ^^^^^^^^\nNameError: name 'baseline' is not defined\n"
+    }
+  ],
+  "snapshots": {
+    "baseline.xdw": {
+      "sha256": "1e562882f2940c9084368f2c9313f1bb50a7625ed2c30d1937f50fbb56013e82",
+      "pages": [
+        {
+          "page": 1,
+          "width_100mm": 21000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":1}",
+          "annotations": [
+            {
+              "path": [
+                1
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                2000,
+                1180,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r1\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                2
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                4000,
+                1180,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r2\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                3
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                6000,
+                2020,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r3\"}",
+              "text": "削除対象",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            }
+          ]
+        },
+        {
+          "page": 2,
+          "width_100mm": 14837,
+          "height_100mm": 20983,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":2}",
+          "annotations": []
+        },
+        {
+          "page": 3,
+          "width_100mm": 42000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":3}",
+          "annotations": []
+        }
+      ],
+      "document_identity": "{\"review_id\":\"research\",\"canonical_run\":\"synthetic\"}"
+    },
+    "resize-inspection.xdw": {
+      "sha256": "29e68531357b61cbfd204dfc95655d105ebab905aa3a53a339628c2faea52a93",
+      "pages": [
+        {
+          "page": 1,
+          "width_100mm": 21000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":1}",
+          "annotations": [
+            {
+              "path": [
+                1
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                2000,
+                6000,
+                3301
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r1\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 1
+            },
+            {
+              "path": [
+                2
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                4000,
+                1180,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r2\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                3
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                6000,
+                2020,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r3\"}",
+              "text": "削除対象",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            }
+          ]
+        },
+        {
+          "page": 2,
+          "width_100mm": 14837,
+          "height_100mm": 20983,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":2}",
+          "annotations": []
+        },
+        {
+          "page": 3,
+          "width_100mm": 42000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":3}",
+          "annotations": []
+        }
+      ],
+      "document_identity": "{\"review_id\":\"research\",\"canonical_run\":\"synthetic\"}"
+    }
+  }
+}

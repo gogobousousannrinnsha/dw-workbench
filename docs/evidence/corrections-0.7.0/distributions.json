@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "file": "docuworks_ctypes-1.0.0-py3-none-any.whl",
+      "bytes": 46587,
+      "sha256": "8d62f219c58d7b92f3179a0a8670718bc2adf0e3b41f20ba4f2b1da1a4d74871"
+    },
+    {
+      "file": "docuworks_ctypes-1.0.0.tar.gz",
+      "bytes": 56475,
+      "sha256": "b0e72baa088efc5a6f31e212df94be6203869405246b16846ee4b25f1cf06d08"
+    },
+    {
+      "file": "docuworks_integrations-0.7.0.dev1-py3-none-any.whl",
+      "bytes": 55705,
+      "sha256": "0a6056d3804e841ad25cd3bef334da202e03c87c77b464367d4418a2ce42cea8"
+    },
+    {
+      "file": "docuworks_integrations-0.7.0.dev1.tar.gz",
+      "bytes": 60886,
+      "sha256": "96ed791e6dab05801fe2657eae2f63b5a49fe5de061c8c446dc8d9b39ad521ca"
+    }
+  ]
+}

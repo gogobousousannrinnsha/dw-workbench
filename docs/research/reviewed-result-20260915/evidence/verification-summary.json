@@ -1,0 +1,116 @@
+{
+  "investigation_only": true,
+  "product_worktree_clean": true,
+  "commit": "0e93209f99daea0d8497687d728f8629a77f927c",
+  "verified_local_links": 15,
+  "probe_runs": [
+    {
+      "path": "probe-200702-bed467/results.json",
+      "cases": [
+        {
+          "case": "mixed_size_blank_pages_and_document_page_identity",
+          "passed": true
+        },
+        {
+          "case": "unicode_newline_spaces_move_size_identity",
+          "passed": true
+        },
+        {
+          "case": "new_untagged_black_text_delete_nontext",
+          "passed": true
+        },
+        {
+          "case": "duplicate_origin_does_not_prevent_raw_extraction",
+          "passed": true
+        },
+        {
+          "case": "missing_malformed_origin_text_independent",
+          "passed": true
+        },
+        {
+          "case": "all_text_deleted_page_identity_survives",
+          "passed": true
+        },
+        {
+          "case": "empty_whitespace_annotations",
+          "passed": true
+        },
+        {
+          "case": "rotation_geometry",
+          "passed": true
+        },
+        {
+          "case": "wrapped_text_resize",
+          "passed": false
+        },
+        {
+          "case": "group_nested_text_identity_and_move_coordinates",
+          "passed": true
+        },
+        {
+          "case": "sticky_child_coordinates",
+          "passed": false
+        }
+      ],
+      "baseline_unchanged": true
+    },
+    {
+      "path": "probe-200828-e6e89d/results.json",
+      "cases": [
+        {
+          "case": "resize_actual_geometry_vs_requested",
+          "passed": true
+        },
+        {
+          "case": "sticky_child_parent_relative_coordinates",
+          "passed": false
+        },
+        {
+          "case": "historical_viewer_saves_identity_and_copy_duplicate",
+          "passed": true
+        },
+        {
+          "case": "duplicate_page_identity_detection",
+          "passed": false
+        },
+        {
+          "case": "vertical_text_metadata",
+          "passed": false
+        }
+      ],
+      "baseline_unchanged": true
+    },
+    {
+      "path": "probe-200849-5b9c69/results.json",
+      "cases": [
+        {
+          "case": "sticky_child_parent_relative_coordinates",
+          "passed": true
+        },
+        {
+          "case": "duplicate_page_identity_detection",
+          "passed": true
+        },
+        {
+          "case": "vertical_text_metadata",
+          "passed": true
+        }
+      ],
+      "baseline_unchanged": true
+    },
+    {
+      "path": "probe-201003-5a8e3f/results.json",
+      "cases": [
+        {
+          "case": "page_180_rotation_requires_extended_info",
+          "passed": true
+        }
+      ],
+      "baseline_unchanged": true
+    }
+  ],
+  "viewer_current_session": false,
+  "historical_viewer_files_revalidated": 6,
+  "report": "../README.md",
+  "note": "Local investigation record. Probe helper failures and the disproved exact-height assertion are retained. New Viewer acceptance remains pending."
+}

@@ -1,51 +1,13 @@
-# DW-Workbench v0.2.0
+# DW-Workbench 0.4.0
 
-DocuWorks文書の項目を原本と照合し、採用値と根拠を保存して、案件ごとにExcel／CSVへ出力するWindowsデスクトップアプリです。文書全体用・1ページ用のテンプレートを登録し、ページごとに使うテンプレートを選べます。
+複数文書への一括テンプレート適用を保持し、未完了項目の移動、原文確認・訂正、Excel出力、台帳照合と別XDWへの注釈を追加した公開Pre-releaseです。保存形式は2のままです。
 
-**v0.2.0は検証候補のPre-releaseです。** DocuWorks 10.1での合成帳票・Portable移動等を検証しています。現地の実帳票とDocuWorks 9.1は未確認です。実帳票の認識精度や業務での最終受け入れを保証するものではありません。
+[操作の流れ](docs/WORKFLOW_UI_JA.md)、[一括適用](docs/BULK_TEMPLATE_JA.md)、[台帳と注釈](docs/LEDGER_MARKUP_JA.md)、[別PCで使う](docs/user/portable-transfer.md)、[配布案内](DISTRIBUTION.md)を参照してください。
 
-配布版 **v0.2.0-restore.1** は復元用ヘルパーと配布案内を更新した保守版です。アプリはv0.2.0のままで、Portableの4つのZIP部品と説明書の内容は従来版と同一です。旧v0.2.0のタグと配布物を保持しています。
+Core 1.0.1 / Integrations 0.14.0 / Python 3.13以降を使います。PortableはDW-OCR v0.8.0候補と同じruntime・モデルを共有できます。DocuWorks本体・XDWAPI・ドライバーは利用者が移動先に導入します。自作部分はMIT、第三者条件を保持します。実文書と利用者DB・設定を含めません。9.1・別の物理PC・実帳票・Viewer手操作は未確認です。
 
-## Portableを使う
+## Portableをダウンロードして使う
 
-[GitHub Release v0.2.0-restore.1](https://github.com/gogobousousannrinnsha/dw-workbench/releases/tag/v0.2.0-restore.1)からPortableと説明書を取得してください。大容量配布物の復元手順・ハッシュは該当Releaseの案内に従ってください。解凍後は `起動.bat` を使います。フォルダー移動は保存し、アプリとワーカーを終了してから行います。
+[DW-OCR v0.8.0 / Workbench 0.4.0 共通Portable](https://github.com/gogobousousannrinnsha/dw-ocr/releases/tag/v0.8.0) を使います。輸送ZIP8個 `ocr_part_001_transport.zip` ～ `ocr_part_008_transport.zip` と `ocr_join_tools.zip` をダウンロードし、同じ新しいフォルダーへ展開してください。`join_parts.bat` で検査・結合し、できた `dw_ocr_with_code.zip` を別の新しいフォルダーへ展開して `Workbench開始.bat` を実行します。
 
-取得するファイルとPortable復元の手順は[配布物の案内](DISTRIBUTION.md)にまとめています。
-
-DocuWorks本体は外部依存です。GPU OCRには対応NVIDIA GPU・ドライバーと付属モデルが必要です。GPU OCRが使えない環境でも、DocuWorksの原本を表示して手入力・確認・保存・出力できます。
-
-## ソースから実行する
-
-Windows、Python 3.13以降、Tkinter、DocuWorksを用意してください。このリポジトリはPython、DocuWorks、ドライバー、OCRモデルを含みません。次の操作は通常の依存ライブラリを取得します。
-
-```powershell
-py -3.13 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
-.\.venv\Scripts\python.exe -m pip install ./packages/docuworks-ctypes ./packages/docuworks-integrations ./packages/dw-workbench
-.\.venv\Scripts\python.exe -m dw_workbench --portable-root ./workbench-data
-```
-
-ソース実行では `--portable-root` を明示してください。設定・案件・作業ファイルは指定したフォルダーに作られます。Portable候補の既存案件を直接開く前に、アプリで案件バックアップを作成してください。
-
-通常の手入力経路ではOCR依存の追加は不要です。ソースからGPU OCRを組み立てる場合は、固定版PaddleOCR 3.7.0／PaddleX 3.7.2、対応するPaddlePaddle GPUとNVIDIA環境、および `models/PP-OCRv6_medium_det` と `models/PP-OCRv6_medium_rec` のローカルモデルが必要です。モデルの実行時自動取得は行いません。GPU構成は[Release v0.2.0-restore.1](https://github.com/gogobousousannrinnsha/dw-workbench/releases/tag/v0.2.0-restore.1)の固定Portableを基準にしてください。
-
-## ビルドと検証
-
-```powershell
-.\.venv\Scripts\python.exe -m pip wheel --no-build-isolation --no-deps --wheel-dir ./dist ./packages/docuworks-ctypes ./packages/docuworks-integrations ./packages/dw-workbench
-.\.venv\Scripts\python.exe -m pip install pytest openpyxl numpy psutil
-.\.venv\Scripts\python.exe scripts/verify_source.py
-.\.venv\Scripts\python.exe scripts/test_restore.py
-.\.venv\Scripts\python.exe -m pytest packages/dw-workbench/tests
-```
-
-GUIテストはWindowsデスクトップで実行してください。DocuWorks／GPUの実機試験と、合成データによる業務規則・保存・出力テストは別の検証です。GitHub ActionsはWindows上でソース監査・wheelビルド・Workbenchの合成テストと、復元用ヘルパーの17件の合成ZIPテストを行います。復元用の試験は利用者の案件や実際のPortableを使いません。
-
-## ソースと説明書
-
-- [コンポーネントと固定版の出所](COMPONENTS.md)
-- [実装ファイルのハッシュ](SOURCE_SNAPSHOT.json)
-- [図解説明書の再生成資料](docs/manual-build/README.md)
-- [ライセンスの適用範囲](LICENSE_NOTICE.md)・[第三者コンポーネント](THIRD_PARTY_NOTICES.md)
-
-公開用ソースは固定したv0.2.0から作成した独立スナップショットです。開発用Git履歴、実帳票、案件、ログは含みません。公開時に整えたパッケージメタデータと固定されたアプリ実装を維持し、v0.2.0-restore.1では復元用ヘルパー、その試験・CIと配布案内を更新しています。
+Windows x64、DocuWorks本体/XDWAPI、GPU OCR用の対応NVIDIA GPU・ドライバーが必要です。Python・OCRモデルは同梱しています。すべてのZIP・部品・展開後ファイルを残す場合は空き容量16GB以上を目安にしてください。使用中のPortableは保存して終了し、新版は別フォルダーへ展開します。DocuWorks10.1.1の本PCで合成データによるSDK/GPU/Tk/保存・再読込・フォルダー移動を確認済みです。9.1、Viewer目視、別の物理PC、全DPI、CPU専用OCRは未確認です。

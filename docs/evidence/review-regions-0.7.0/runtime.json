@@ -1,0 +1,30 @@
+{
+  "status": "SDK_ROUNDTRIP_VERIFIED",
+  "viewer_status": "NOT_VERIFIED_FOR_MULTIPLE_REGIONS",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "xdwapi_version": "10.1.1",
+  "dll_sha256": "35a5eacf7c0959df48e42f6f5b63840f95b06e803375cf70c5c5d262cd1055d3",
+  "source_is_synthetic": true,
+  "source_files_unchanged": true,
+  "original_metadata_preserved": true,
+  "files": {
+    "corrections.json": "052fe411227b5bce9bfad78dd846f64e89e7d4f2125cfd59e212c156c63e0ab5",
+    "edited.xdw": "d8f61f94ca1a374d16a5e734bdef4207ca605cf51145fef8cfeb085892ff71b0",
+    "effective.jsonl": "4b1d237a0bf5dfae4702f9b5c174194ffaca1189f3bf63acb06720832268b490",
+    "review/review.json": "b0e2702e0707ca2fbff52ff03a4159aef329989dfeccc67fe3ab7a38dab76fdb",
+    "review/review.xdw": "7f12853e940afd804140e35d7ce7d9db87b565b95b2b2ca272e8c18afa17f21d"
+  },
+  "sdk_test_python": "3.13.15",
+  "dll_file_version": [
+    10,
+    1,
+    0,
+    17
+  ],
+  "dll_product_version": [
+    10,
+    1,
+    0,
+    0
+  ]
+}

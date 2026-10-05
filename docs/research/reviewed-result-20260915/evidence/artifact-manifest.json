@@ -1,0 +1,18 @@
+{
+  "source_report_sha256": "d316bba7b05bd672fe08b5fb5f87363c96e2c80fc295b923f33dbd34a0da2aa1",
+  "transformations": [
+    "repository-relative links",
+    "compact environment without installed paths",
+    "local-path redaction in probe errors",
+    "research status and navigation"
+  ],
+  "files": {
+    "evidence/environment.json": "4572ce72e2b4fde3ac2d0e794866ba7429bf1daf7d9c736b2eae73c2ab8b4fc3",
+    "evidence/probe-200702-bed467/results.json": "f6c311a7ca2f039b4e27e813e3a52a5fc81714b4c59dfd9ccbedbff11a0f945d",
+    "evidence/probe-200828-e6e89d/results.json": "9073f53a99040fc5b389baae94178dc2e732fd6f3b2cc9912b595de4d60f9780",
+    "evidence/probe-200849-5b9c69/results.json": "e49684e3c0db9c7f3dd58e87ec0a7024edda6f9ee9dfab8e4e002fbf74876eff",
+    "evidence/probe-201003-5a8e3f/results.json": "0f70091d0de27ee1f30ed1ea5d40eceb09c3fb98c3dfbb3b8afb545dada5bc40",
+    "evidence/verification-summary.json": "0a231c43392f77ca6c40555c04edb33fd07d0b13eaa622f5cfc3b59cbfed06f3",
+    "README.md": "6fc39d5cfd17d686b3c5e4e7372b0e11cba69892cc20b9618203833c3ab7d95b"
+  }
+}

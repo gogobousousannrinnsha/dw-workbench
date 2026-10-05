@@ -1,0 +1,27 @@
+{
+  "ignored_cases": [
+    "local-data/source.xdw",
+    "local-data/run/manifest.json",
+    "models/inference.yml",
+    "test.xdw",
+    "test.dll",
+    "sdk/header.h",
+    ".env",
+    "credentials.json",
+    ".venv-results/pyvenv.cfg",
+    "dist/test.whl",
+    "test.pdf",
+    "test.png",
+    "regions.jsonl",
+    "private.pem",
+    "ocr-cache/test.json"
+  ],
+  "allowed_cases": [
+    "README.md",
+    "docs/evidence/consolidation.json",
+    "examples/ocr.ps1",
+    "requirements/models-ppocrv6-medium.json",
+    "packages/docuworks-integrations/docuworks_integrations/ocr-result-1.0.schema.json"
+  ],
+  "passed": true
+}

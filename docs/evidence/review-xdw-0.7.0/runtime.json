@@ -1,0 +1,23 @@
+{
+  "status": "SDK_ROUNDTRIP_VERIFIED",
+  "viewer_status": "PENDING_MANUAL_REVIEW",
+  "python": "3.13.15",
+  "xdwapi_version": "10.1.1",
+  "dll_file_version": [
+    10,
+    1,
+    0,
+    17
+  ],
+  "dll_product_version": [
+    10,
+    1,
+    0,
+    0
+  ],
+  "dll_sha256": "35A5EACF7C0959DF48E42F6F5B63840F95B06E803375CF70C5C5D262CD1055D3",
+  "installed_product": "InstalledDocuWorksInfo(version=(10, 1, 1), trial=True)",
+  "source_page": 3,
+  "review_page": 1,
+  "source_files_unchanged": 17
+}

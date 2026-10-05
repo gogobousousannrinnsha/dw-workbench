@@ -1,12 +1,16 @@
 """Application operations; called by the UI thread, never by workers."""
 from dataclasses import asdict, replace
+from collections.abc import Mapping
 from pathlib import Path
+import hashlib
 import json
 import os
 import shutil
 from .domain import (Anchor, Candidate, ExtractionProfile, FieldState, FinalizedDataset, Observation,
     ResultSchema, PageAssignment, RuleError, StaleRevision, Status, identifier, timestamp,
-    profile_from, schema_from, source_from, state_from, unfinished)
+    TemplateRecordRevision, TemplateSourceState, TemplateApplicationEntry, TemplateModeChange,
+    TemplateApplicationPlan, TemplateApplicationResult,
+    profile_from, schema_from, source_from, state_from, unfinished, field_complete)
 from .storage import Store, atomic_bytes, digest, encode, ValidatedSources, validate_sources, fingerprint
 
 
@@ -182,20 +186,25 @@ class Workbench:
         if mode not in ("document", "page"):
             raise RuleError("処理方式が不正です")
         with self.store.transaction():
-            current = self.mode(source_id)
-            if expected_revision != current["revision"]:
-                raise StaleRevision("処理方式の古い版からの変更を拒否しました")
-            if current["mode"] == mode:
-                return current
-            locked = self.store.db.execute("SELECT 1 FROM page_assignments WHERE source_id=? AND state!='unassigned' LIMIT 1", (source_id,)).fetchone()
-            if locked:
-                raise RuleError("テンプレート適用・対象外指定後は処理方式を変更できません")
-            revision = current["revision"] + 1
-            self.store.db.execute("INSERT INTO source_modes VALUES(?,?,?) ON CONFLICT(source_id) DO UPDATE SET mode=excluded.mode,revision=excluded.revision", (source_id, mode, revision))
-            self.store.db.execute("DELETE FROM page_assignments WHERE source_id=?", (source_id,))
-            pages = [0] if mode == "document" else range(1, len(source.pages)+1)
-            self.store.db.executemany("INSERT INTO page_assignments VALUES(?,?,0,'unassigned',NULL,'')", [(source_id, p) for p in pages])
-            self.store.event("mode", source_id, revision)
+            return self._set_mode(source, mode, expected_revision)
+
+    def _set_mode(self, source, mode, expected_revision):
+        """Change units inside an already-open application transaction."""
+        source_id = source.id
+        current = self.mode(source_id)
+        if expected_revision != current["revision"]:
+            raise StaleRevision("処理方式の古い版からの変更を拒否しました")
+        if current["mode"] == mode:
+            return current
+        locked = self.store.db.execute("SELECT 1 FROM page_assignments WHERE source_id=? AND state!='unassigned' LIMIT 1", (source_id,)).fetchone()
+        if locked:
+            raise RuleError("テンプレート適用・対象外指定後は処理方式を変更できません")
+        revision = current["revision"] + 1
+        self.store.db.execute("INSERT INTO source_modes VALUES(?,?,?) ON CONFLICT(source_id) DO UPDATE SET mode=excluded.mode,revision=excluded.revision", (source_id, mode, revision))
+        self.store.db.execute("DELETE FROM page_assignments WHERE source_id=?", (source_id,))
+        pages = [0] if mode == "document" else range(1, len(source.pages)+1)
+        self.store.db.executemany("INSERT INTO page_assignments VALUES(?,?,0,'unassigned',NULL,'')", [(source_id, p) for p in pages])
+        self.store.event("mode", source_id, revision)
         return {"mode": mode, "revision": revision}
 
     def assignments(self, source_id):
@@ -224,28 +233,164 @@ class Workbench:
         mode = self.mode(source_id)["mode"]
         if mode != profile.scope:
             raise RuleError("文書用・ページ用の処理方式とテンプレートが一致しません")
-        result = []
         with self.store.transaction():
-            for assignment in self._targets(source_id, pages, expected_revisions):
-                if assignment.current_record_id:
-                    current = self.store.record(assignment.current_record_id)
-                    if (current["profile_id"], current["profile_version"]) == (profile_id, version):
-                        result.append(current["id"])
-                        continue
-                self._retire_record(assignment.current_record_id)
-                actual_page = assignment.page or None
-                matches = profile.matches(source, actual_page)
-                fields = {}
-                for f in profile.fields:
-                    r = profile.resolve_region(f.id, actual_page)
-                    anchor = Anchor(source.id, source.sha256, r["page"], tuple(r["rect"])) if matches else None
-                    fields[f.id] = asdict(FieldState(unit=f.unit, anchor=anchor))
-                id, revision = identifier(), assignment.revision+1
-                self.store.db.execute("INSERT INTO records(id,source_id,profile_id,profile_version,revision,data,page,active,assignment_revision) VALUES(?,?,?,?,?,?,?,1,?)", (id, source_id, profile_id, version, 0, encode({"fields": fields, "geometry_matches": matches}), actual_page, revision))
-                self.store.db.execute("UPDATE page_assignments SET revision=?,state='applied',current_record_id=?,reason='' WHERE source_id=? AND page=?", (revision, id, source_id, assignment.page))
-                self.store.event("assign-page", id, revision)
-                result.append(id)
+            return self._assign_profile(source, profile, self._targets(source_id, pages, expected_revisions))
+
+    def _assign_profile(self, source, profile, assignments):
+        """Reuse single-page assignment rules without opening a nested transaction."""
+        result = []
+        for assignment in assignments:
+            if assignment.current_record_id:
+                current = self.store.record(assignment.current_record_id)
+                if (current["profile_id"], current["profile_version"]) == (profile.id, profile.version):
+                    result.append(current["id"])
+                    continue
+            self._retire_record(assignment.current_record_id)
+            actual_page = assignment.page or None
+            matches = profile.matches(source, actual_page)
+            fields = {}
+            for f in profile.fields:
+                r = profile.resolve_region(f.id, actual_page)
+                anchor = Anchor(source.id, source.sha256, r["page"], tuple(r["rect"])) if matches else None
+                fields[f.id] = asdict(FieldState(unit=f.unit, anchor=anchor))
+            id, revision = identifier(), assignment.revision+1
+            self.store.db.execute("INSERT INTO records(id,source_id,profile_id,profile_version,revision,data,page,active,assignment_revision) VALUES(?,?,?,?,?,?,?,1,?)", (id, source.id, profile.id, profile.version, 0, encode({"fields": fields, "geometry_matches": matches}), actual_page, revision))
+            self.store.db.execute("UPDATE page_assignments SET revision=?,state='applied',current_record_id=?,reason='' WHERE source_id=? AND page=?", (revision, id, source.id, assignment.page))
+            self.store.event("assign-page", id, revision)
+            result.append(id)
         return result
+
+    def _template_source_state(self, source_id):
+        source = self.source(source_id)
+        if source.id != source_id:
+            raise RuleError("原本のIDが案件データと一致しません")
+        mode = self.mode(source_id)
+        assignments = tuple(self.assignments(source_id))
+        expected = set() if mode["mode"] is None else ({0} if mode["mode"] == "document" else set(range(1, len(source.pages)+1)))
+        if {a.page for a in assignments} != expected:
+            raise RuleError("処理方式と対象ページの構成が一致しません")
+        records = []
+        for assignment in assignments:
+            if not assignment.current_record_id:
+                continue
+            record = self.store.record(assignment.current_record_id)
+            if (not record["active"] or record["source_id"] != source.id or
+                    record["page"] != (assignment.page or None) or
+                    record["assignment_revision"] != assignment.revision):
+                raise RuleError("現在のページ割当と記録が一致しません")
+            records.append(TemplateRecordRevision(record["id"], record["revision"], bool(record["active"]),
+                record["source_id"], record["page"], record["assignment_revision"], record["profile_id"], record["profile_version"]))
+        active_ids = {r[0] for r in self.store.db.execute("SELECT id FROM records WHERE source_id=? AND active=1", (source_id,))}
+        if active_ids != {r.id for r in records}:
+            raise RuleError("現在の記録にページ割当がありません")
+        return TemplateSourceState(source, mode["mode"], mode["revision"], assignments, tuple(records))
+
+    @staticmethod
+    def _profile_fingerprint(profile):
+        data = json.dumps(asdict(profile), ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(data.encode("utf-8")).hexdigest()
+
+    def plan_template_application(self, profile_id, version, targets, unassigned_only=True):
+        """Read-only preview. Targets use page 0 for document-level templates."""
+        if not isinstance(targets, Mapping) or not targets or type(unassigned_only) is not bool:
+            raise RuleError("対象文書と適用条件を指定してください")
+        requested = []
+        states = []
+        for source_id, pages in targets.items():
+            if not isinstance(source_id, str) or not isinstance(pages, (list, tuple, range)):
+                raise RuleError("対象文書とページ一覧が不正です")
+            # Keep an invalid request visible without allowing bool/float to alias a page.
+            normalized = {page if type(page) is int else None for page in pages}
+            ordered = tuple(sorted(p for p in normalized if p is not None)) + ((None,) if None in normalized else ())
+            requested.append((source_id, ordered))
+            states.append(self._template_source_state(source_id))
+        return self._build_template_plan(self.profile(profile_id, version), tuple(requested), tuple(states), unassigned_only)
+
+    def _build_template_plan(self, profile, targets, states, unassigned_only):
+        entries, mode_changes = [], []
+        for (source_id, pages), captured in zip(targets, states):
+            source = captured.source
+            assignments = {a.page: a for a in captured.assignments}
+            records = {r.id: r for r in captured.records}
+            change_mode = captured.mode != profile.scope
+            locked = change_mode and any(a.state != "unassigned" for a in captured.assignments)
+            apply_count = 0
+            for page in pages or (None,):
+                valid = type(page) is int and (page == 0 if profile.scope == "document" else 1 <= page <= len(source.pages))
+                assignment = assignments.get(page)
+                record = records.get(assignment.current_record_id) if assignment else None
+                current_state = assignment.state if assignment else "unassigned"
+                action, reason, matches = "skip", "", None
+                if not valid:
+                    reason = "文書用テンプレートの対象は文書全体（0）です" if profile.scope == "document" and page is not None else "対象ページが文書の範囲外、または未選択です"
+                elif locked:
+                    reason = "処理方式が異なり、適用済み・対象外の記録があるため変更できません"
+                else:
+                    if change_mode:
+                        assignment, record, current_state = PageAssignment(source_id, page, 0, "unassigned"), None, "unassigned"
+                    matches = profile.matches(source, page or None)
+                    if unassigned_only and current_state != "unassigned":
+                        reason = "適用済みのため除外します" if current_state == "applied" else "対象外に指定済みのため除外します"
+                    elif record and (record.profile_id, record.profile_version) == (profile.id, profile.version):
+                        action, reason = "same", "同じテンプレート・版を適用済みのため変更しません"
+                    else:
+                        action = "apply"
+                        reason = "テンプレートを変更し、現在の記録は変更前の結果に残します" if record else ("対象外指定を解除して適用します" if current_state == "excluded" else "未割当の項目を作成します")
+                        apply_count += 1
+                    if not matches:
+                        reason += "。ページ数・寸法・向きが不一致のため、範囲指定と手入力が必要です"
+                entries.append(TemplateApplicationEntry(source_id, source.name, page, action, reason, matches, current_state,
+                    assignment.current_record_id if assignment else None, assignment.revision if assignment else None,
+                    record.revision if record else None, record.profile_id if record else None, record.profile_version if record else None))
+            if change_mode and apply_count:
+                mode_changes.append(TemplateModeChange(source_id, source.name, captured.mode, profile.scope, captured.mode_revision))
+        return TemplateApplicationPlan(profile.id, profile.version, self._profile_fingerprint(profile), unassigned_only,
+            tuple(entries), tuple(mode_changes), states, targets)
+
+    def apply_template_plan(self, plan):
+        """Revalidate the entire preview before atomically applying any document."""
+        if (not isinstance(plan, TemplateApplicationPlan) or type(plan.unassigned_only) is not bool or
+                not isinstance(plan.profile_id, str) or not plan.profile_id or
+                type(plan.profile_version) is not int or plan.profile_version < 1 or
+                type(plan.targets) is not tuple or not plan.targets):
+            raise RuleError("適用前確認の計画が不正です")
+        for target in plan.targets:
+            if (type(target) is not tuple or len(target) != 2 or not isinstance(target[0], str) or not target[0] or
+                    type(target[1]) is not tuple or any(page is not None and type(page) is not int for page in target[1])):
+                raise RuleError("適用前確認の対象文書・ページが不正です")
+        if len({source_id for source_id, _ in plan.targets}) != len(plan.targets):
+            raise RuleError("適用前確認の対象文書が重複しています")
+        with self.store.transaction():
+            try:
+                profile = self.profile(plan.profile_id, plan.profile_version)
+                current_states = tuple(self._template_source_state(source_id) for source_id, _ in plan.targets)
+            except RuleError as exc:
+                raise StaleRevision("適用前確認後に対象が変更されました。確認一覧を作り直してください") from exc
+            if current_states != plan.captured_sources or self._profile_fingerprint(profile) != plan.profile_fingerprint:
+                raise StaleRevision("適用前確認後に記録・割当・処理方式が変更されました。確認一覧を作り直してください")
+            try:
+                requested = dict(plan.targets)
+            except (TypeError, ValueError) as exc:
+                raise RuleError("適用前確認の対象が不正です") from exc
+            # Reuse normalization too: altered duplicates, ordering and non-integer
+            # pages cannot turn an edited plan into an unreviewed operation.
+            current_plan = self.plan_template_application(plan.profile_id, plan.profile_version, requested, plan.unassigned_only)
+            if current_plan != plan:
+                raise RuleError("適用前確認の内容が変更されています。確認一覧を作り直してください")
+            changes = {change.source_id: change for change in plan.mode_changes}
+            result = []
+            for captured in current_states:
+                source = captured.source
+                entries = [entry for entry in plan.entries if entry.source_id == source.id and entry.action in ("apply", "same")]
+                if not entries:
+                    continue
+                if source.id in changes:
+                    change = changes[source.id]
+                    self._set_mode(source, change.new_mode, change.expected_revision)
+                expected = {entry.page: entry.assignment_revision for entry in entries}
+                result.extend(self._assign_profile(source, profile, self._targets(source.id, list(expected), expected)))
+            return TemplateApplicationResult(sum(e.action == "apply" for e in plan.entries), sum(e.action == "same" for e in plan.entries),
+                sum(e.action == "skip" for e in plan.entries), tuple(result), len(plan.mode_changes))
 
     def exclude_pages(self, source_id, pages, reason, expected_revisions):
         if not isinstance(reason, str) or not reason.strip():
@@ -347,6 +492,44 @@ class Workbench:
                 result.append({"record_id": None, "source_id": data["id"], "name": data["name"], "page": None,
                     "kind": "unregistered", "reason": "原本登録未完了", "fields": ["原本登録未完了"]})
         return result
+
+    def review_targets(self):
+        """Current work only, ordered by source registration, real page and field.
+
+        Include unassigned pages and unfinished imports so navigation cannot hide
+        them. No writes, history selection or machine-score confirmation here.
+        """
+        result = []
+        for row in self.store.db.execute('SELECT id FROM sources ORDER BY rowid'):
+            source = self.source(row['id'])
+            assignments = self.assignments(source.id)
+            if not assignments:
+                result.append(dict(source_id=source.id, page=0, field_id=None, complete=False, record_id=None))
+            for assignment in assignments:
+                if assignment.state == 'excluded':
+                    continue
+                base = dict(source_id=source.id, page=assignment.page, record_id=assignment.current_record_id)
+                if not assignment.current_record_id:
+                    result.append(base | dict(field_id=None, complete=False))
+                    continue
+                record, _, profile = self._active_context(assignment.current_record_id)
+                for field in profile.fields:
+                    state = state_from(record['data']['fields'][field.id])
+                    result.append(base | dict(field_id=field.id, complete=field_complete(field, state)))
+        for job in self.store.db.execute("SELECT id,data FROM jobs WHERE kind='inspect' AND status!='complete' ORDER BY rowid"):
+            data = json.loads(job['data'])
+            result.append(dict(source_id=data['id'], page=0, field_id=None,
+                complete=False, record_id=None, job_id=job['id']))
+        return result
+
+    def next_unfinished(self, current=None):
+        targets = self.review_targets()
+        keys = [(t['source_id'], t['page'], t['field_id']) for t in targets]
+        start = keys.index(current)+1 if current in keys else 0
+        for target in targets[start:] + targets[:start]:
+            if not target['complete']:
+                return target
+        return None
 
     def finalize(self, *, completed_only=False, validation=None):
         incomplete = self.incomplete()

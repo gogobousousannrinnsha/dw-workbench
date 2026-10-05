@@ -1,0 +1,144 @@
+{
+  "baseline": "8f8d53765b4ba237268aa942fef32353f90fa7c9",
+  "candidate": "paddle-blank-text",
+  "version": "0.7.0",
+  "actual_user_document_tested": false,
+  "source_native_tests": false,
+  "fixture_sha256": "38c3be53bd1d6c724c5a91f08564843880affe2ffac79e1ab901a884ca7496ec",
+  "payload_sha256": "bf83668227f7f33ae356dd8e2b48bde862380beb70e37072253e1fdab36bd0c9",
+  "baseline_parser_sha256": "60f0eb8cd89e32325a1266128018774d51581b1f95f9508b007510feee7f6f44",
+  "parser_sha256": "68f3d7206cc663d53a525e960ec2b42322c39da52a8e579b63109b9e03f38ec4",
+  "baseline_new_expectations": {
+    "tests": 40,
+    "failures": 19,
+    "errors": 0,
+    "skipped": 0
+  },
+  "tests": {
+    "3.10": {
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "3.11": {
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_regression": {
+        "tests": 325,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "3.12": {
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_regression": {
+        "tests": 325,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "3.13": {
+      "tests": 40,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_regression": {
+        "tests": 325,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "distribution": {
+    "3.11": {
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "3.12": {
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "3.13": {
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "replay": {
+    "3.10": {
+      "status": "PASS",
+      "python": "3.10.11",
+      "retry_after_sharing_error": false
+    },
+    "3.11": {
+      "status": "PASS",
+      "python": "3.11.9",
+      "retry_after_sharing_error": false
+    },
+    "3.12": {
+      "status": "PASS",
+      "python": "3.12.10",
+      "retry_after_sharing_error": true
+    },
+    "3.13": {
+      "status": "PASS",
+      "python": "3.13.15",
+      "retry_after_sharing_error": false
+    }
+  },
+  "wheel": {
+    "tests": 325,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sdist": {
+    "tests": 196,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "sdist_details": {
+    "exit_code": 0,
+    "source_unchanged": true,
+    "supplemental_files_added": false,
+    "archive_sha256": "c576827b2d8fe3dfbfbd721bdd6c8f4f93742b15eb0ff7f4ee723dd05dcb2ad2",
+    "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "source_files": 68,
+    "generated_cache_files": 5
+  },
+  "audit": "PASS: final Integrations wheel/sdist and existing Core wheel/sdist",
+  "installation": "ordinary pip install --no-index --no-deps, pip check; test-only dependencies from existing Python 3.11 environment",
+  "environment_notes": [
+    "Script tests retried with the existing Windows-safe temporary fixture after ACL setup errors.",
+    "Python 3.12 replay retried in a fresh directory after WinError 32 during job journal replacement; no storage code changes.",
+    "Initial sdist rejected raw-shaped synthetic fixture; final hand-authored recipe produces identical input and passes unchanged audit policy."
+  ],
+  "wheel_source_installed_files_match": 35,
+  "distributions": [
+    {
+      "name": "docuworks_integrations-0.7.0-py3-none-any.whl",
+      "bytes": 61851,
+      "sha256": "b7eaa8565d67cfd7291c4933fed0883d68c813c645f50c36bc9ef692c453aa0e"
+    },
+    {
+      "name": "docuworks_integrations-0.7.0.tar.gz",
+      "bytes": 80060,
+      "sha256": "c576827b2d8fe3dfbfbd721bdd6c8f4f93742b15eb0ff7f4ee723dd05dcb2ad2"
+    }
+  ]
+}

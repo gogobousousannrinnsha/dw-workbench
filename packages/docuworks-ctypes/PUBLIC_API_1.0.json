@@ -1,0 +1,1002 @@
+{
+  "schema_version": 1,
+  "release": "1.0.0",
+  "top_level_exports": [
+    "Annotation",
+    "ANNOTATION_CAPABILITIES",
+    "AnnotationCapabilitySpec",
+    "AnnotationRefreshError",
+    "AnnotationType",
+    "ArrowheadStyle",
+    "AttributeCondition",
+    "ArrowheadType",
+    "AttributeType",
+    "AuthMode",
+    "BitnessMismatchError",
+    "BorderType",
+    "ClosedHandleError",
+    "Color",
+    "CandidateReport",
+    "CustomAttribute",
+    "CustomAttributeKind",
+    "DllNotFoundError",
+    "DllBundle",
+    "DllFileInfo",
+    "Document",
+    "DocuWorksError",
+    "MINIMUM_VERSION",
+    "InstalledDocuWorksInfo",
+    "LinkPageFrom",
+    "LinkType",
+    "MultibyteEncodingPolicy",
+    "OpenMode",
+    "Page",
+    "PlatformNotSupportedError",
+    "PointMM",
+    "RawPoint",
+    "ProbeResult",
+    "ReadOnlyDocumentError",
+    "RectMM",
+    "RuntimeInfo",
+    "RuntimeBundleConflictError",
+    "RuntimeResolutionError",
+    "ResolutionReport",
+    "STANDARD_ATTRIBUTE_REGISTRY",
+    "SizeMM",
+    "StandardAttributeSpec",
+    "StaticValidation",
+    "UnsupportedVersionError",
+    "XdwApi",
+    "XdwError",
+    "standard_attribute_spec",
+    "annotation_capability",
+    "system_ansi_codepage"
+  ],
+  "simple_exports": [
+    "SimpleAnnotation",
+    "SimpleDocument",
+    "SimplePage",
+    "open_xdw"
+  ],
+  "simple_signatures": {
+    "SimpleAnnotation.__init__": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "core",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "Annotation"
+        }
+      ],
+      "return": null
+    },
+    "SimpleAnnotation.core": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "Annotation"
+    },
+    "SimpleAnnotation.delete": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "None"
+    },
+    "SimpleAnnotation.move_to": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        }
+      ],
+      "return": "None"
+    },
+    "SimpleAnnotation.position": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "PointMM"
+    },
+    "SimpleAnnotation.resize": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "width",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "height",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        }
+      ],
+      "return": "None"
+    },
+    "SimpleAnnotation.size": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "SizeMM | None"
+    },
+    "SimpleAnnotation.type": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "AnnotationType | int"
+    },
+    "SimpleDocument.__init__": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "core",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "Document"
+        }
+      ],
+      "return": null
+    },
+    "SimpleDocument.close": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "None"
+    },
+    "SimpleDocument.page": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "number",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": 1,
+          "annotation": "int"
+        }
+      ],
+      "return": "'SimplePage'"
+    },
+    "SimpleDocument.save": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        }
+      ],
+      "return": "None"
+    },
+    "SimplePage.__init__": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "core",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "Page"
+        }
+      ],
+      "return": null
+    },
+    "SimplePage.annotations": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "recursive",
+          "kind": "KEYWORD_ONLY",
+          "default": false,
+          "annotation": "bool"
+        }
+      ],
+      "return": "tuple[SimpleAnnotation, ...]"
+    },
+    "SimplePage.ellipse": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "width",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "height",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "border_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "border_width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        },
+        {
+          "name": "border_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "fill_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_transparent",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.line": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "x1",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y1",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "x2",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y2",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "border_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "border_width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        },
+        {
+          "name": "border_type",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "BorderType | None"
+        },
+        {
+          "name": "border_transparent",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "arrowhead_type",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "ArrowheadType | None"
+        },
+        {
+          "name": "arrowhead_style",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "ArrowheadStyle | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.link": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "caption",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "str"
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "link_type",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "LinkType"
+        },
+        {
+          "name": "target",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "str | None"
+        },
+        {
+          "name": "auto_resize",
+          "kind": "KEYWORD_ONLY",
+          "default": true,
+          "annotation": "bool"
+        },
+        {
+          "name": "width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "float | None"
+        },
+        {
+          "name": "height",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "float | None"
+        },
+        {
+          "name": "fore_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "font_size",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "float | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.marker": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "points",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "Sequence[PointMM]"
+        },
+        {
+          "name": "border_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "border_width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        },
+        {
+          "name": "border_transparent",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.polygon": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "points",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "Sequence[PointMM]"
+        },
+        {
+          "name": "close",
+          "kind": "KEYWORD_ONLY",
+          "default": true,
+          "annotation": "bool"
+        },
+        {
+          "name": "border_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "border_width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        },
+        {
+          "name": "border_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "fill_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_transparent",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "arrowhead_type",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "ArrowheadType | None"
+        },
+        {
+          "name": "arrowhead_style",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "ArrowheadStyle | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.rectangle": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "width",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "height",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "border_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "border_width",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        },
+        {
+          "name": "border_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "fill_visible",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "fill_transparent",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.sticky": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "width",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "height",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "fill_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "auto_resize",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "bool | None"
+        },
+        {
+          "name": "text",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "str | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "SimplePage.text": {
+      "parameters": [
+        {
+          "name": "self",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": null
+        },
+        {
+          "name": "text",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "str"
+        },
+        {
+          "name": "x",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "y",
+          "kind": "KEYWORD_ONLY",
+          "default": {
+            "required": true
+          },
+          "annotation": "float"
+        },
+        {
+          "name": "font_size",
+          "kind": "KEYWORD_ONLY",
+          "default": 12.0,
+          "annotation": "float"
+        },
+        {
+          "name": "font_name",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "str | None"
+        },
+        {
+          "name": "fore_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        },
+        {
+          "name": "back_color",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "Color | None"
+        }
+      ],
+      "return": "SimpleAnnotation"
+    },
+    "open_xdw": {
+      "parameters": [
+        {
+          "name": "path",
+          "kind": "POSITIONAL_OR_KEYWORD",
+          "default": {
+            "required": true
+          },
+          "annotation": "str | Path"
+        },
+        {
+          "name": "writable",
+          "kind": "KEYWORD_ONLY",
+          "default": false,
+          "annotation": "bool"
+        },
+        {
+          "name": "dll_path",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "str | Path | None"
+        },
+        {
+          "name": "codepage",
+          "kind": "KEYWORD_ONLY",
+          "default": null,
+          "annotation": "int | None"
+        }
+      ],
+      "return": "SimpleDocument"
+    }
+  },
+  "enums": {
+    "AnnotationType": {
+      "OLE": 32783,
+      "TEXT": 32785,
+      "STICKY": 32794,
+      "MARKER": 32795,
+      "DATE_STAMP": 32819,
+      "STRAIGHT_LINE": 32828,
+      "RECTANGLE": 32829,
+      "ELLIPSE": 32830,
+      "BITMAP": 32831,
+      "POLYGON": 32834,
+      "CUSTOM": 32837,
+      "TITLE": 32838,
+      "GROUP": 32839,
+      "LINK": 49199,
+      "PAGE_FORM": 32814
+    },
+    "ArrowheadStyle": {
+      "WIDE_POLYLINE": 0,
+      "POLYLINE": 1,
+      "POLYGON": 2
+    },
+    "ArrowheadType": {
+      "NONE": 0,
+      "BEGINNING": 1,
+      "ENDING": 2,
+      "BOTH": 3
+    },
+    "AttributeType": {
+      "INT": 0,
+      "STRING": 1,
+      "DATE": 2,
+      "BOOL": 3,
+      "OCTETS": 4,
+      "OTHER": 999
+    },
+    "AuthMode": {
+      "NONE": 0,
+      "NO_DIALOG": 1,
+      "CONDITIONAL_DIALOG": 2
+    },
+    "BorderType": {
+      "SOLID": 0,
+      "DOT": 1,
+      "DASH": 2,
+      "DASH_DOT": 3,
+      "DOUBLE": 4
+    },
+    "Color": {
+      "NONE": 65793,
+      "BLACK": 0,
+      "RED": 255,
+      "GREEN": 32768,
+      "BLUE": 16711680,
+      "YELLOW": 65535,
+      "WHITE": 16777215,
+      "GRAY": 8421504,
+      "MAROON": 128,
+      "OLIVE": 32896,
+      "NAVY": 8388608,
+      "PURPLE": 8388736,
+      "TEAL": 8421376,
+      "SILVER": 12632256,
+      "LIME": 65280,
+      "FUCHIA": 16711935,
+      "AQUA": 16776960,
+      "STICKY_RED": 16761599,
+      "STICKY_BLUE": 16760733,
+      "STICKY_YELLOW": 6619135,
+      "STICKY_LIME": 12779421
+    },
+    "CustomAttributeKind": {
+      "INT": 0,
+      "STRING": 1,
+      "DATE": 2,
+      "BOOL": 3,
+      "OTHER": 999
+    },
+    "LinkPageFrom": {
+      "XDW": 0,
+      "BINDER": 1,
+      "XDW_IN_BINDER": 2
+    },
+    "LinkType": {
+      "THIS_DOCUMENT": 0,
+      "XDW": 1,
+      "URL": 2,
+      "OTHER_FILE": 3,
+      "MAIL_ADDRESS": 4
+    },
+    "OpenMode": {
+      "READONLY": 0,
+      "UPDATE": 1
+    }
+  }
+}

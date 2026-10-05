@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.13"
-dependencies = ["docuworks-ctypes>=1.0.1,<2", "docuworks-integrations==0.13.0", "Pillow>=11", "XlsxWriter==3.2.9"]
+dependencies = ["docuworks-ctypes>=1.0.1,<2", "docuworks-integrations==0.14.0", "Pillow>=11", "XlsxWriter==3.2.9"]
 
 [project.scripts]
 dw-workbench = "dw_workbench.__main__:main"

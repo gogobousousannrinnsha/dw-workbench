@@ -180,6 +180,73 @@ class PageAssignment:
 
 
 @dataclass(frozen=True)
+class TemplateRecordRevision:
+    id: str
+    revision: int
+    active: bool
+    source_id: str
+    page: int | None
+    assignment_revision: int
+    profile_id: str
+    profile_version: int
+
+
+@dataclass(frozen=True)
+class TemplateSourceState:
+    source: SourceSnapshot
+    mode: str | None
+    mode_revision: int
+    assignments: tuple[PageAssignment, ...]
+    records: tuple[TemplateRecordRevision, ...]
+
+
+@dataclass(frozen=True)
+class TemplateApplicationEntry:
+    source_id: str
+    source_name: str
+    page: int | None  # 0 is the document target; None is an invalid/empty request.
+    action: str  # apply, same, skip
+    reason: str
+    geometry_matches: bool | None
+    current_state: str
+    current_record_id: str | None = None
+    assignment_revision: int | None = None
+    record_revision: int | None = None
+    previous_profile_id: str | None = None
+    previous_profile_version: int | None = None
+
+
+@dataclass(frozen=True)
+class TemplateModeChange:
+    source_id: str
+    source_name: str
+    old_mode: str | None
+    new_mode: str
+    expected_revision: int
+
+
+@dataclass(frozen=True)
+class TemplateApplicationPlan:
+    profile_id: str
+    profile_version: int
+    profile_fingerprint: str
+    unassigned_only: bool
+    entries: tuple[TemplateApplicationEntry, ...]
+    mode_changes: tuple[TemplateModeChange, ...]
+    captured_sources: tuple[TemplateSourceState, ...]
+    targets: tuple[tuple[str, tuple[int | None, ...]], ...]
+
+
+@dataclass(frozen=True)
+class TemplateApplicationResult:
+    applied: int
+    same: int
+    skipped: int
+    record_ids: tuple[str, ...]
+    mode_changes: int
+
+
+@dataclass(frozen=True)
 class Observation:
     id: str
     source_id: str
@@ -251,10 +318,13 @@ class FinalizedDataset:
     format_version: int = 1
 
 
+def field_complete(field, state):
+    return state.status == Status.ACCEPTED or bool(
+        not field.required and state.status == Status.NOT_APPLICABLE and state.reason.strip())
+
+
 def unfinished(profile, states):
-    return [f.name for f in profile.fields if not (
-        states[f.id].status == Status.ACCEPTED or
-        not f.required and states[f.id].status == Status.NOT_APPLICABLE and states[f.id].reason.strip())]
+    return [f.name for f in profile.fields if not field_complete(f, states[f.id])]
 
 
 def profile_from(data):

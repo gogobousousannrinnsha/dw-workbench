@@ -1,8 +1,9 @@
 """Lightweight public API; optional backends are loaded only on use."""
 from importlib import import_module
 
-__version__ = "0.13.0"
+__version__ = "0.14.0"
 _EXPORTS = {
+    **dict.fromkeys(("build_review_report", "export_review_report"), "review_report"),
     **dict.fromkeys(("TemplateDraft", "create_template_draft", "load_template_draft", "refresh_template_draft",
                     "update_template_draft", "preview_template_draft", "publish_template_draft",
                     "load_authoring_context", "list_template_versions"), "template_authoring"),

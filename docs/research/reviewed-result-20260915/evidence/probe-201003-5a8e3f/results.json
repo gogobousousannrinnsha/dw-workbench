@@ -1,0 +1,176 @@
+{
+  "baseline_unchanged": true,
+  "cases": [
+    {
+      "case": "page_180_rotation_requires_extended_info",
+      "passed": true,
+      "detail": {
+        "size_unchanged": true,
+        "page_identity_unchanged": true,
+        "before_degrees": 0,
+        "after_degrees": 180,
+        "conclusion": "Page count, size and identity alone do not detect 180 degree rotation."
+      }
+    }
+  ],
+  "snapshots": {
+    "baseline.xdw": {
+      "sha256": "1e562882f2940c9084368f2c9313f1bb50a7625ed2c30d1937f50fbb56013e82",
+      "pages": [
+        {
+          "page": 1,
+          "width_100mm": 21000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":1}",
+          "annotations": [
+            {
+              "path": [
+                1
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                2000,
+                1180,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r1\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                2
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                4000,
+                1180,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r2\"}",
+              "text": "部晶",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                3
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                2000,
+                6000,
+                2020,
+                763
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r3\"}",
+              "text": "削除対象",
+              "orientation": 0,
+              "direction": 0,
+              "word_wrap": 0
+            }
+          ]
+        },
+        {
+          "page": 2,
+          "width_100mm": 14837,
+          "height_100mm": 20983,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":2}",
+          "annotations": []
+        },
+        {
+          "page": 3,
+          "width_100mm": 42000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":3}",
+          "annotations": []
+        }
+      ],
+      "document_identity": "{\"review_id\":\"research\",\"canonical_run\":\"synthetic\"}"
+    },
+    "page-180.xdw": {
+      "sha256": "2612e1c3e54fcdf19d442ec5664d3e902cbf2163d94f2857305a68b792c6254d",
+      "pages": [
+        {
+          "page": 1,
+          "width_100mm": 21000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":1}",
+          "annotations": [
+            {
+              "path": [
+                1
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                17820,
+                26937,
+                1180,
+                762
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r1\"}",
+              "text": "部晶",
+              "orientation": 180,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                2
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                17820,
+                24937,
+                1180,
+                762
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r2\"}",
+              "text": "部晶",
+              "orientation": 180,
+              "direction": 0,
+              "word_wrap": 0
+            },
+            {
+              "path": [
+                3
+              ],
+              "kind": 32785,
+              "rect_100mm": [
+                16980,
+                22937,
+                2020,
+                762
+              ],
+              "origin": "{\"run_id\":\"synthetic\",\"region_id\":\"r3\"}",
+              "text": "削除対象",
+              "orientation": 180,
+              "direction": 0,
+              "word_wrap": 0
+            }
+          ]
+        },
+        {
+          "page": 2,
+          "width_100mm": 14837,
+          "height_100mm": 20983,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":2}",
+          "annotations": []
+        },
+        {
+          "page": 3,
+          "width_100mm": 42000,
+          "height_100mm": 29700,
+          "page_identity": "{\"review_id\":\"research\",\"source_page\":3}",
+          "annotations": []
+        }
+      ],
+      "document_identity": "{\"review_id\":\"research\",\"canonical_run\":\"synthetic\"}"
+    }
+  }
+}

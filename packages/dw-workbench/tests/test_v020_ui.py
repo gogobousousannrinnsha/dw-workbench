@@ -29,7 +29,7 @@ def isolated_gui(test):
             return
         environment = os.environ.copy()
         environment.update({"DW_WORKBENCH_GUI_CASE": name, "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1"})
-        completed = subprocess.run([sys.executable, "-m", "pytest", str(Path(__file__).resolve())+"::"+name,
+        completed = subprocess.run([sys.executable, "-m", "pytest", str(Path(test.__code__.co_filename).resolve())+"::"+name,
             "-q", "-s", "-p", "no:cacheprovider"], capture_output=True, text=True, encoding="utf-8",
             env=environment, timeout=60, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         assert completed.returncode == 0, completed.stdout+completed.stderr
@@ -133,6 +133,120 @@ def select_page(window, page):
     window.select_page()
     window.select_field()
     window.root.update()
+
+
+def review_navigation_button(window):
+    def children(widget):
+        for child in widget.winfo_children():
+            yield child
+            yield from children(child)
+    return next(w for w in children(window.review_tab) if isinstance(w, ttk.Button)
+        and w.cget('text') == '次の未完了項目へ（案件全体）')
+
+
+@isolated_gui
+def test_next_unfinished_field_page_document_save_and_reopen(window, workdir):
+    from dw_workbench.domain import Status
+    app = window.app
+    first = make_source(app, workdir)
+    second = make_source(app, workdir, pages=1)
+    schema = ResultSchema(identifier(), 1, '確認項目', (FieldSchema('part', '部品番号'), FieldSchema('temp', '温度')))
+    profile = ExtractionProfile(identifier(), 1, '二項目', (PageInfo(210, 297),), schema.fields,
+        {f.id: {'page': 1, 'rect': [10, 20+20*i, 30, 8]} for i, f in enumerate(schema.fields)},
+        'page', schema.id, schema.version)
+    app.register_template(profile, schema)
+    for sid in (first, second):
+        app.set_mode(sid, 'page')
+    r1, r2 = app.assign_pages(first, [1, 2], profile.id, 1, {1: 0, 2: 0})
+    r3 = app.assign_pages(second, [1], profile.id, 1, {1: 0})[0]
+    select_source(window, first)
+    select_page(window, 1)
+    window.tabs.select(window.review_tab)
+    window.root.update()
+    window.select_field()
+    original_anchor = window.anchor
+    window.vars['value'].set('001234')
+    window.vars['raw'].set('００１２３４')
+    button = review_navigation_button(window)
+    button.invoke()
+    window.root.update()
+    assert window.record['id'] == r1 and window.field_id == 'temp'
+    saved = app.store.record(r1)['data']['fields']['part']
+    assert saved['value'] == '001234' and saved['raw'] == '００１２３４'
+    assert saved['anchor']['rect'] == list(original_anchor.rect)
+    assert saved['status'] == Status.PENDING  # navigation never confirms
+    button.invoke()
+    window.root.update()
+    assert window.record['id'] == r2 and window.field_id == 'part' and window.anchor.page == 2
+    window.zoom.set('200%')
+    window.show_image()
+    window.canvas.xview_moveto(.2)
+    assert window.anchor.rect == original_anchor.rect
+    button.invoke()
+    window.root.update()
+    button.invoke()
+    window.root.update()
+    assert window.source.id == first and window.page == 3 and window.record is None
+    assert window.tabs.select() == str(window.list_tab) and 'テンプレート未選択' in window.status.get()
+    window.next_unfinished()
+    window.root.update()
+    assert window.source.id == second and window.record['id'] == r3 and window.field_id == 'part'
+    project_root = app.store.root
+    window.app.close()
+    window.app = None
+    window.open_project(project_root)
+    finish_background(window)
+    select_source(window, first)
+    select_page(window, 1)
+    assert window.app.store.record(r1)['data']['fields']['part'] == saved
+    assert window.test_errors == []
+
+
+@isolated_gui
+def test_next_unfinished_blocks_failed_save_and_frozen_history(window, workdir):
+    from dw_workbench.domain import RuleError
+    sid = make_source(window.app, workdir)
+    profile, _ = make_profile(window.app)
+    window.app.set_mode(sid, 'page')
+    record = window.app.assign_pages(sid, [1, 2], profile.id, 1, {1: 0, 2: 0})[0]
+    select_source(window, sid)
+    select_page(window, 1)
+    window.vars['value'].set('keep me')
+    window.app.store.db.execute('PRAGMA query_only=ON')
+    window.next_unfinished()
+    assert window.record['id'] == record and window.page == 1 and window.dirty
+    assert window.vars['value'].get() == 'keep me'
+    window.app.store.db.execute('PRAGMA query_only=OFF')
+    window.next_unfinished()
+    window.root.update()
+    assert window.page == 2 and not window.dirty
+    window.frozen = 'archived'
+    with pytest.raises(RuleError, match='閲覧専用'):
+        window.next_unfinished()
+    assert window.page == 2
+    window.frozen = None
+    assert window.test_errors == []
+
+
+@isolated_gui
+def test_next_unfinished_cycles_unfinished_imports(window, workdir):
+    ids = []
+    for name in ('import-a.xdw', 'import-b.xdw'):
+        path = workdir/name
+        path.write_bytes(b'Unfinished synthetic import')
+        ids.append(window.app.prepare_source(path))
+    window.refresh_lists()
+    window.next_unfinished()
+    window.root.update()
+    assert window.document_list.selection() == ('job-inspect-'+ids[0],)
+    assert '原本登録未完了' in window.status.get()
+    window.next_unfinished()
+    window.root.update()
+    assert window.document_list.selection() == ('job-inspect-'+ids[1],)
+    window.next_unfinished()
+    window.root.update()
+    assert window.document_list.selection() == ('job-inspect-'+ids[0],)
+    assert window.test_errors == []
 
 
 @isolated_gui
@@ -589,3 +703,124 @@ def test_ocr_callback_keeps_dirty_input_and_candidate_selection_without_project_
     assert window.document_list.item(first_source, "values")[1] == "1/3 記録 完了"
     assert window.page_list.item("1", "values")[2] == "1/1 項目 完了"
     assert window.test_errors == []
+
+
+def ledger_dialog_fixture(window, workdir, monkeypatch):
+    import xlsxwriter
+    from dw_workbench.domain import state_from
+    source = make_source(window.app, workdir, 1)
+    schema = ResultSchema(identifier(), 1, "台帳確認", (FieldSchema("part", "部品番号"), FieldSchema("reading", "測定値")))
+    profile = ExtractionProfile(identifier(), 1, "台帳配置", (PageInfo(210, 297),), schema.fields,
+        {"part": {"page": 1, "rect": [10, 20, 30, 8]}, "reading": {"page": 1, "rect": [50, 60, 30, 8]}},
+        "page", schema.id, 1)
+    window.app.register_template(profile, schema)
+    window.app.set_mode(source, "page")
+    rid = window.app.assign_pages(source, [1], profile.id, 1, {1: 0})[0]
+    for field, value in (("part", "001234"), ("reading", "原文測定値")):
+        record = window.app.store.record(rid)
+        state = state_from(record["data"]["fields"][field])
+        window.app.edit(rid, field, record["revision"], value=value, raw=value, unit="", anchor=state.anchor)
+        window.app.accept(rid, field, window.app.store.record(rid)["revision"])
+    window.app.finalize()
+    ledger = workdir/"合成 台帳 日本語.xlsx"
+    with xlsxwriter.Workbook(str(ledger)) as wb:
+        sheet = wb.add_worksheet("台帳")
+        sheet.write_row(0, 0, ["部品番号", "判定"])
+        sheet.write_row(1, 0, ["001234", "対象"])
+        sheet.write_row(2, 0, ["OTHER", "対象"])
+    window.open_ledger()
+    dialog = window.ledger_dialog
+    dialog.vars["path"].set(str(ledger))
+    dialog.read_book()
+    dialog.key_field.current(0)
+    dialog.draw_field.current(1)
+    dialog.key_column.current(0)
+    dialog.condition_column.current(1)
+    dialog.vars["condition"].set("対象")
+    dialog.preview_button.invoke()
+    assert dialog.session and len(dialog.table.get_children()) == 2
+    return dialog, ledger
+
+
+@isolated_gui
+def test_ledger_preview_crop_exclusion_reopen_and_changed_conditions(window, workdir, monkeypatch):
+    import dw_workbench.ledger_ui as lui
+    dialog, ledger = ledger_dialog_fixture(window, workdir, monkeypatch)
+    assert dialog.counts.get().find("対象1件") >= 0
+    assert str(dialog.output_button.cget("state")) == "disabled"
+    target = next(id for id,item in dialog.items.items() if item["status"] == "target")
+    dialog.table.selection_set(target)
+    dialog.show_item()
+    assert dialog.photo and "原文測定値" in dialog.detail.get()
+    assert dialog.items[target]["anchor"]["rect"] == [50,60,30,8]
+    dialog.rendering = True
+    dialog.show_item()
+    assert not dialog.image_label.cget("image")  # Never show a previous crop while waiting.
+    dialog.rendering = False
+    dialog.table.selection_set("ledger:3")
+    monkeypatch.setattr(lui.simpledialog, "askstring", lambda *a,**k: None)
+    dialog.exclude_button.invoke()
+    assert not dialog.session["exclusions"]
+    monkeypatch.setattr(lui.simpledialog, "askstring", lambda *a,**k: "今回の対象外")
+    dialog.exclude_button.invoke()
+    assert str(dialog.output_button.cget("state")) == "normal"
+    folder = dialog.folder
+    monkeypatch.setattr(lui.messagebox, "askyesno", lambda *a,**k: False)
+    dialog.output_button.invoke()
+    assert not dialog.busy and not dialog.session["outputs"]
+    assert dialog.close()
+    window.open_ledger()
+    resumed = window.ledger_dialog
+    monkeypatch.setattr(lui.filedialog, "askdirectory", lambda *a,**k: str(folder))
+    resumed.resume()
+    assert resumed.session["exclusions"] == {"ledger:3":"今回の対象外"}
+    assert str(resumed.output_button.cget("state")) == "normal"
+    resumed.vars["condition"].set("不要")
+    assert resumed.changed and str(resumed.output_button.cget("state")) == "disabled"
+    with pytest.raises(RuleError, match="再プレビュー"):
+        resumed.output()
+    resumed.preview_button.invoke()
+    assert all(item["status"] != "target" for item in resumed.items.values())
+    assert not window.test_errors
+
+
+@isolated_gui
+def test_ledger_ui_save_failure_cancel_repeated_click_and_output_failure(window, workdir, monkeypatch):
+    import threading
+    import dw_workbench.ledger_ui as lui
+    dialog, ledger = ledger_dialog_fixture(window, workdir, monkeypatch)
+    dialog.table.selection_set("ledger:3")
+    monkeypatch.setattr(lui.simpledialog, "askstring", lambda *a,**k: "除外理由")
+    original_save = lui.save_decisions
+    monkeypatch.setattr(lui, "save_decisions", lambda *a: (_ for _ in ()).throw(OSError("保存失敗")))
+    with pytest.raises(OSError, match="保存失敗"):
+        dialog.exclude()
+    assert dialog.session["exclusions"] == {}
+    monkeypatch.setattr(lui, "save_decisions", original_save)
+    dialog.exclude()
+    monkeypatch.setattr(lui.messagebox, "askyesno", lambda *a,**k: True)
+    started = threading.Event()
+    calls = []
+    def cancelled(root, folder, session, *, cancel):
+        calls.append(session["id"])
+        started.set()
+        assert cancel.wait(5)
+        raise RuleError("キャンセルしました")
+    monkeypatch.setattr(lui, "export_annotations", cancelled)
+    dialog.output_button.invoke()
+    assert started.wait(2) and dialog.busy
+    dialog.output()
+    dialog.output_button.invoke()
+    assert len(calls) == 1
+    assert not dialog.close()  # Close requests cancellation and keeps the window.
+    finish_background(window)
+    assert not dialog.busy and not dialog.closed and "キャンセル" in dialog.status.get()
+    assert not dialog.session["outputs"]
+    monkeypatch.setattr(lui, "export_annotations", lambda *a,**k: (_ for _ in ()).throw(OSError("SDK保存失敗")))
+    dialog.output_button.invoke()
+    finish_background(window)
+    assert "SDK保存失敗" in dialog.status.get() and dialog.session["exclusions"]
+    ledger.write_bytes(b"changed ledger")
+    with pytest.raises(RuleError, match="元台帳"):
+        dialog.output()
+    assert not window.test_errors

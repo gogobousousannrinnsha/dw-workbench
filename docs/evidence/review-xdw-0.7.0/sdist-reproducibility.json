@@ -1,0 +1,28 @@
+{
+  "exit_code": 0,
+  "source_unchanged": true,
+  "supplemental_files_added": false,
+  "archive_sha256": "2f30a943e5789df0e5252bf454ffdf09a4710e21b351acd18fec9bdf7afafe67",
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "source_files": 57,
+  "generated_cache_files": 5,
+  "revision": "sdist-reproducible",
+  "baseline_commit": "bf57d9b10313b72df570464ab25594e518487d5e",
+  "sdist_tests": 99,
+  "wheel_tests": 130,
+  "guard_tests": 65,
+  "normal_pip_install": {
+    "python": "3.11.9",
+    "pip": "24.0",
+    "fresh_venv": true,
+    "custom_installer": false,
+    "tempfile_override": false,
+    "exit_code": 0,
+    "pip_check": "No broken requirements found.",
+    "core": "1.0.0",
+    "integrations": "0.7.0.dev2"
+  },
+  "viewer_saved_cases": 6,
+  "unchanged_runtime_files": 33,
+  "core_unchanged": true
+}
