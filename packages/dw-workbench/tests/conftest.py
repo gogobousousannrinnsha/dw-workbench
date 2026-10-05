@@ -13,7 +13,7 @@ def workdir():
     # Normal mkdir inherits the Windows ACL; do not use Python's 0700 temp helper.
     root = Path(os.environ.get("DW_WORKBENCH_TEST_TMP", str(Path(tempfile.gettempdir())/"workbench-tests")))/uuid.uuid4().hex
     root.mkdir(parents=True)
-    return root
+    return root.resolve()
 
 
 @pytest.fixture

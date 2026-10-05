@@ -2352,8 +2352,8 @@
     },
     {
       "path": "packages/dw-workbench/tests/conftest.py",
-      "bytes": 2027,
-      "sha256": "83ba48bef27e80a40eb9e5620490d800b98c4d5a4ec6b8acca361eaa84e48a3b"
+      "bytes": 2037,
+      "sha256": "c99c9434a7541669348d6df1bdfb90bdb80f52b1ffcf9bf06c7eb3b6d15904a1"
     },
     {
       "path": "packages/dw-workbench/tests/test_ledger_marking.py",
