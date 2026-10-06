@@ -1,5 +1,13 @@
 # Changes
 
+## 0.4.1 — local Portable candidate
+
+- Skip known template/page dimension mismatches during OCR and continuous review; preserve explicit mismatch details and unassigned work.
+- Prefill the latest clear OCR into pristine adopted fields as pending, preserving original page/mm anchors and leading-zero text.
+- Protect hand edits, deliberate clears, manual evidence and accepted values during re-OCR, cancellation and delayed results.
+- Confirm the current field and advance to the next unfinished field with one action; retain background selection and focus.
+- Keep saved-case/finalized format 2 and prepare a shared DW-OCR v0.8.1 local Portable, without publishing it.
+
 ## 0.4.0 — local candidate
 
 - Keep 0.3.0 bulk template preview and transactional application.

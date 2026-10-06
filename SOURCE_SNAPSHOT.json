@@ -1,11 +1,11 @@
 {
   "format_version": 1,
-  "description": "Local v0.4.0 preparation. Keeps the v0.3.0 bulk template work and adds guided review and ledger annotations.",
+  "description": "Workbench 0.4.1 / shared Portable v0.8.1 Pre-release; dimension mismatch skip and protected OCR prefill.",
   "components": [
     {
       "package": "dw-workbench",
       "module": "dw_workbench",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "path": "packages/dw-workbench"
     },
     {
@@ -24,87 +24,87 @@
   "implementation_files": [
     {
       "path": "packages/dw-workbench/dw_workbench/__init__.py",
-      "sha256": "b831a13960de17f506ef4378a6772702302b20386782f7493f5d06c7e1000717",
+      "sha256": "d8891991e0d63603332c5734bd71a2297723491d91fd52ca5b93fb331f71d33f",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/__main__.py",
       "sha256": "a60c1ef5226bc303ef1699e9437896d2e583e07a11a4340d7af6e1ddc8eb35d6",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/annotation_writer.py",
       "sha256": "5f16d4bb7cfbd3836608ffd03f9d0c2a571ca121f2f6f13828393d659f950dea",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/application.py",
-      "sha256": "bf16c6072362336fd8f339c4405754edf6215403c1491f2067e820bd59669c72",
+      "sha256": "e09422fcce6d1283a254511fd7378633609a08213ab62dbc4ce3a6947b0f0a6c",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/domain.py",
-      "sha256": "166f19a838da5439ffd0666e7a17b4de1f4398d47e0522113b9369d63ee0aa90",
+      "sha256": "9cf8f4f4b0576b6300b7fdbd12d015582b62a9b98959221c7b1b3ba0a4ee5ef4",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/exporting.py",
-      "sha256": "e75a884ff756f02a8c3b4196ca7cf86684dde7df9090a1e6d559768ab163860e",
+      "sha256": "b5aa01218177e2978b2eddae5b3ec9ac4ae8a31eac6e22233f9ba08839e954e3",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/ledger.py",
       "sha256": "82fff3234d3a8b95e4baf941f8e3b3ad628647e85032f16bea02b6ba64743ae0",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/ledger_marking.py",
       "sha256": "7c89c3e801259d794a187e522bb51543831cc6e67a43ab7a993314fb851df82d",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/ledger_ui.py",
       "sha256": "45c67d1938afcc92aa5f612f38a647527a73e5f90be9fb9171922c9df78cff5f",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/library.py",
       "sha256": "bede871538f50874b1bb6585cce77f128c55b931a726c122d97244084c99b975",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/storage.py",
       "sha256": "945cdb4223ea60dae18f22c761437b9b10d830167b94410f09ebc6d6b2fd57b7",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/ui.py",
-      "sha256": "0a3c836f4f89883a2b8e398eec6be305bc95886357eeeafeca49b0a6bcc7a81f",
+      "sha256": "0aa92c5c30219b439308654b38685e5b87fea91c163cc4fbaf45a9c91e99235e",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/ui_guidance.py",
-      "sha256": "170f89a09c274c3201f5573ec1f321c972bbd6cc6247fc5f7b59bc38837f29fa",
+      "sha256": "2112fddf0cc1b3362443ad5d5054eec2bd367fa16681cf46b31f2f7e9804993a",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/dw-workbench/dw_workbench/workers.py",
       "sha256": "421d322799d4370784e45bc53ff154efbba5aa3522e4e175b5d05b280c6ad767",
       "component": "dw-workbench",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     {
       "path": "packages/docuworks-ctypes/docuworks_ctypes/__init__.py",
@@ -543,6 +543,16 @@
       "sha256": "cd6233743b75736d69c29f8c7fe561cf4f770c4d75c37a5193f202203dba796c",
       "component": "docuworks-integrations",
       "version": "0.14.0"
+    },
+    {
+      "path": "packages/dw-workbench/dw_workbench/input_tracking.py",
+      "sha256": "6c189122d5087248988ea65a1511049fd43cb600d0ba7e429021ab9f86cd314d",
+      "component": "dw-workbench",
+      "version": "0.4.1"
     }
-  ]
+  ],
+  "publication": {
+    "candidate_commit": "6a89c0775bfc34ed5aaf1a06589f748824dcf278",
+    "changes_saved_format": false
+  }
 }

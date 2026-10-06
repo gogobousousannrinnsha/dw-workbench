@@ -12,6 +12,7 @@ from .domain import (Anchor, Candidate, ExtractionProfile, FieldState, Finalized
     TemplateApplicationPlan, TemplateApplicationResult,
     profile_from, schema_from, source_from, state_from, unfinished, field_complete)
 from .storage import Store, atomic_bytes, digest, encode, ValidatedSources, validate_sources, fingerprint
+from . import input_tracking
 
 
 def copy_snapshot(filename, project_root):
@@ -254,7 +255,9 @@ class Workbench:
                 anchor = Anchor(source.id, source.sha256, r["page"], tuple(r["rect"])) if matches else None
                 fields[f.id] = asdict(FieldState(unit=f.unit, anchor=anchor))
             id, revision = identifier(), assignment.revision+1
-            self.store.db.execute("INSERT INTO records(id,source_id,profile_id,profile_version,revision,data,page,active,assignment_revision) VALUES(?,?,?,?,?,?,?,1,?)", (id, source.id, profile.id, profile.version, 0, encode({"fields": fields, "geometry_matches": matches}), actual_page, revision))
+            data = dict(fields=fields, geometry_matches=matches,
+                input_tracking=dict(format=1, record_revision=0, fields={f.id: 'initial' for f in profile.fields}))
+            self.store.db.execute("INSERT INTO records(id,source_id,profile_id,profile_version,revision,data,page,active,assignment_revision) VALUES(?,?,?,?,?,?,?,1,?)", (id, source.id, profile.id, profile.version, 0, encode(data), actual_page, revision))
             self.store.db.execute("UPDATE page_assignments SET revision=?,state='applied',current_record_id=?,reason='' WHERE source_id=? AND page=?", (revision, id, source.id, assignment.page))
             self.store.event("assign-page", id, revision)
             result.append(id)
@@ -338,7 +341,7 @@ class Workbench:
                         reason = "テンプレートを変更し、現在の記録は変更前の結果に残します" if record else ("対象外指定を解除して適用します" if current_state == "excluded" else "未割当の項目を作成します")
                         apply_count += 1
                     if not matches:
-                        reason += "。ページ数・寸法・向きが不一致のため、範囲指定と手入力が必要です"
+                        reason += "。ページ数・寸法・向きが不一致のため、OCR・通常確認をスキップします（手入力・確認履歴は保持）"
                 entries.append(TemplateApplicationEntry(source_id, source.name, page, action, reason, matches, current_state,
                     assignment.current_record_id if assignment else None, assignment.revision if assignment else None,
                     record.revision if record else None, record.profile_id if record else None, record.profile_version if record else None))
@@ -422,6 +425,7 @@ class Workbench:
             raise RuleError("ページ記録の根拠は対象ページに指定してください")
         schema = next(f for f in profile.fields if f.id == field_id)
         state = state_from(record["data"]["fields"][field_id])
+        input_tracking.track(record, source, profile, field_id, 'human')
         state.edit(schema, source=source, **changes)
         record["data"]["fields"][field_id] = asdict(state)
         with self.store.transaction():
@@ -433,6 +437,7 @@ class Workbench:
         if record["page"] is not None and state.anchor is not None and state.anchor.page != record["page"]:
             raise RuleError("根拠ページが記録と一致しません")
         schema = next(f for f in profile.fields if f.id == field_id)
+        input_tracking.track(record, source, profile, field_id, 'human')
         state.accept(schema, source, expected_revision+1)
         record["data"]["fields"][field_id] = asdict(state)
         with self.store.transaction():
@@ -444,8 +449,9 @@ class Workbench:
             return self.store.update(record_id, expected_revision, record["data"], "accept")
 
     def mark(self, record_id, field_id, expected_revision, status, reason):
-        record, _, profile = self._active_context(record_id)
+        record, source, profile = self._active_context(record_id)
         state = state_from(record["data"]["fields"][field_id])
+        input_tracking.track(record, source, profile, field_id, 'human')
         state.mark(next(f for f in profile.fields if f.id == field_id), status, reason)
         record["data"]["fields"][field_id] = asdict(state)
         with self.store.transaction():
@@ -466,6 +472,42 @@ class Workbench:
         return [json.loads(r[0]) for r in self.store.db.execute("SELECT data FROM candidates WHERE record_id=? ORDER BY rowid DESC", (record_id,))
             if json.loads(r[0])["field_id"] == field_id]
 
+    def input_origin(self, record_id, field_id):
+        record, source, profile = self.context(record_id)
+        return input_tracking.origins(record, source, profile)[field_id]
+
+    def latest_ocr(self, record_id, field_id):
+        row = self.store.db.execute("SELECT id,status,result,error FROM jobs WHERE kind='ocr' AND json_extract(data,'$.record_id')=? AND json_extract(data,'$.field_id')=? ORDER BY rowid DESC LIMIT 1", (record_id, field_id)).fetchone()
+        return dict(row) | dict(result=json.loads(row['result']) if row['result'] else {}) if row else None
+
+    def workflow_skip(self, record_id):
+        """Derive an OCR/review skip from immutable source/template geometry.
+
+        Do not change assignment state, human values, confirmations or datasets.
+        Unassigned targets have no template and are never dimension skips.
+        """
+        record, source, profile = self.context(record_id)
+        if not record["active"]:
+            return None
+        page = record["page"]
+        if (profile.scope == "page" and (type(page) is not int or not 1 <= page <= len(source.pages)) or
+                profile.scope == "document" and page is not None):
+            raise RuleError("記録の対象ページとテンプレートの処理単位が一致しません")
+        if profile.matches(source, page):
+            return None
+        reason = f"ページ数・寸法・向きがテンプレート「{profile.name}」版{profile.version}と不一致のため、OCR・通常確認をスキップ"
+        return dict(record_id=record_id, source_id=source.id, name=source.name, page=page,
+            kind="dimension_mismatch", reason=reason, profile_id=profile.id,
+            profile_version=profile.version, fields=[reason])
+
+    def workflow_skips(self):
+        result = []
+        for row in self.store.db.execute("SELECT source_id,page,current_record_id FROM page_assignments WHERE state='applied' ORDER BY rowid"):
+            skipped = self.workflow_skip(row["current_record_id"])
+            if skipped:
+                result.append(skipped)
+        return result
+
     def incomplete(self):
         result = []
         for row in self.store.rows("sources"):
@@ -484,8 +526,10 @@ class Workbench:
                         raise RuleError("現在のページ割当が無効な記録を参照しています")
                     fields = unfinished(p, {k: state_from(v) for k, v in r["data"]["fields"].items()})
                 if fields:
+                    skipped = self.workflow_skip(id) if id else None
                     result.append({"record_id": id, "source_id": source.id, "name": source.name,
-                        "page": assignment.page or None, "kind": "incomplete", "reason": "未完了", "fields": fields})
+                        "page": assignment.page or None, "kind": skipped["kind"] if skipped else "incomplete",
+                        "reason": skipped["reason"] if skipped else "未完了", "fields": fields})
         for job in self.store.rows("jobs"):
             if job["kind"] == "inspect" and job["status"] != "complete":
                 data = json.loads(job["data"])
@@ -493,7 +537,7 @@ class Workbench:
                     "kind": "unregistered", "reason": "原本登録未完了", "fields": ["原本登録未完了"]})
         return result
 
-    def review_targets(self):
+    def review_targets(self, *, include_skipped=False):
         """Current work only, ordered by source registration, real page and field.
 
         Include unassigned pages and unfinished imports so navigation cannot hide
@@ -513,6 +557,11 @@ class Workbench:
                     result.append(base | dict(field_id=None, complete=False))
                     continue
                 record, _, profile = self._active_context(assignment.current_record_id)
+                skipped = self.workflow_skip(record["id"])
+                if skipped and not include_skipped:
+                    continue
+                if skipped:
+                    base |= dict(skipped=True, skip_reason=skipped["reason"])
                 for field in profile.fields:
                     state = state_from(record['data']['fields'][field.id])
                     result.append(base | dict(field_id=field.id, complete=field_complete(field, state)))
@@ -523,11 +572,16 @@ class Workbench:
         return result
 
     def next_unfinished(self, current=None):
-        targets = self.review_targets()
+        # Keep skipped positions for forward order, but never select them.
+        targets = self.review_targets(include_skipped=True)
         keys = [(t['source_id'], t['page'], t['field_id']) for t in targets]
         start = keys.index(current)+1 if current in keys else 0
+        if current and current not in keys:
+            positions = [i for i, key in enumerate(keys) if key[:2] == current[:2]]
+            if positions:
+                start = positions[-1]+1
         for target in targets[start:] + targets[:start]:
-            if not target['complete']:
+            if not target['complete'] and not target.get('skipped'):
                 return target
         return None
 
@@ -597,8 +651,10 @@ class Workbench:
 
     def ocr_jobs(self, record_id):
         record, source, profile = self._active_context(record_id)
-        if not profile.matches(source, record["page"]):
-            raise RuleError("ページ数・寸法・向きが設定と不一致です。手入力と文書固有の範囲指定をご利用ください")
+        skipped = self.workflow_skip(record_id)
+        if skipped:
+            from .domain import DimensionMismatch
+            raise DimensionMismatch(skipped["reason"])
         run = identifier()
         jobs = []
         for f in profile.fields:
@@ -607,6 +663,7 @@ class Workbench:
             jobs.append(self.add_job("ocr", {"run": run, "record_id": record_id, "field_id": f.id, "source_id": source.id,
                 "sha256": source.sha256, "profile_id": profile.id, "profile_version": profile.version,
                 "assignment_revision": record["assignment_revision"], "page": r["page"],
+                "prefill_allowed": input_tracking.pristine(record, source, profile, f.id),
                 "rect": r["rect"], "image": f"cache/{source.id}/page-{r['page']}-300.png"}))
         return jobs
 
@@ -616,7 +673,7 @@ class Workbench:
         for row in self.store.db.execute("SELECT id,data FROM jobs WHERE kind='ocr' AND status IN ('pending','failed')").fetchall():
             data = json.loads(row["data"])
             if not self._job_current(data):
-                self.store.db.execute("UPDATE jobs SET status='cancelled',error='現在のページ割当ではありません' WHERE id=?", (row["id"],))
+                self.store.db.execute("UPDATE jobs SET status='cancelled',error=? WHERE id=?", (self._job_cancellation_reason(data), row["id"]))
                 continue
             key = (data["source_id"], data["page"])
             if key not in prepared:
@@ -635,7 +692,7 @@ class Workbench:
         if job["status"] in ("complete", "cancelled"):
             return None
         if job["kind"] == "ocr" and not self._job_current(job["data"]):
-            self.store.db.execute("UPDATE jobs SET status='cancelled',error='現在のページ割当ではありません' WHERE id=?", (id,))
+            self.store.db.execute("UPDATE jobs SET status='cancelled',error=? WHERE id=?", (self._job_cancellation_reason(job["data"]), id))
             return None
         self.store.db.execute("UPDATE jobs SET status='running',error=NULL WHERE id=?", (id,))
         return job
@@ -647,14 +704,14 @@ class Workbench:
         data = job["data"]
         with self.store.transaction():
             if job["kind"] == "ocr" and not self._job_current(data):
-                self.store.db.execute("UPDATE jobs SET status='cancelled',error='現在のページ割当ではありません' WHERE id=?", (id,))
+                self.store.db.execute("UPDATE jobs SET status='cancelled',error=? WHERE id=?", (self._job_cancellation_reason(data), id))
                 self.store.event("job-cancelled", id)
                 return
             if error is None:
                 if job["kind"] == "inspect":
                     self.register_source(data, result)
                 elif job["kind"] == "ocr":
-                    self._save_ocr(id, data, result)
+                    result = dict(result, prefill=self._save_ocr(id, data, result))
                 elif job["kind"] == "render":
                     self._check_source_result(data["path"], data["sha256"], result)
                     if not self.store.path(data["image"]).is_file():
@@ -676,9 +733,18 @@ class Workbench:
         profile = self.profile(record["profile_id"], record["profile_version"])
         if data.get("field_id") not in {f.id for f in profile.fields}:
             return False
+        if self.workflow_skip(record["id"]):
+            return False
         assignment = self.store.db.execute("SELECT current_record_id,revision FROM page_assignments WHERE source_id=? AND page=?", (record["source_id"], record["page"] or 0)).fetchone()
         return bool(record["active"] and assignment and assignment["current_record_id"] == record["id"] and
             assignment["revision"] == data.get("assignment_revision", record["assignment_revision"]))
+
+    def _job_cancellation_reason(self, data):
+        try:
+            skipped = self.workflow_skip(data["record_id"])
+        except RuleError:
+            skipped = None  # Missing retired records already fail _job_current.
+        return skipped["reason"] if skipped else "現在のページ割当ではありません"
 
     def _save_ocr(self, job_id, data, result):
         record, source, profile = self._active_context(data["record_id"])
@@ -696,7 +762,25 @@ class Workbench:
         if ids:
             candidate = Candidate(job_id, data["field_id"], result["text"], anchor, tuple(ids))
             self.store.db.execute("INSERT INTO candidates VALUES(?,?,?)", (candidate.id, record["id"], encode(asdict(candidate))))
-        # No machine operation changes adopted values, review status or human revision.
+        # Only this explicit latest request may prefill a still-pristine field.
+        # Machine input remains pending; human confirmation is a separate action.
+        field_id = data['field_id']
+        latest = self.latest_ocr(record['id'], field_id)
+        if not latest or latest['id'] != job_id:
+            return dict(status='superseded', reason='新しいOCR要求があります。古い結果は候補履歴に保持します')
+        if data.get('prefill_allowed') is not True or not input_tracking.pristine(record, source, profile, field_id):
+            return dict(status='protected', reason='既存の入力・確認・根拠を保持しました')
+        schema = next(f for f in profile.fields if f.id == field_id)
+        problem = input_tracking.recognition_problem(schema, result)
+        if problem:
+            return dict(status='needs_review', reason=problem)
+        state = state_from(record['data']['fields'][field_id])
+        input_tracking.track(record, source, profile, field_id, 'ocr')
+        state.edit(schema, source=source, value=candidate.text, unit=state.unit, raw=candidate.text,
+            anchor=candidate.anchor, candidate_id=candidate.id)
+        record['data']['fields'][field_id] = asdict(state)
+        self.store.update(record['id'], record['revision'], record['data'], 'ocr-prefill')
+        return dict(status='applied', candidate_id=candidate.id, reason='OCR結果を自動入力しました。未確認です')
 
     def _check_source_result(self, path, sha256, result):
         current = self.store.path(path)

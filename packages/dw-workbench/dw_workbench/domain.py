@@ -24,6 +24,10 @@ class StaleRevision(RuleError):
     pass
 
 
+class DimensionMismatch(RuleError):
+    """An assigned template cannot OCR this target's saved page geometry."""
+
+
 class Status(StrEnum):
     MISSING = "missing"
     PENDING = "pending"

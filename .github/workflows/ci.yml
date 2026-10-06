@@ -42,3 +42,30 @@ jobs:
         run: python -m pytest -p no:cacheprovider packages/dw-workbench/tests
       - name: Verify the manual publication inputs
         run: python scripts/verify_manual_inputs.py
+      - name: Test packaging and publication guards
+        run: python -m pytest -p no:cacheprovider scripts/tests
+      - name: Smoke-test built wheels from outside repository
+        shell: powershell
+        run: |
+          $smokeDir = Join-Path $env:RUNNER_TEMP 'workbench-wheel-smoke'
+          $outsideDir = Join-Path $env:RUNNER_TEMP 'workbench-outside-repository'
+          python -m venv $smokeDir
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $smokePython = Join-Path $smokeDir 'Scripts\python.exe'
+          & $smokePython -m pip install Pillow 'XlsxWriter==3.2.9'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $smokePython -m pip install --no-index --find-links dist docuworks-ctypes docuworks-integrations dw-workbench
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $smokePython -m pip check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force -Path $outsideDir | Out-Null
+          Push-Location $outsideDir
+          try {
+            & $smokePython -c "import docuworks_ctypes, docuworks_integrations, dw_workbench; print('wheel imports ok')"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $smokePython -m dw_workbench --help
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          finally {
+            Pop-Location
+          }

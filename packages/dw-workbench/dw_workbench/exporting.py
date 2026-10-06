@@ -181,7 +181,7 @@ def info_rows_v2(dataset, exported_at):
         page = excluded.get("page")
         reason = excluded.get("reason", "")
         unfinished = ", ".join(value for value in excluded.get("fields", ()) if value != reason)
-        kind = {"excluded": "対象外", "unassigned": "未選択", "unfinished": "未完了", "incomplete": "未完了", "unregistered": "原本登録未完了"}.get(excluded.get("kind"), excluded.get("kind", ""))
+        kind = {"excluded": "対象外", "unassigned": "未選択", "unfinished": "未完了", "incomplete": "未完了", "dimension_mismatch": "寸法不一致スキップ（未完了）", "unregistered": "原本登録未完了"}.get(excluded.get("kind"), excluded.get("kind", ""))
         detail = " / ".join(value for value in (kind, reason, unfinished, "原本ID: "+excluded.get("source_id", "")) if value)
         yield _strings(["除外", excluded.get("name", excluded.get("source_id", "")),
             "ページ "+str(page) if page is not None and page != 0 else "文書", detail])

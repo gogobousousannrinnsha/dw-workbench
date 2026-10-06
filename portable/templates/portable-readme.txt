@@ -1,7 +1,7 @@
 DW-OCR @RELEASE_VERSION@ / Integrations @INTEGRATIONS_VERSION@ / Core @CORE_VERSION@
 Windows x64用Pre-releaseです。旧版と別の新しいフォルダーへ展開してください。
 
-DW-Workbench 0.4.0はWorkbench開始.batで起動します。
+DW-Workbench 0.4.1はWorkbench開始.batで起動します。
 文書登録→読取設定→OCR→確認・訂正→Excel出力→台帳・注釈を案内します。
 案件はprojects、共通設定はsettingsへ保存します。初期状態は空です。
 操作説明はdocs/WORKFLOW_UI_JA.md、台帳はdocs/LEDGER_MARKUP_JA.md。
@@ -29,7 +29,11 @@ ocr開始（一括）.bat / ocr開始（分割）.batで校正用XDWの作成方
 テンプレート適用.batで校正結果と登録版のフォルダーを選び、取得値・判定・保存先を確認します。
 結果はstructured/result-日時-IDへ新規保存します。操作例はdocs/user/template-apply.mdです。
 CSVはUTF-8 BOM付きです。Excelには取得値の列を文字列として取り込み、先頭ゼロなどを保持してください。
-Viewer手操作・フォルダー選択画面の手操作・Excel画面・実帳票・DocuWorks 9.1は未確認です。確認範囲はdocs/maintainer/RELEASE_v0.7.0.mdと公開Releaseの最終検証報告を参照してください。
+Viewer手操作・フォルダー選択画面の手操作・Excel画面・実帳票・DocuWorks 9.1は未確認です。確認範囲はdocs/maintainer/RELEASE_v0.8.1.mdと公開Releaseの最終検証報告を参照してください。
 対応DocuWorks・NVIDIA GPUが必要です。旧版と元データは保持してください。
 
 確認用XDWの文字背景は塗りつぶしなしです。新規白紙Reviewの追加処理を軽量化しています。
+
+OCRで未操作の採用欄へ自動入力しますが、状態は未確認です。原文と照合し「確認して次へ」で進みます。
+手編集・意図的空欄・確認済みを再OCRで上書きしません。寸法不一致は件数と一覧で確認できます。
+このv0.8.1 / Workbench 0.4.1はローカル検証候補で、公開Releaseは更新していません。

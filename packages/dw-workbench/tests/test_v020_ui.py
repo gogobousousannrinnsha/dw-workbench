@@ -681,7 +681,8 @@ def test_ocr_callback_keeps_dirty_input_and_candidate_selection_without_project_
     app.store.db.set_trace_callback(queries.append)
     window.refresh_job_view(second_job)
     app.store.db.set_trace_callback(None)
-    assert len(queries) == 1 and "FROM candidates" in queries[0]
+    assert sum("FROM candidates" in q for q in queries) == 1
+    assert all("FROM candidates" in q or "FROM jobs" in q for q in queries)
     assert window.dirty and window.vars["value"].get() == "保存前の訂正"
     assert window.vars["raw"].get() == "原文は保持"
     assert asdict(window.anchor) == anchor_before

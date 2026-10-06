@@ -55,9 +55,10 @@ class WorkflowUI:
         self.flow_hint_label.pack(fill="x")
         self.flow_next = ttk.Button(row,command=lambda: self.safe(self.perform_next))
         self.flow_next.pack(side="right",padx=(8,0))
+        self.action_button(row,"skip_details","寸法不一致の一覧",self.show_workflow_skips).pack(side="right",padx=(8,0))
         ttk.Label(guide,textvariable=self.flow_count).pack(anchor="w",pady=(3,0))
         labels.bind("<Configure>",lambda e: self.flow_hint_label.configure(wraplength=max(220,e.width)))
-        self.root.bind("<Control-Return>",lambda e: self.keyboard_action("accept",self.accept),add=True)
+        self.root.bind("<Control-Return>",lambda e: self.keyboard_action("accept",self.accept_and_next),add=True)
         self.root.bind("<Control-s>",lambda e: self.keyboard_action("retry",self.retry_saves),add=True)
         for index in range(1,7):
             self.root.bind(f"<Alt-Key-{index}>",lambda e,i=index: self.keyboard_step(i),add=True)
@@ -123,24 +124,27 @@ class WorkflowUI:
                 self.flow_dataset_rowid=row[0]
             if self.record and self.profile and not self.frozen:
                 states=[field_complete(f,state_from(self.record["data"]["fields"][f.id])) for f in self.profile.fields]
-                current=(sum(not state for state in states),all(states))
+                eligible=self.record["id"] not in result["skipped_record_ids"]
+                current=(sum(not state for state in states) if eligible else 0,all(states))
                 old=records.get(self.record["id"],current)
                 result["unconfirmed"]+=current[0]-old[0]
                 result["complete_records"]+=int(current[1])-int(old[1])
                 records[self.record["id"]]=current
             return result
-        targets=self.app.review_targets()
+        targets=self.app.review_targets(include_skipped=True)
         grouped=defaultdict(list)
         for item in targets:
             if item["record_id"]:
                 grouped[item["record_id"]].append(item["complete"])
-        result=dict(unconfirmed=sum(bool(t["field_id"] and not t["complete"]) for t in targets),
+        skipped_ids={t["record_id"] for t in targets if t.get("skipped")}
+        result=dict(unconfirmed=sum(bool(t["field_id"] and not t["complete"] and not t.get("skipped")) for t in targets),
             unassigned=sum(t["field_id"] is None and not t.get("job_id") for t in targets),
             imports=sum(bool(t.get("job_id")) for t in targets),
             complete_records=sum(all(items) for items in grouped.values()),
+            skipped=len(skipped_ids),skipped_record_ids=skipped_ids,
             sources=len(self.app.store.rows("sources")),
             datasets=sum(json.loads(r["data"]).get("format_version")==2 for r in self.app.store.rows("datasets")))
-        self.flow_cache=(id(self.app),result,{key:(sum(not state for state in values),all(values)) for key,values in grouped.items()})
+        self.flow_cache=(id(self.app),result,{key:(sum(not state for state in values) if key not in skipped_ids else 0,all(values)) for key,values in grouped.items()})
         self.flow_dataset_rowid=self.app.store.db.execute("SELECT COALESCE(MAX(rowid),0) FROM datasets").fetchone()[0]
         return result
 
@@ -151,7 +155,7 @@ class WorkflowUI:
         base="処理中です。完了を待ってください。OCRの中断は管理・復旧から行えます" if busy else ""
         if self.app and not self.project_verified and not busy:
             base="原本の検証が未完了です。管理・復旧から再保存・再検査してください"
-        reasons={key:base for key in ("add","apply","bulk","new_template","ocr","accept","finalize","ledger","backup","next_unfinished","history_view","history_export")}
+        reasons={key:base for key in ("add","apply","bulk","new_template","ocr","accept","finalize","ledger","backup","next_unfinished","history_view","history_export","skip_details")}
         reasons.update(new="処理中は案件を切り替えられません" if busy else "",open="処理中は案件を切り替えられません" if busy else "",
             retry="処理の終了を待ってから再保存してください" if busy else "",
             resume=base,cancel="" if self.active_job or self.tasks or self.ledger_dialog and self.ledger_dialog.busy else "中断できる処理はありません")
@@ -172,7 +176,8 @@ class WorkflowUI:
                 position+=f" / p{self.page}"
             if self.frozen:
                 position+=" / 過去の結果（閲覧専用）"
-            count=f"案件全体：未確認 {counts['unconfirmed']}項目 / 読取設定なし {counts['unassigned']}対象 / 登録待ち {counts['imports']}文書 / 確定結果 {counts['datasets']}件"
+            count=f"案件全体：未確認 {counts['unconfirmed']}項目 / 読取設定なし {counts['unassigned']}対象 / 寸法不一致スキップ {counts['skipped']}対象 / 登録待ち {counts['imports']}文書 / 確定結果 {counts['datasets']}件"
+            if not counts["skipped"]: reasons["skip_details"]="寸法不一致のスキップ対象はありません"
             selected_error=""
             try: targets=self.chosen_targets()
             except Exception as exc: targets=[]; selected_error=str(exc)
@@ -182,8 +187,8 @@ class WorkflowUI:
                 if selected_error: reasons["apply"]=reasons["ocr"]=selected_error
                 elif self.profile_choice.current()<0: reasons["apply"]="読み取りテンプレートを選択してください。未作成なら「読み取り範囲を作る」へ進みます"
                 assignments=[a for a in self.app.assignments(self.source.id) if a.page in targets]
-                usable=any(a.current_record_id and self.app.store.record(a.current_record_id)["data"].get("geometry_matches",True) for a in assignments)
-                if not usable: reasons["ocr"]="選択対象に読み取り設定を適用してください。寸法不一致は手入力で確認できます"
+                usable=any(a.current_record_id and not self.app.workflow_skip(a.current_record_id) for a in assignments)
+                if not usable: reasons["ocr"]="選択対象にOCRできる読み取り設定がありません。寸法不一致はスキップし、適合テンプレートを選び直せます"
             if not self.caps or not self.caps.get("models"):
                 reasons["ocr"]="OCRモデルが利用できません。原文を見ながら値を手入力して確認できます"
             if self.draft_dirty:
@@ -196,7 +201,8 @@ class WorkflowUI:
                 reasons["accept"]="原文を見て値を入力し、確認する範囲を指定してください"
             if not counts["complete_records"]: reasons["finalize"]="確認が完了した記録がありません。確認タブで未完了項目を確認してください"
             if not counts["datasets"]: reasons["ledger"]="先に確認済み結果を確定してください。台帳照合は保存した確定結果を使います"
-            if not (counts["unconfirmed"] or counts["unassigned"] or counts["imports"]): reasons["next_unfinished"]="案件全体の確認は完了しています。出力へ進めます"
+            if not (counts["unconfirmed"] or counts["unassigned"] or counts["imports"]):
+                reasons["next_unfinished"]=(f"通常対象の未完了はありません。寸法不一致 {counts['skipped']}対象はスキップ中です" if counts["skipped"] else "案件全体の確認は完了しています。出力へ進めます")
             if not self.history_list.selection(): reasons["history_view"]=reasons["history_export"]="履歴の一覧で確定結果を選んでください"
             if self.save_failed or self.pending_results or self.pending_exports:
                 label,command,hint="未保存の内容を再保存する",self.retry_saves,"保存に失敗した入力・処理結果を保持しています。先に保存を再試行してください"
@@ -212,13 +218,23 @@ class WorkflowUI:
                 label,command,hint="XDW文書を追加する",self.add_sources,"原本の固定コピーを案件内へ登録します。元の文書には書き込みません"
             elif not self.source:
                 label,command,hint="未完了の作業を開く",self.next_unfinished,"文書一覧から選ぶか、未完了の文書・ページ・項目へ移動できます"
-                if reasons["next_unfinished"]: label,command,hint="出力へ進む",lambda:self.select_step(5),"確認は完了しています。出力画面で確定・Excel出力・台帳照合を選べます"
+                if reasons["next_unfinished"]:
+                    if counts["complete_records"]: label,command,hint="出力へ進む",lambda:self.select_step(5),"完了した記録を出力できます。不一致の未完了は除外一覧に記録します"
+                    elif counts["skipped"]: label,command,hint="適合テンプレートを選び直す",lambda:self.select_step(2),reasons["next_unfinished"]
             elif not self.record:
                 if self.available_profiles:
                     label,command,hint="読取設定を適用する",self.apply_profile,reasons["apply"] or "対象ページと読み取りテンプレートを確認して適用します"
                     if reasons["apply"]: command=None
                 else:
                     label,command,hint="読み取り範囲を作る",self.new_profile,"この文書の配置に合わせた範囲を作るか、管理・復旧から共通テンプレートを取り込めます"
+            elif self.app.workflow_skip(self.record["id"]):
+                notice=self.workflow_skip_notice()
+                if counts["unconfirmed"] or counts["unassigned"] or counts["imports"]:
+                    label,command,hint="寸法不一致をスキップして次へ",lambda:self.next_unfinished(notice=notice),notice
+                elif counts["complete_records"]:
+                    label,command,hint="完了分の出力へ進む",lambda:self.select_step(5),notice+"。人手で確認済みの値は保持し、未完了の除外は出力前に確認します"
+                else:
+                    label,command,hint="適合テンプレートを選び直す",lambda:self.select_step(2),notice+"。OCR対象はありません。読み取り設定を選び直してください"
             elif self.tabs.select()!=str(self.review_tab) and counts["unconfirmed"]:
                 label,command,hint="原文の確認・訂正へ進む",lambda:self.select_step(4),"OCRで候補を作るか、手入力で確認できます。OCRだけでは確認済みになりません"
             elif self.dirty:
@@ -231,7 +247,7 @@ class WorkflowUI:
                 elif not self.vars["value"].get().strip():
                     label,command,hint="値を手入力する",lambda:self.entries[0].focus_set(),"原本を見て、出力する値を入力してください。入力は自動保存され、確認は別操作です"
                 else:
-                    label,command,hint="この項目を確認済みにする",self.accept,reasons["accept"] or "入力を保存して原本を検証し、この項目を確認済みにします。Ctrl+Enterでも実行できます"
+                    label,command,hint="確認して次へ",self.accept_and_next,reasons["accept"] or "原文と照合し、確認済みにして次の未完了項目へ進みます。OCR自動入力はまだ未確認です。Ctrl+Enterでも実行できます"
                     if reasons["accept"]: command=None
             elif counts["unconfirmed"] or counts["unassigned"] or counts["imports"]:
                 label,command,hint="次の未完了項目へ",self.next_unfinished,"現在の入力を保存して、案件全体の次の未完了へ移動します"
@@ -255,7 +271,10 @@ class WorkflowUI:
         for index,button in enumerate(self.step_buttons,1):
             button.configure(state="normal" if self.app or index==1 else "disabled")
         if hasattr(self,"output_reason"):
-            self.output_reason.set(reasons.get("finalize","") or "未完了が残る場合は、完了した記録だけを明示して出力できます")
+            detail="未完了が残る場合は、完了した記録だけを明示して出力できます"
+            if self.app and counts["skipped"]:
+                detail+=f"。寸法不一致 {counts['skipped']}対象の未完了は除外一覧に理由を残します。確認済み手入力は従来どおり出力対象です"
+            self.output_reason.set(reasons.get("finalize","") or detail)
             self.ledger_reason.set(reasons.get("ledger","") or "台帳照合は保存済みの確定結果を使用します。訂正後は新しく確定してください")
 
     def perform_next(self):

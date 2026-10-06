@@ -83,6 +83,7 @@ class Window(WorkflowUI):
         self.closing = False
         self.background = 0
         self.pending_results = {}
+        self.ocr_review_request = None
         self.pending_exports = {}
         self.exporting_ids = set()
         self.ledger_dialog = None
@@ -235,7 +236,7 @@ class Window(WorkflowUI):
         review_footer = ttk.Frame(self.review_tab)
         review_footer.pack(side="bottom", fill="x", pady=(5,0))
         self.edit_buttons = []
-        self.accept_button = self.action_button(review_footer, "accept", "この項目を確認済みにする  Ctrl+Enter", self.accept)
+        self.accept_button = self.action_button(review_footer, "accept", "確認して次へ  Ctrl+Enter", self.accept_and_next)
         self.accept_button.pack(fill="x")
         self.edit_buttons.append(self.accept_button)
         self.action_button(review_footer, "next_unfinished", "次の未完了項目へ（案件全体）", self.next_unfinished).pack(fill="x", pady=3)
@@ -269,7 +270,7 @@ class Window(WorkflowUI):
             self.edit_buttons.append(b)
         self.candidate_list = ttk.Combobox(review_content, state="readonly")
         self.candidate_list.pack(fill="x", pady=4)
-        self.candidate_count_label = ttk.Label(review_content, text="候補0件")
+        self.candidate_count_label = ttk.Label(review_content, text="候補0件", wraplength=450)
         self.candidate_count_label.pack(anchor="w")
         b = ttk.Button(review_content, text="OCR候補を入力欄に使う（確認はまだ）", command=lambda: self.safe(self.adopt))
         b.pack(fill="x")
@@ -571,7 +572,8 @@ class Window(WorkflowUI):
         ready = sum(states[f.id]["status"] == Status.ACCEPTED or
             not f.required and states[f.id]["status"] == Status.NOT_APPLICABLE and bool(states[f.id]["reason"].strip())
             for f in profile.fields)
-        warning = " / 寸法不一致・手入力" if not record["data"].get("geometry_matches", True) else ""
+        skipped = self.app.workflow_skip(record["id"])
+        warning = " / 寸法不一致・OCRと通常確認はスキップ" if skipped else ""
         return f"{ready}/{len(profile.fields)} 項目 完了"+warning, ready == len(profile.fields)
 
     def refresh_pages(self):
@@ -623,7 +625,7 @@ class Window(WorkflowUI):
             self.refresh_pages()
 
     def refresh_job_view(self, job):
-        """OCR adds immutable candidates; it never changes adoption or completion counts."""
+        """Refresh one record without stealing background review selection/focus."""
         if job["kind"] == "inspect":
             if self.app.job(job["id"])["status"] == "complete":
                 source_id = job["data"]["id"]
@@ -631,9 +633,58 @@ class Window(WorkflowUI):
                 if mode["mode"] is None:
                     self.app.set_mode(source_id, "page", mode["revision"])
             self.refresh_lists()
-        elif job["kind"] == "ocr" and self.record and not self.frozen and self.field_id and (
-            self.record["id"], self.field_id) == (job["data"]["record_id"], job["data"]["field_id"]):
-            self.refresh_candidate_choices()
+        elif job["kind"] == "ocr" and self.record and not self.frozen and self.record['id'] == job['data']['record_id']:
+            if self.dirty:
+                # An external callback cannot replace unsaved GUI text. Ordinary
+                # workers save it before finishing; retain the UI in either case.
+                if self.field_id == job['data']['field_id']:
+                    self.refresh_candidate_choices()
+                return
+            self.record, _, self.profile = self.app.context(self.record['id'])
+            self.refresh_review()
+            if self.field_id == job['data']['field_id']:
+                saved = self.app.job(job['id'])
+                result = json.loads(saved['result']) if saved['result'] else {}
+                if result.get('prefill', {}).get('status') == 'applied':
+                    self.load_field(preserve_view=True)
+                else:
+                    self.refresh_candidate_choices()
+        if job['kind'] == 'ocr':
+            self.open_requested_ocr_review(job)
+
+    def review_context(self):
+        return (id(self.app), self.source.id if self.source else None,
+            self.record['id'] if self.record else None, self.field_id, self.tabs.select())
+
+    def request_ocr_review(self, ids):
+        # Only an explicit OCR action for the displayed record grants this intent.
+        self.ocr_review_request = None
+        if not self.record or self.frozen:
+            return
+        matching = [id for id in ids if self.app.job(id)['data']['record_id'] == self.record['id']]
+        if matching:
+            chosen = next((id for id in matching if self.app.job(id)['data']['field_id'] == self.field_id), matching[0])
+            self.ocr_review_request = dict(job_id=chosen, context=self.review_context(), focus=self.root.focus_get())
+
+    def open_requested_ocr_review(self, job):
+        request = self.ocr_review_request
+        if not request:
+            return
+        if request['context'] != self.review_context() or self.dirty or request['focus'] != self.root.focus_get():
+            self.ocr_review_request = None
+            return
+        if request['job_id'] != job['id']:
+            return
+        self.ocr_review_request = None
+        if self.app.job(job['id'])['status'] == 'cancelled':
+            return
+        self.field_id = job['data']['field_id']
+        self.tabs.select(self.review_tab)
+        self.review_list.selection_set(self.field_id)
+        self.load_field()
+        self.entries[0].focus_set()
+        self.reveal_focus(type('Event', (), {'widget': self.entries[0]})())
+        self.status.set('OCR結果を原文と確認してください。正しければ「確認して次へ」、問題があれば採用欄を修正します')
 
     def select_source(self):
         selection = self.document_list.selection()
@@ -655,6 +706,7 @@ class Window(WorkflowUI):
             if self.source and self.document_list.exists(self.source.id):
                 self.document_list.selection_set(self.source.id)
             return
+        self.ocr_review_request = None
         self.frozen = None
         self.source = self.app.source(selection[0])
         mode = self.app.mode(self.source.id)
@@ -689,7 +741,7 @@ class Window(WorkflowUI):
         self.refresh_review()
         self.tabs.select(self.review_tab)
         if not self.record["data"]["geometry_matches"]:
-            self.status.set("寸法・向きが不一致です。項目は保持しました。手入力と原本上の範囲指定をご利用ください")
+            self.status.set(self.workflow_skip_notice()+"。適合するテンプレートを選び直すと通常の作業対象に戻ります")
         else:
             self.status.set(f"{len(pages)}記録に適用しました。同じ版の再適用では値を変更しません")
 
@@ -770,7 +822,7 @@ class Window(WorkflowUI):
             new = f"{profile.name} 版{profile.version}" if profile else "対象外: "+reason
             warning = "（同じ版・変更なし）" if same else ""
             if profile and not profile.matches(self.source, page if page else None):
-                warning += "（寸法不一致・自動OCRなし）"
+                warning += "（寸法不一致・OCRと通常確認はスキップ）"
             lines.append(f"{'文書全体' if page == 0 else str(page)+'ページ'}: {old} → {new} {warning}")
         return self.confirm_list("適用内容を確認", self.source.name+f" / {len(pages)}記録", lines, "適用する",
             "切替前の結果は履歴へ保存します。新しい記録の値・確認状態は引き継ぎません。" if changed else "")
@@ -847,6 +899,7 @@ class Window(WorkflowUI):
         if not self.save_field():
             self.page_list.selection_set(str(record_page or 0))
             return
+        self.ocr_review_request = None
         self.load_assignment(page)
         self.load_page()
 
@@ -894,21 +947,27 @@ class Window(WorkflowUI):
         assignments = {a.page: a for a in self.app.assignments(self.source.id)}
         ids = []
         skipped = []
+        dimension_skips = []
+        from .domain import DimensionMismatch
         for page in targets:
             assignment = assignments[page]
             if assignment.current_record_id:
-                record, _, _ = self.app.context(assignment.current_record_id)
-                if record["data"].get("geometry_matches", True):
+                try:
                     ids.extend(self.app.ocr_jobs(assignment.current_record_id))
-                else:
+                except DimensionMismatch:
                     skipped.append(page)
+                    dimension_skips.append(page)
             else:
                 skipped.append(page)
         if not ids:
+            if dimension_skips:
+                self.next_unfinished(notice=self.workflow_skip_notice())
+                return
             raise RuleError("OCRできる対象がありません。テンプレート未選択・対象外・寸法不一致の状態をご確認ください")
+        self.request_ocr_review(ids)
         self.enqueue_ocr_jobs(ids)
         if skipped:
-            self.status.set("OCRを開始しました。未選択・対象外・寸法不一致は除外: "+", ".join(map(str, skipped)))
+            self.status.set(f"OCRを開始しました。寸法不一致 {len(dimension_skips)}対象をスキップ / 未選択・対象外 {len(skipped)-len(dimension_skips)}対象（未選択は未完了のまま） / ページ: "+", ".join(map(str, skipped)))
 
     def new_profile(self):
         self.require_project()
@@ -1265,10 +1324,11 @@ class Window(WorkflowUI):
             if self.field_id:
                 self.review_list.selection_set(self.field_id)
             return
+        self.ocr_review_request = None
         self.field_id = selected[0]
         self.load_field()
 
-    def load_field(self):
+    def load_field(self, *, preserve_view=False):
         s = state_from(self.record["data"]["fields"][self.field_id])
         f = next(f for f in self.profile.fields if f.id == self.field_id)
         self.loading = True
@@ -1280,9 +1340,11 @@ class Window(WorkflowUI):
         target = f" / p{self.record['page']}" if self.record.get("page") else " / 文書全体"
         self.field_label.configure(text=f"{f.name} / {KINDS[f.kind]} / {'必須' if f.required else '任意'} / {LABELS[s.status]}"+target+(" / 過去の結果・編集不可" if self.frozen else ""))
         self.save_label.configure(text="変更前の保存済み内容（編集不可）" if self.frozen == "archived" else "確定時の保存済み内容" if self.frozen else "保存済み（確認状態は上に表示）")
+        if not self.frozen and self.app.input_origin(self.record['id'], self.field_id) == 'ocr' and s.status != Status.ACCEPTED:
+            self.save_label.configure(text='OCR結果を自動入力済み・未確認 — 原文と確認し、問題があれば修正してください')
         self.anchor_label.configure(text="根拠未指定" if not self.anchor else f"原本 p{self.anchor.page} / mm {tuple(round(x, 2) for x in self.anchor.rect)}")
         self.refresh_candidate_choices()
-        if self.anchor and self.page != self.anchor.page:
+        if not preserve_view and self.anchor and self.page != self.anchor.page:
             self.page = self.anchor.page
             self.load_page()
         self.draw_anchor()
@@ -1293,7 +1355,14 @@ class Window(WorkflowUI):
         selected_id = previous[index]["id"] if 0 <= index < len(previous) else None
         self.candidate_values = [] if self.frozen or not self.record or not self.field_id else self.app.candidates(self.record["id"], self.field_id)
         self.candidate_list.configure(values=[c["text"] for c in self.candidate_values])
-        self.candidate_count_label.configure(text=f"候補{len(self.candidate_values)}件（取り込み後に原本と照合して確認）")
+        detail = '自動入力は未確認。必要な場合だけ候補を取り込んで修正'
+        if not self.frozen and self.record and self.field_id:
+            latest = self.app.latest_ocr(self.record['id'], self.field_id)
+            if latest and latest['status'] == 'failed':
+                detail = '読取失敗・要確認: '+str(latest['error'])
+            elif latest and latest['result'].get('prefill', {}).get('status') == 'needs_review':
+                detail = '要確認: '+latest['result']['prefill']['reason']
+        self.candidate_count_label.configure(text=f"候補{len(self.candidate_values)}件（{detail}）")
         if self.candidate_values:
             selected = next((i for i, c in enumerate(self.candidate_values) if c["id"] == selected_id), 0)
             self.candidate_list.current(selected)
@@ -1303,6 +1372,7 @@ class Window(WorkflowUI):
     def changed(self, *args):
         if self.loading or not self.record or not self.field_id or self.frozen or self.validation_busy or not self.project_verified:
             return
+        self.ocr_review_request = None
         self.dirty = True
         self.save_label.configure(text="未保存入力 — 保存待ち")
         if self.save_timer:
@@ -1341,7 +1411,10 @@ class Window(WorkflowUI):
         finally:
             self.refresh_workflow()
 
-    def accept(self):
+    def accept_and_next(self):
+        self.accept(advance=True)
+
+    def accept(self, *, advance=False):
         self.require_project()
         if self.frozen or not self.field_id:
             return
@@ -1354,15 +1427,19 @@ class Window(WorkflowUI):
         self.refresh_review()
         self.status.set("確認前に固定原本を検証しています…")
         def finish(proof):
+            move = False
             try:
                 project.accept(record_id, field, revision, proof)
                 if self.record and self.record["id"] == record_id and not self.frozen:
                     self.after_edit()
+                    move = advance and self.field_id == field and self.app is project
                 else:
                     self.refresh_source_progress(source.id)
             finally:
                 self.validation_busy = False
                 self.refresh_review()
+            if move:
+                self.next_unfinished()
         def failure(exc):
             self.validation_busy = False
             self.refresh_review()
@@ -1413,12 +1490,53 @@ class Window(WorkflowUI):
             self.page = page
         self.load_page()
 
-    def next_unfinished(self):
+    def workflow_skip_notice(self):
+        count = len(self.app.workflow_skips())
+        return f"寸法不一致 {count}対象をOCR・通常確認からスキップ。理由は「寸法不一致の一覧」で確認できます"
+
+    def show_workflow_skips(self):
+        """An aggregate list without grabbing or blocking the main window."""
+        self.require_project()
+        rows = self.app.workflow_skips()
+        if not rows:
+            self.status.set("寸法不一致のスキップ対象はありません")
+            return
+        previous = getattr(self, "skip_dialog", None)
+        if previous and previous.winfo_exists():
+            previous.destroy()
+        dialog = self.skip_dialog = tk.Toplevel(self.root)
+        dialog.title("寸法不一致の一覧 — OCR・通常確認からスキップ")
+        dialog.geometry("950x400")
+        dialog.transient(self.root)
+        ttk.Label(dialog, text=f"{len(rows)}対象。値・確認状態・原本は変更していません。文書画面で適合テンプレートを選び直すと通常対象に戻ります。",
+            wraplength=900, padding=10).pack(fill="x")
+        panel = ttk.Frame(dialog)
+        panel.pack(fill="both", expand=True, padx=10)
+        table = ttk.Treeview(panel, columns=("source", "page", "reason"), show="headings", height=10)
+        for key, label, width in (("source", "文書", 200), ("page", "対象", 80), ("reason", "スキップ理由", 620)):
+            table.heading(key, text=label)
+            table.column(key, width=width)
+        scroll = ttk.Scrollbar(panel, orient="vertical", command=table.yview)
+        horizontal = ttk.Scrollbar(panel, orient="horizontal", command=table.xview)
+        table.configure(yscrollcommand=scroll.set, xscrollcommand=horizontal.set)
+        panel.columnconfigure(0, weight=1)
+        panel.rowconfigure(0, weight=1)
+        table.grid(row=0, column=0, sticky="nsew")
+        scroll.grid(row=0, column=1, sticky="ns")
+        horizontal.grid(row=1, column=0, sticky="ew")
+        for index, row in enumerate(rows):
+            table.insert("", "end", iid=str(index), values=(row["name"], row["page"] or "文書全体", row["reason"]))
+        ttk.Label(dialog, text="未完了の不一致は「完了分だけ出力」の除外一覧に残ります。人手で確認済みの値・過去の確定結果は従来どおり保持します。",
+            wraplength=900, padding=10).pack(fill="x")
+        ttk.Button(dialog, text="閉じる", command=dialog.destroy).pack(pady=8)
+
+    def next_unfinished(self, *, notice=""):
         self.require_project()
         if self.frozen:
             raise RuleError("過去の結果は閲覧専用です。「文書」画面へ戻ってください")
         if not self.save_field():
             return
+        self.ocr_review_request = None
         current = (self.source.id, self.record.get('page') or 0, self.field_id) if self.source and self.record else (
             (self.source.id, self.page if self.app.mode(self.source.id)['mode'] == 'page' else 0, None) if self.source else None)
         selection = self.document_list.selection()
@@ -1427,13 +1545,14 @@ class Window(WorkflowUI):
             current = (job['data']['id'], 0, None)
         target = self.app.next_unfinished(current)
         if target is None:
-            self.status.set("案件の全項目が完了しています")
+            skips = self.app.workflow_skips()
+            self.status.set((notice+" / " if notice else "")+(f"通常対象の未完了はありません。寸法不一致 {len(skips)}対象はスキップ中です。必要なら適合テンプレートを選び直してください" if skips else "案件の全項目が完了しています"))
             return
         if target.get('job_id'):
             self.document_list.selection_set('job-'+target['job_id'])
             self.select_source()
             self.tabs.select(self.list_tab)
-            self.status.set("原本登録未完了です。管理・復旧の再開操作で続けてください")
+            self.status.set((notice+" / " if notice else "")+"原本登録未完了です。管理・復旧の再開操作で続けてください")
             return
         self.refreshing = True
         try:
@@ -1462,19 +1581,20 @@ class Window(WorkflowUI):
         finally:
             self.refreshing = False
         # Let queued selection/tab events settle before setting the requested field.
-        self.root.after_idle(lambda: self.show_review_target(target))
+        self.root.after_idle(lambda: self.show_review_target(target, notice=notice))
 
-    def show_review_target(self, target):
+    def show_review_target(self, target, *, notice=""):
         if target['field_id'] and self.record and self.record['id'] == target['record_id']:
             self.field_id = target['field_id']
             self.review_list.selection_set(self.field_id)
             self.review_list.see(self.field_id)
             self.load_field()
-            self.status.set("未完了項目を表示しました。原本と照合して確認してください")
-        elif not target['field_id']:
-            self.status.set("テンプレート未選択です。「文書」画面で対象を設定してください")
+            self.status.set((notice+" / " if notice else "")+"未完了項目を表示しました。原本と照合して確認してください")
+        elif not target['field_id'] and self.source and self.source.id == target['source_id'] and not self.record:
+            self.status.set((notice+" / " if notice else "")+"テンプレート未選択です。「文書」画面で対象を設定してください")
 
     def tab_changed(self):
+        self.ocr_review_request = None
         if not self.save_field():
             if self.tabs.select() != str(self.review_tab):
                 self.tabs.select(self.review_tab)
@@ -1490,7 +1610,13 @@ class Window(WorkflowUI):
                 return
             if self.tabs.select() == str(self.list_tab) and self.frozen:
                 self.frozen = None
+            record_id = self.record['id'] if self.record else None
+            field_id = self.field_id
             self.load_assignment(0 if self.app.mode(self.source.id)["mode"] == "document" else self.page)
+            if self.record and self.record['id'] == record_id and field_id and self.review_list.exists(field_id):
+                self.field_id = field_id
+                self.review_list.selection_set(field_id)
+                self.load_field(preserve_view=True)
             self.load_page()
 
     def load_page(self):
@@ -1605,7 +1731,14 @@ class Window(WorkflowUI):
             return
         if not self.save_field():
             return
-        self.enqueue_ocr_jobs(self.app.ocr_jobs(self.record["id"]))
+        from .domain import DimensionMismatch
+        try:
+            jobs = self.app.ocr_jobs(self.record["id"])
+        except DimensionMismatch:
+            self.next_unfinished(notice=self.workflow_skip_notice())
+            return
+        self.request_ocr_review(jobs)
+        self.enqueue_ocr_jobs(jobs)
 
     def enqueue_ocr_jobs(self, ids):
         render_ids = []
@@ -1616,9 +1749,17 @@ class Window(WorkflowUI):
 
     def resume_jobs(self):
         self.require_project()
+        self.ocr_review_request = None
         if self.pending_results and not self.retry_saves():
             return
         self.enqueue([r["id"] for r in self.app.pending_jobs()])
+
+    def persist_worker_result(self, job, value, error=False):
+        if job['kind'] == 'ocr' and self.record and not self.frozen and self.record['id'] == job['data']['record_id']:
+            if self.dirty and not self.save_field():
+                return False
+        self.app.finish_job(job['id'], error=str(value)) if error else self.app.finish_job(job['id'], result=value)
+        return True
 
     def retry_saves(self):
         if not self.project_verified and not self.validation_busy:
@@ -1683,7 +1824,12 @@ class Window(WorkflowUI):
             if self.app is not project or self.active_job != id:
                 return
             try:
-                self.app.finish_job(id, error=str(value)) if error else self.app.finish_job(id, result=value)
+                if not self.persist_worker_result(job, value, error):
+                    self.pending_results[id] = (value, error)
+                    self.active_job = None
+                    self.tasks.clear()
+                    self.status.set('入力保存失敗・OCR結果を保持。再保存後に処理結果を保存します')
+                    return
             except RuleError as exc:
                 try:
                     self.app.finish_job(id, error=str(exc))
@@ -1702,11 +1848,12 @@ class Window(WorkflowUI):
             if job["kind"] == "render" and self.source and job["data"]["source_id"] == self.source.id and job["data"]["page"] == self.page and job["data"]["dpi"] == 150 and not error:
                 self.read_image(self.app.store.path(job["data"]["image"]))
             if not self.tasks:
-                self.status.set("処理が終了しました。失敗した処理は再開操作で再試行できます")
+                self.status.set("処理が終了しました。自動入力は未確認です。原文と確認して次へ進んでください。失敗は再開できます")
             self.next_job()
         self.async_call(lambda: self.clients[kind].call(request), finish, lambda error: finish(error, True))
 
     def cancel_jobs(self):
+        self.ocr_review_request = None
         had_jobs = bool(self.tasks or self.active_job)
         self.tasks.clear()
         if self.active_job and self.app:
@@ -2102,7 +2249,7 @@ class BulkTemplateDialog:
                 previous = profiles.get((entry.previous_profile_id, entry.previous_profile_version))
                 old = f"{previous.name} / 版{previous.version}" if previous else ("対象外" if entry.current_state == "excluded" else "未割当")
                 page = "文書全体" if entry.page == 0 else "対象なし" if entry.page is None else str(entry.page)
-                geometry = "—" if entry.geometry_matches is None else "一致" if entry.geometry_matches else "不一致・手入力"
+                geometry = "—" if entry.geometry_matches is None else "一致" if entry.geometry_matches else "不一致・作業スキップ"
                 values = (self.source_labels[entry.source_id], page, old, {"apply": "適用", "same": "変更なし", "skip": "スキップ"}[entry.action],
                           entry.reason, geometry, modes.get(entry.source_id, "変更なし"))
                 self.preview_list.insert("", "end", iid=str(index), values=values)
