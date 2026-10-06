@@ -2882,8 +2882,8 @@
     },
     {
       "path": "scripts/verify_source.py",
-      "bytes": 2106,
-      "sha256": "d40f71b07f5971d97490e6e1a305797202f5766704858b3f7c09eec21383384a"
+      "bytes": 4153,
+      "sha256": "cf942eda521687ff624399cece781e31f5550d3c0096e2822c2c18185263885e"
     },
     {
       "path": "scripts/verify_workbench.py",
